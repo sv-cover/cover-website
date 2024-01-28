@@ -17,8 +17,7 @@
         "symfony/intl": "^5.4",
         "symfony/mime": "^5.4",
         "odolbeau/phone-number-bundle": "^3.9",
-        "php-http/message-factory": "^1.1",
-        "sentry/sdk": "^3.5",
+        "sentry/sdk": "^4.0",
         "twig/intl-extra": "^3.8"
     },
     "require-dev": {
