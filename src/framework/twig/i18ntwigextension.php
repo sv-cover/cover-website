@@ -1,7 +1,13 @@
 <?php
 require_once 'src/framework/member.php'; // for member_full_name
 
-class I18NTwigExtension extends Twig_Extension
+use Twig\Extension\AbstractExtension as TwigAbstractExtension;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
+use Twig\TwigTest;
+
+
+class I18NTwigExtension extends TwigAbstractExtension
 {
 	public function getName()
 	{
@@ -11,28 +17,28 @@ class I18NTwigExtension extends Twig_Extension
 	public function getFilters()
 	{
 		return [
-			new Twig_SimpleFilter('trans', '__'),
-			new Twig_SimpleFilter('translate_parts', '__translate_parts'),
-			new Twig_SimpleFilter('ordinal', 'ordinal'),
-			new Twig_SimpleFilter('full_name', function($member) {
+			new TwigFilter('trans', '__'),
+			new TwigFilter('translate_parts', '__translate_parts'),
+			new TwigFilter('ordinal', 'ordinal'),
+			new TwigFilter('full_name', function($member) {
 				return $member ? member_full_name($member) : null;
 			}),
-			new Twig_SimpleFilter('personal_full_name', function($member) {
+			new TwigFilter('personal_full_name', function($member) {
 				return $member ? member_full_name($member, BE_PERSONAL) : null;
 			}),
-			new Twig_SimpleFilter('full_name_ignore_privacy', function($member) {
+			new TwigFilter('full_name_ignore_privacy', function($member) {
 				return $member ? member_full_name($member, IGNORE_PRIVACY) : null;
 			}),
-			new Twig_SimpleFilter('first_name', 'member_first_name'),
-			new Twig_SimpleFilter('date_relative', 'format_date_relative'),
-			new Twig_SimpleFilter('vformat', 'vsprintf'),
-			new Twig_SimpleFilter('human_join', 'implode_human'),
-			new Twig_SimpleFilter('human_file_size', 'human_file_size'),
-			new Twig_SimpleFilter('flip', 'array_flip'),
-			new Twig_SimpleFilter('values', 'array_values'),
-			new Twig_SimpleFilter('select', 'array_select'),
-			new Twig_SimpleFilter('sum', 'array_sum'),
-			new Twig_SimpleFilter('group_by', function($iters, $property) {
+			new TwigFilter('first_name', 'member_first_name'),
+			new TwigFilter('date_relative', 'format_date_relative'),
+			new TwigFilter('vformat', 'vsprintf'),
+			new TwigFilter('human_join', 'implode_human'),
+			new TwigFilter('human_file_size', 'human_file_size'),
+			new TwigFilter('flip', 'array_flip'),
+			new TwigFilter('values', 'array_values'),
+			new TwigFilter('select', 'array_select'),
+			new TwigFilter('sum', 'array_sum'),
+			new TwigFilter('group_by', function($iters, $property) {
 				$groups = [];
 
 				foreach ($iters as $iter)
@@ -43,7 +49,7 @@ class I18NTwigExtension extends Twig_Extension
 
 				return $groups;
 			}),
-			new Twig_SimpleFilter('sort_by', function($iters, ...$args) {
+			new TwigFilter('sort_by', function($iters, ...$args) {
 				$sort_args = [];
 
 				foreach ($args as $sort_arg) {
@@ -68,7 +74,7 @@ class I18NTwigExtension extends Twig_Extension
 
 				return $iters;
 			}),
-			new Twig_SimpleFilter('academic_year', function($date) {
+			new TwigFilter('academic_year', function($date) {
 				if ( is_string($date) )
 					$date = new DateTime($date);
 
@@ -83,14 +89,14 @@ class I18NTwigExtension extends Twig_Extension
 	public function getFunctions()
 	{
 		return [
-			new Twig_SimpleFunction('__', '__'),
-			new Twig_SimpleFunction('__N', function($singular, $plural, $value, $count = null) {
+			new TwigFunction('__', '__'),
+			new TwigFunction('__N', function($singular, $plural, $value, $count = null) {
 				if ($count === null) $count = $value;
 				return sprintf(_ngettext($singular, $plural, $count), $value);
 			}, ['variadic' => true]),
-			new Twig_SimpleFunction('__translate_parts', '__translate_parts'),
-			new Twig_SimpleFunction('get_config_value', 'get_config_value'),
-			new Twig_SimpleFunction('var_dump', function($value) {
+			new TwigFunction('__translate_parts', '__translate_parts'),
+			new TwigFunction('get_config_value', 'get_config_value'),
+			new TwigFunction('var_dump', function($value) {
 				ob_start();
 				var_dump($value);
 				return '<pre style="text-align: left">' . ob_get_clean() . '</pre>';
@@ -101,11 +107,11 @@ class I18NTwigExtension extends Twig_Extension
 	public function getTests()
 	{
 		return [
-			new Twig_SimpleTest('numeric', 'is_numeric'),
-			new Twig_SimpleTest('instance_of', function($var, $classname) {
+			new TwigTest('numeric', 'is_numeric'),
+			new TwigTest('instance_of', function($var, $classname) {
 				return $var instanceof $classname; 
 			}),
-			new Twig_SimpleTest('past', function($date) {
+			new TwigTest('past', function($date) {
 				if (!$date)
 					return false;
 				
@@ -114,7 +120,7 @@ class I18NTwigExtension extends Twig_Extension
 
 				return $date < new DateTime();
 			}),
-			new Twig_SimpleTest('future', function($date) {
+			new TwigTest('future', function($date) {
 				if (!$date)
 					return false;
 				

@@ -2,7 +2,12 @@
 require_once 'src/framework/form.php';
 require_once 'src/framework/markup.php';
 
-class HTMLTwigExtension extends Twig_Extension
+use Twig\Extension\AbstractExtension as TwigAbstractExtension;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
+
+
+class HTMLTwigExtension extends TwigAbstractExtension
 {
 	public function getName()
 	{
@@ -12,16 +17,16 @@ class HTMLTwigExtension extends Twig_Extension
 	public function getFunctions()
 	{
 		return [
-			new Twig_SimpleFunction('html_email', [__CLASS__, 'email'], ['is_variadic' => true, 'is_safe' => ['html']]),
+			new TwigFunction('html_email', [__CLASS__, 'email'], ['is_variadic' => true, 'is_safe' => ['html']]),
 		];
 	}
 
 	public function getFilters()
 	{
 		return [
-			new Twig_SimpleFilter('parse_markup', 'markup_parse', ['is_safe' => ['html']]),
-			new Twig_SimpleFilter('strip_markup', 'markup_strip'),
-			new Twig_SimpleFilter('excerpt', 'text_excerpt')
+			new TwigFilter('parse_markup', 'markup_parse', ['is_safe' => ['html']]),
+			new TwigFilter('strip_markup', 'markup_strip'),
+			new TwigFilter('excerpt', 'text_excerpt')
 		];
 	}
 

@@ -92,7 +92,7 @@
 				<div class="tabs is-toggle" id="starting-year">
 					<div class="is-sr-only">{{ __('Filter starting year') }}</div>
 					<ul>
-						{% for year in model.get_distinct_years|reverse if year != '' %}
+						{% for year in model.get_distinct_years|filter(year => year != '')|reverse %}
 							<li class="{% if params.year == year %}is-active{% endif %}">
 								<a href="?search_year={{ year }}">{{ year }}</a>
 							</li>

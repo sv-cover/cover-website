@@ -14,7 +14,7 @@ F<h2 class="title is-5">
     {% endif %}
 </p>
 <ul class="search-result-meta is-size-7">
-{% spaceless %}
+{% apply spaceless %}
     <li class="property" title="{{ __('Job type') }}">
         <span class="icon is-small">
             <i class="fas fa-hourglass-half" aria-hidden="true"></i>
@@ -30,18 +30,18 @@ F<h2 class="title is-5">
         </span>
         {{ global.views.vacancies.study_phase_options[result.study_phase] }}
     </li>
-{% endspaceless %}
+{% endapply %}
 </ul>
 <div class="content">
     {% set content = result.description|strip_markup|excerpt(query_parts, 150) %}
     {% if content %}
         {{ content|raw }}
     {% else %}
-        {% spaceless %}
+        {% apply spaceless %}
             {{ result.description|strip_markup|slice(0, 150) }}
             {% if result.description|strip_markup|length > 150 %}
                 <span class="glue">…</span>
             {% endif %}
-        {% endspaceless %}
+        {% endapply %}
     {% endif %}
 </div>

@@ -1,6 +1,9 @@
 <?php
 
+use Twig\Compiler as TwigCompiler;
+use Twig\Extension\AbstractExtension as TwigAbstractExtension;
 use Twig\Node\Expression\AbstractExpression;
+use Twig\TwigFilter;
 
 abstract class Policy_Twig_Node_Expression_UserCan extends AbstractExpression
 {
@@ -9,7 +12,7 @@ abstract class Policy_Twig_Node_Expression_UserCan extends AbstractExpression
 		parent::__construct(array('node' => $node), array(), $lineno);
 	}
 
-	public function compile(Twig_Compiler $compiler)
+	public function compile(TwigCompiler $compiler)
 	{
 		$compiler->raw(' get_policy(');
 		$compiler->subcompile($this->getNode('node'));
@@ -54,7 +57,7 @@ class Policy_Twig_Node_Expression_UserCanDelete extends Policy_Twig_Node_Express
 	}
 }
 
-class PolicyTwigExtension extends Twig_Extension
+class PolicyTwigExtension extends TwigAbstractExtension
 {
 	public function getName()
 	{
@@ -89,17 +92,17 @@ class PolicyTwigExtension extends Twig_Extension
 	public function getFilters()
 	{
 		return [
-			new Twig_SimpleFilter('user_can_read', function($iters) {
+			new TwigFilter('user_can_read', function($iters) {
 				return array_filter($iters, function($iter) {
 					return get_policy($iter)->user_can_read($iter);
 				});
 			}),
-			new Twig_SimpleFilter('user_can_update', function($iters) {
+			new TwigFilter('user_can_update', function($iters) {
 				return array_filter($iters, function($iter) {
 					return get_policy($iter)->user_can_update($iter);
 				});
 			}),
-			new Twig_SimpleFilter('user_can_delete', function($iters) {
+			new TwigFilter('user_can_delete', function($iters) {
 				return array_filter($iters, function($iter) {
 					return get_policy($iter)->user_can_delete($iter);
 				});
