@@ -1,6 +1,6 @@
 {
     "require": {
-        "maennchen/zipstream-php": "^2.2",
+        "maennchen/zipstream-php": "^3.1",
         "jeroendesloovere/vcard": "^1.7",
         "twig/twig": "^3.8",
         "giggsey/libphonenumber-for-php": "^8.13",

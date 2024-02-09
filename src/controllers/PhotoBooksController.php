@@ -470,15 +470,14 @@ class PhotoBooksController extends \Controller
 		// Apparently nginx doesn't like zipstream
 		header('X-Accel-Buffering: no');
 
-		// Set up the output zip stream and just handle all files as large files
-		// (meaning no compression, streaming instead of reading into memory.)
-		$options = new \ZipStream\Option\Archive();
-		$options->setLargeFileSize(1);
-		$options->setLargeFileMethod(\ZipStream\Option\Method::STORE());
-		$options->setSendHttpHeaders(true);
-		$options->setOutputStream(fopen('php://output', 'wb'));
-
-		$zip = new ZipStream(sanitize_filename($root_book->get('titel')) . '.zip', $options);
+		// Set up the output zip stream.
+		// Use no compression, streaming instead of reading into memory.
+		$zip = new ZipStream(
+			outputName: sanitize_filename($root_book->get('titel')) . '.zip',
+			outputStream: fopen('php://output', 'wb'),
+			sendHttpHeaders: true,
+			defaultCompressionMethod: \ZipStream\CompressionMethod::STORE,
+		);
 
 		// Now for each book find all photos and add them to the zip stream
 		foreach ($books as $book)
@@ -516,19 +515,19 @@ class PhotoBooksController extends \Controller
 				// Let's just assume that the filename the photo already has is sane and safe
 				$photo_path = $book_path . '/' . basename($photo->get('filepath'));
 
-				// Add meta data to the zip file if availabley();
-				$metadata = new \ZipStream\Option\File();
-
+				// Calculate modification time
 				if ($photo->has_value('created_on'))
-					$metadata->setTime(new \DateTime($photo->get('created_on')));
+					$modification_time = new \DateTime($photo->get('created_on'));
 				else
-					$metadata->setTime(new \DateTime(sprintf('@%d', filectime($photo->get_full_path()))));
-				
-				if (!empty($photo->get('beschrijving')))
-					$metadata->setComment($photo->get('beschrijving'));
+					$modification_time = new \DateTime(sprintf('@%d', filectime($photo->get_full_path())));
 
 				// And finally add the photo to the actual stream
-				$zip->addFileFromPath($photo_path, $photo->get_full_path(), $metadata);
+				$zip->addFileFromPath(
+					fileName: $photo_path,
+					path: $photo->get_full_path(),
+					lastModificationDateTime: $modification_time,
+					comment: $photo->get('beschrijving') ?? '',
+				);
 			}
 		}
 
