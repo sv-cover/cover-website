@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -71,6 +72,16 @@ class EventType extends AbstractType
 				'label' => __('Link to Facebook event'),
 				'required' => false,
 				'constraints' => new Assert\Callback([$this, 'validate_facebook_id']),
+			])
+			->add('category', ChoiceType::class, [
+				'label' => __('Category'),
+				'required' => true,
+				'choices' => [
+					__('General') => 'general',
+					__('Social') => 'social',
+					__('Educational') => 'educational',
+					__('Career') => 'career',
+				],
 			])
 			->add('beschrijving', MarkupType::class, [
 				'label' => __('Description'),

@@ -13,7 +13,16 @@
     {% endif %}
     <li class="event {% if event.image_url %}has-image{% endif %} {% if event.is_proposal() %}is-proposal{% endif %} column is-half-tablet is-one-third-widescreen is-one-quarter-fullhd">
         <a href="{{ path('calendar', {agenda_id: event.id}) }}">
-            <div class="overlay">
+            {% if event.image_url %}
+                <figure class="image">
+                    <picture>
+                        <source srcset="{{ event.get_image(600) }} 1x, {{ event.get_image(900) }} 1.5x, {{ event.get_image(1200) }} 2x" media="(min-width: 400px) and (max-width: 600px)">
+                        <source srcset="{{ event.get_image(400) }} 1x, {{ event.get_image(600) }} 1.5x, {{ event.get_image(800) }} 2x">
+                        <img src="{{ event.get_image(600) }}"> 
+                    </picture>
+                </figure>
+            {% endif %}
+            <div class="content">
                 <div class="date">
                     <span>
                         {{ macros.format_period_short(event) }}
@@ -24,6 +33,9 @@
                         {{ event.kop }}
                     </h3>
                 </div>
+                {% if event.category %}
+                    <span class="category-label {{ event.category }}">{{ event.category }}</span>
+                {% endif %}
                 {% if event.is_proposal() %}
                     <div class="label-pending">
                         <span>
@@ -32,15 +44,6 @@
                     </div>
                 {% endif %}
             </div>
-            {% if event.image_url %}
-                <figure class="image">
-                    <picture>
-                        <source srcset="{{ event.get_image(600) }} 1x, {{ event.get_image(900) }} 1.5x, {{ event.get_image(1200) }} 2x" media="(min-width: 400px) and (max-width: 600px)">
-                        <source srcset="{{ event.get_image(400) }} 1x, {{ event.get_image(600) }} 1.5x, {{ event.get_image(800) }} 2x">
-                        <img src="{{ event.get_image(600) }}"> 
-                    </picture>
-                </figure>
-            {% endif %}
         </a>
     </li>
 {% else %}
