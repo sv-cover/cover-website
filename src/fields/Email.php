@@ -26,7 +26,7 @@ class Email implements \SignUpFieldType
 	{
 		$this->name = $name;
 
-		$this->label = $configuration['label'] ?? 'E-mail';
+		$this->label = $configuration['label'] ?? 'Email';
 
 		$this->required = $configuration['required'] ?? false;
 
