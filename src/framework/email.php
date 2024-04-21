@@ -471,7 +471,7 @@ class MessagePart
 
 		for ($i = 0; $i < count($lines); ++$i)
 		{
-			$line_prefix = $prefix($i);
+			$line_prefix = $prefix($i) ?? '';
 
 			$line_preferred_length = $preferred_length - strlen($line_prefix);
 
