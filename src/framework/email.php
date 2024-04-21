@@ -259,14 +259,16 @@ class MessagePart
 	{
 		return preg_match(
 			'/^' . preg_quote($content_type, '/') . '(;\s*charset=(.+?))?$/i',
-			$this->header('Content-Type'));
+			$this->header('Content-Type') ?? ''
+		);
 	}
 
 	public function isAttachment(): bool
 	{
 		return preg_match(
 			'/^attachment(;.+)?$/i',
-			$this->header('Content-Disposition'));
+			$this->header('Content-Disposition') ?? ''
+		);
 	}
 
 	public function isText(): bool
