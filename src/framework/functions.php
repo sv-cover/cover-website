@@ -69,7 +69,7 @@ function format_string($format, $params)
 // almost dead: only used in framework/member.php:member_full_name
 function optional($value)
 {
-	return strlen($value) > 0 ? ' ' . $value : '';
+	return !empty($value) ? ' ' . $value : '';
 }
 
 
@@ -342,7 +342,7 @@ function set_domain_cookie($name, $value, $cookie_time = 0)
 		$options['samesite'] = 'None';
 	}
 
-	setcookie($name, $value, $options);
+	setcookie($name, $value ?? '', $options);
 
 	if ($cookie_time === 0 || $cookie_time > time())
 		$_COOKIE[$name] = $value;
@@ -442,7 +442,6 @@ function is_same_domain($subdomain, $domain, $levels = 2)
 	return true;
 }
 
-
 /**
  * Really really simple mail function for attachments that barely uses any memory
  * because it streams like everything!
@@ -540,54 +539,6 @@ function array_select($array, $property, $default_value = null)
 	}, $array);
 }
 
-// Dead after old form stuff is gone
-/**
- * Follow a path through $array. The path can contain array index operators and
- * object property accessors, similar to PHP's syntax.
- *
- * Examples:
- *   options[0]->value
- *   options[0][test][4]
- *   options
- *
- * @param mixed $array the source of the data
- * @param string $path the path to follow
- * @param mixed $default_value the value returned if the path does not exist.
- * @return mixed the data in $array at the end of $path, or $default_value if that path did not exist.
- */
-function array_path($array, $path, $default_value = null)
-{
-	// Construct the path
-	if (!preg_match('/^(?P<head>[\w-]+)(?P<rest>(\[[\w-]+\]|->\w+)*)$/', $path, $match))
-		throw new InvalidArgumentException("The path '$path' is malformed");
-
-	$steps = [['index' => $match['head']]];
-
-	if (!empty($match['rest'])) {
-		if (!preg_match_all('/\[(?P<index>[\w-]+)\]|->(?P<property>\w+)/', $match['rest'], $match, PREG_SET_ORDER))
-			throw new InvalidArgumentException('The rest of the path is malformed');
-
-		$steps = array_merge($steps, $match);
-	}
-
-	// Unwind the path
-	foreach ($steps as $step) {
-		if (isset($step['property'])) {
-			if (!isset($array->{$step['property']}))
-				return $default_value;
-			else
-				$array = $array->{$step['property']};
-		} else {
-			if (!isset($array[$step['index']]))
-				return $default_value;
-			else
-				$array = $array[$step['index']];
-		}
-	}
-
-	return $array;
-}
-
 function summarize($text, $length)
 {
 	$text = trim($text);
@@ -667,6 +618,8 @@ function is_safe_redirect($redirect)
 
 function get_filemanager_url($path, $width=null)
 {
+	if (empty($path))
+		return '';
 	$filemanager_root = get_config_value('filemanager_root', 'https://filemanager.svcover.nl');
 	$resize_exts = get_config_value('filemanager_image_resize_extensions', ['jpg', 'jpeg', 'png']);
 	if (!$width || !in_array(pathinfo($path, PATHINFO_EXTENSION), $resize_exts))

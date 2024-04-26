@@ -54,12 +54,6 @@ $config = array(
 		[null, 400] // size used for the thumbnails in comments
 	),
 
-	// Used for forms & XSS prevention. Generate with `openssl rand -base64 64`.
-	'nonce_salt' => null, 
-
-	// Lifetime in seconds.
-	'nonce_lifetime' => 3600 * 12, 
-
 	// Used to enable people without a SEPA bank account to become a member
     'no_iban_string' => 'OUTSIDESEPAAREA',
 
@@ -77,9 +71,9 @@ $config = array(
 	'secretary_shared_secret' => 'p5mWhn1Ojmsi51w9QcNC',
 
 	// For the website calling the KAST API to read the current credit balance
-	'kast_root' => 'https://kast.svcover.nl/api',
-	'kast_app' => '',
-	'kast_secret' => '',
+	'kast_root' => 'https://kast.svcover.nl/api/',
+	'kast_user' => '',
+	'kast_password' => '',
 
 	// For the website calling Incassomatic to fetch the current balance and contract status.
 	'incassomatic_root' => 'https://incasso.svcover.nl/api/',
@@ -95,5 +89,7 @@ $config = array(
 	'wiki_public_url' => 'https://wiki.svcover.nl/%s',
 
 	// url for merging internal ical with google ical
-	'url_to_external_ical' => 'https://calendar.google.com/calendar/ical/s16ii08dg06pt83j0mblbnqfrc%40group.calendar.google.com/public/basic.ics'
+	'url_to_external_ical' => 'https://calendar.google.com/calendar/ical/s16ii08dg06pt83j0mblbnqfrc%40group.calendar.google.com/public/basic.ics',
+
+	'url_to_forum' => 'https://forum.svcover.nl',
 );

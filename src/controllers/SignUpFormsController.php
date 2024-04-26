@@ -12,6 +12,10 @@ class SignUpFormsController extends \Controller
 {
 	protected $view_name = 'signup';
 
+	protected $field_model;
+	protected $form_model;
+	protected $entry_model;
+
 	public function __construct($request, $router)
 	{
 		$this->form_model = get_model('DataModelSignUpForm');
@@ -200,7 +204,7 @@ class SignUpFormsController extends \Controller
 			// Process the posted values. This will delegate all data handling to the classes
 			// in src/fields/*.php
 			$entry->process($form);
-			$this->entry_model->insert($entry);
+			$this->entry_model->update($entry);
 
 			// Redirect admins back to the entry index
 			if (get_policy($iter)->user_can_update($iter))
@@ -263,7 +267,7 @@ class SignUpFormsController extends \Controller
 		$success = false;
 
 		if ($form->isSubmitted() && $form->isValid()) {
-			if ($this->_process_create($this->form_model, $iter))
+			if ($this->_create($this->form_model, $iter))
 				$success = true;
 
 			if ($success && !empty($form->get('template')->getData()))
@@ -291,10 +295,8 @@ class SignUpFormsController extends \Controller
 
 		$success = false;
 
-		$errors = new \ErrorSet();
-
 		if ($form->isSubmitted() && $form->isValid())
-			if ($this->_process_update($this->form_model, $iter))
+			if ($this->_update($this->form_model, $iter))
 				$success = true;
 
 		return $this->view->render('update_form_form.twig',  [
@@ -460,7 +462,7 @@ class SignUpFormsController extends \Controller
 		return $this->view->redirect($this->generate_url('signup', ['view' => 'update_form', 'form' => $form['id']]));
 	}
 
-	protected function _process_create(\DataModel $model, \DataIter $iter)
+	protected function _create(\DataModel $model, \DataIter $iter)
 	{
 		// Huh, why are we checking again? Didn't we already check in the run_create() method?
 		// Well, yes, but sometimes a policy is picky about how you fill in the data!
@@ -474,7 +476,7 @@ class SignUpFormsController extends \Controller
 		return true;
 	}
 
-	protected function _process_update(\DataModel $model, \DataIter $iter)
+	protected function _update(\DataModel $model, \DataIter $iter)
 	{
 		return $model->update($iter) > 0;
 	}

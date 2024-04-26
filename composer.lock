@@ -4,66 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0fc3d0c7fb6cabc4c571caac4739dd93",
+    "content-hash": "720733b91f8b7f6f551c5bce7edf6a64",
     "packages": [
-        {
-            "name": "99designs/http-signatures",
-            "version": "4.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/99designs/http-signatures-php.git",
-                "reference": "acb9d2e4f4661de9445fa5930b49a259bfd6175b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/99designs/http-signatures-php/zipball/acb9d2e4f4661de9445fa5930b49a259bfd6175b",
-                "reference": "acb9d2e4f4661de9445fa5930b49a259bfd6175b",
-                "shasum": ""
-            },
-            "require": {
-                "paragonie/random_compat": "^1.0|^2.0",
-                "php": ">=5.5",
-                "psr/http-message": "^1.0"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "^1.11",
-                "guzzlehttp/psr7": "^1.2",
-                "phpunit/phpunit": "~4.8",
-                "symfony/http-foundation": "~2.8|~3.0",
-                "symfony/psr-http-message-bridge": "^1.0",
-                "zendframework/zend-diactoros": "^1.1"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "HttpSignatures\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Paul Annesley",
-                    "email": "paul@99designs.com"
-                }
-            ],
-            "description": "Sign and verify HTTP messages",
-            "keywords": [
-                "hmac",
-                "http",
-                "https",
-                "signature",
-                "signed",
-                "signing"
-            ],
-            "support": {
-                "issues": "https://github.com/99designs/http-signatures-php/issues",
-                "source": "https://github.com/99designs/http-signatures-php/tree/master"
-            },
-            "time": "2017-05-04T01:36:17+00:00"
-        },
         {
             "name": "behat/transliterator",
             "version": "v1.5.0",
@@ -623,24 +565,24 @@
         },
         {
             "name": "jeroendesloovere/vcard",
-            "version": "v1.7.3",
+            "version": "v1.7.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeroendesloovere/vcard.git",
-                "reference": "2b8b6190c613d368b8cb6552e59cf6e6e7d0aea9"
+                "reference": "11a1cc62ffc2074838b138e9ae0790951004dd8e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeroendesloovere/vcard/zipball/2b8b6190c613d368b8cb6552e59cf6e6e7d0aea9",
-                "reference": "2b8b6190c613d368b8cb6552e59cf6e6e7d0aea9",
+                "url": "https://api.github.com/repos/jeroendesloovere/vcard/zipball/11a1cc62ffc2074838b138e9ae0790951004dd8e",
+                "reference": "11a1cc62ffc2074838b138e9ae0790951004dd8e",
                 "shasum": ""
             },
             "require": {
                 "behat/transliterator": "~1.0",
-                "php": ">=5.3.3"
+                "php": ">=7.3.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "4.6.*"
+                "phpunit/phpunit": "^9.3"
             },
             "type": "library",
             "autoload": {
@@ -670,9 +612,9 @@
             ],
             "support": {
                 "issues": "https://github.com/jeroendesloovere/vcard/issues",
-                "source": "https://github.com/jeroendesloovere/vcard/tree/v1.7.3"
+                "source": "https://github.com/jeroendesloovere/vcard/tree/v1.7.4"
             },
-            "time": "2021-11-24T20:21:20+00:00"
+            "time": "2023-09-07T19:46:46+00:00"
         },
         {
             "name": "maennchen/zipstream-php",
@@ -889,60 +831,6 @@
                 "source": "https://github.com/odolbeau/phone-number-bundle/tree/v3.9.2"
             },
             "time": "2023-07-06T18:41:41+00:00"
-        },
-        {
-            "name": "paragonie/random_compat",
-            "version": "v2.0.21",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/paragonie/random_compat.git",
-                "reference": "96c132c7f2f7bc3230723b66e89f8f150b29d5ae"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/96c132c7f2f7bc3230723b66e89f8f150b29d5ae",
-                "reference": "96c132c7f2f7bc3230723b66e89f8f150b29d5ae",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.2.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "*"
-            },
-            "suggest": {
-                "ext-libsodium": "Provides a modern crypto API that can be used to generate random bytes."
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "lib/random.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Paragon Initiative Enterprises",
-                    "email": "security@paragonie.com",
-                    "homepage": "https://paragonie.com"
-                }
-            ],
-            "description": "PHP 5.x polyfill for random_bytes() and random_int() from PHP 7",
-            "keywords": [
-                "csprng",
-                "polyfill",
-                "pseudorandom",
-                "random"
-            ],
-            "support": {
-                "email": "info@paragonie.com",
-                "issues": "https://github.com/paragonie/random_compat/issues",
-                "source": "https://github.com/paragonie/random_compat"
-            },
-            "time": "2022-02-16T17:07:03+00:00"
         },
         {
             "name": "php-http/client-common",
@@ -4496,6 +4384,85 @@
             "time": "2022-11-03T14:55:06+00:00"
         },
         {
+            "name": "symfony/polyfill-uuid",
+            "version": "v1.29.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/polyfill-uuid.git",
+                "reference": "3abdd21b0ceaa3000ee950097bc3cf9efc137853"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/polyfill-uuid/zipball/3abdd21b0ceaa3000ee950097bc3cf9efc137853",
+                "reference": "3abdd21b0ceaa3000ee950097bc3cf9efc137853",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1"
+            },
+            "provide": {
+                "ext-uuid": "*"
+            },
+            "suggest": {
+                "ext-uuid": "For best performance"
+            },
+            "type": "library",
+            "extra": {
+                "thanks": {
+                    "name": "symfony/polyfill",
+                    "url": "https://github.com/symfony/polyfill"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "bootstrap.php"
+                ],
+                "psr-4": {
+                    "Symfony\\Polyfill\\Uuid\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Grégoire Pineau",
+                    "email": "lyrixx@lyrixx.info"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony polyfill for uuid functions",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "compatibility",
+                "polyfill",
+                "portable",
+                "uuid"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/polyfill-uuid/tree/v1.29.0"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2024-01-29T20:11:03+00:00"
+        },
+        {
             "name": "symfony/property-access",
             "version": "v5.4.26",
             "source": {
@@ -5290,6 +5257,80 @@
                 }
             ],
             "time": "2023-07-20T16:28:53+00:00"
+        },
+        {
+            "name": "symfony/uid",
+            "version": "v7.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/uid.git",
+                "reference": "87cedaf3fabd7b733859d4d77aa4ca598259054b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/uid/zipball/87cedaf3fabd7b733859d4d77aa4ca598259054b",
+                "reference": "87cedaf3fabd7b733859d4d77aa4ca598259054b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2",
+                "symfony/polyfill-uuid": "^1.15"
+            },
+            "require-dev": {
+                "symfony/console": "^6.4|^7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Uid\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Grégoire Pineau",
+                    "email": "lyrixx@lyrixx.info"
+                },
+                {
+                    "name": "Nicolas Grekas",
+                    "email": "p@tchwork.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Provides an object-oriented API to generate and represent UIDs",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "UID",
+                "ulid",
+                "uuid"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/uid/tree/v7.0.3"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2024-01-23T15:02:46+00:00"
         },
         {
             "name": "symfony/validator",

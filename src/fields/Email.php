@@ -18,13 +18,15 @@ class Email implements \SignUpFieldType
 
 	public $required;
 
+	public $autofill;
+
 	private $_form;
 
 	public function __construct($name, array $configuration)
 	{
 		$this->name = $name;
 
-		$this->label = $configuration['label'] ?? 'E-mail';
+		$this->label = $configuration['label'] ?? 'Email';
 
 		$this->required = $configuration['required'] ?? false;
 
