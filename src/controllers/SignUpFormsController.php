@@ -204,7 +204,7 @@ class SignUpFormsController extends \Controller
 			// Process the posted values. This will delegate all data handling to the classes
 			// in src/fields/*.php
 			$entry->process($form);
-			$this->entry_model->insert($entry);
+			$this->entry_model->update($entry);
 
 			// Redirect admins back to the entry index
 			if (get_policy($iter)->user_can_update($iter))

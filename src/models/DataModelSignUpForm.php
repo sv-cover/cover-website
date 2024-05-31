@@ -5,6 +5,7 @@ require_once 'src/framework/data/DataModel.php';
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Uid\Uuid;
 
 class DataIterSignUpForm extends DataIter
 {
@@ -130,7 +131,7 @@ class DataIterSignUpForm extends DataIter
 
 		$iter = $model->new_iter([
 			'form_id' => $this['id'],
-			'name' => uniqid(), // for now
+			'name' => Uuid::v4()->toRfc4122(), // UUID v4 in RFC 4122 contains dashes and therefore never returns a numeric string. Numeric strings cause issues with arrays.
 			'type' => $type,
 			'properties' => '{}'
 		]);
