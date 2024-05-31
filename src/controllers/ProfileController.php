@@ -103,7 +103,7 @@ class ProfileController extends \Controller
 				'label' => __('Phone'),
 				'constraints' => [
 					new Assert\NotBlank(),
-					new AssertPhoneNumber(['defaultRegion' => 'NL']),
+					new AssertPhoneNumber(defaultRegion: 'NL'),
 					new Assert\Length(['max' => 20]),
 				]
 			])

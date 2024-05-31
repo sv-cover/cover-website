@@ -370,6 +370,14 @@ abstract class DataIter implements JsonSerializable, ArrayAccess
 	{
 		return $this->set($field, $value);
 	}
+
+    public function __isset($field): bool
+    {
+        return $field == 'id'
+        	|| static::has_getter($field)
+			|| $this->has_value($field)
+			|| static::has_field($field);
+    }
 }
 
 class GenericDataIter extends DataIter

@@ -492,7 +492,7 @@ function markup_parse($markup, $header_offset = 0, &$placeholders = null, $flags
  */
 function markup_strip($markup)
 {
-	return preg_replace('/\[[^\[\]\s]*\]/', '', $markup);
+	return preg_replace('/\[[^\[\]\s]*\]/', '', $markup ?? '');
 }
 
 /** @group Markup
