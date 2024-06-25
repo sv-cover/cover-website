@@ -327,8 +327,8 @@ legacy:
       career:
         controller: App\Controller\CareerController
         parameters: { _route: career }
-      clubs:
-        controller: App\Controller\ClubsController
+      societies:
+        controller: App\Controller\SocietiesController
         parameters: { _route: societies }
       commissies:
         controller: App\Controller\CommitteesController
