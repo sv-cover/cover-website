@@ -35,8 +35,8 @@ Forms can be rendered using the form-related functions in [Twig](https://twig.sy
 
 ### Form Types
 - [`CommitteeIdType`](/src/Form/Type/CommitteeIdType.php): Render a ChoiceType to pick committees. Additional options:
-    - `show_all` (default false): Renders all committees regardless of permissions. Use carefully.
-    - `show_own` (default true): Renders a list with the members own committees at the top.
+  - `show_all` (default false): Renders all committees regardless of permissions. Use carefully.
+  - `show_own` (default true): Renders a list with the members own committees at the top.
 - [`FilemanagerFileType`](/src/Form/Type/FilemanagerFileType.php): Renders a filepicker field that sources from the [Cover filemanager](https://filemanager.svcover.nl/).
 - [`MarkupType`](/src/Form/Type/MarkupType.php): Renders a field for content with [markup](https://wiki.svcover.nl/documentation/website/markup), with preview option.
 - [`MemberIdType`](/src/Form/Type/MemberIdType.php): Renders an autocomplete field for picking members.
@@ -63,7 +63,7 @@ Bulma wraps checkboxes (and radio buttons) in a label and our rendering does tha
 
 In some situations, a checkbox should be rendered as a switch for [better user experience](https://uxplanet.org/checkbox-vs-toggle-switch-7fc6e83f10b8). To do so, set `switch` to true in PHP or Twig. This will render a switch using the `.switch.is-rounded` class. You can add additional classes to the `attr` configuration for more options. Read the linked blog post for documentation on when a switch is appropriate.
 
-Bulma allows for customisation of the "call to action" on the button of a file input. This can be customised by setting the `cta` (default: `'Browse…'`) configuration option (in PHP or Twig).
+Bulma allows for customisation of the "call to action" on the button of a file input. This can be customised by setting the `cta` (default: `'Browseâ€¦'`) configuration option (in PHP or Twig).
 
 
 ## Notes
@@ -85,7 +85,7 @@ See "Integration with DataIter". This is solved using the [`IntToBooleanTransfor
 This might happen for many different types, but often [Symfony's CallbackTransformer](https://symfony.com/doc/current/form/data_transformers.html#example-1-transforming-strings-form-data-tags-from-user-input-to-an-array) is the answer. For example, [`EventType`](/src/Form/EventType.php) uses it to convert between Facebook event ID and URL,  [`MailinglistType`](/src/Form/MailinglistType.php) uses it to make sure email addresses are always lowercase, [`StickerType`](/src/Form/StickerType.php) uses it to convert between doubles and strings, and [`RegistrationType`](/src/Form/RegistrationType.php) uses it to do some input cleaning. Keep in mind this might cause issues with constraints (see notes).
 
 ### Can I add transformers from controllers?
-Yes, this happens for example in [`CommitteesController`](/src/controllers/CommitteesController.php), [`CommitteesController`](/src/controllers/CommitteesController.php) 
+Yes, this happens for example in [`CommitteesController`](/src/controllers/CommitteesController.php), [`CommitteesController`](/src/controllers/CommitteesController.php)
 
 ### Validation of one field depends on the value of another
 A good way to do this is by using a [Callback constraint](https://symfony.com/doc/current/reference/constraints/Callback.html) to validate the entire form. Examples of this can be seen in [`EventType`](/src/Form/EventType.php), and [`VacancyType`](/src/Form/VacancyType.php). Another but less preferred way to do this is by using an event listener on the `FormEvents::SUBMIT` event, this can be seen in the [`MailingListsController`](/src/controllers/MailingListsController.php).
