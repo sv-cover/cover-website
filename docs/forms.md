@@ -63,7 +63,7 @@ Bulma wraps checkboxes (and radio buttons) in a label and our rendering does tha
 
 In some situations, a checkbox should be rendered as a switch for [better user experience](https://uxplanet.org/checkbox-vs-toggle-switch-7fc6e83f10b8). To do so, set `switch` to true in PHP or Twig. This will render a switch using the `.switch.is-rounded` class. You can add additional classes to the `attr` configuration for more options. Read the linked blog post for documentation on when a switch is appropriate.
 
-Bulma allows for customisation of the "call to action" on the button of a file input. This can be customised by setting the `cta` (default: `'Browse…`) configuration option (in PHP or Twig).
+Bulma allows for customisation of the "call to action" on the button of a file input. This can be customised by setting the `cta` (default: `'Browse…'`) configuration option (in PHP or Twig).
 
 
 ## Notes
