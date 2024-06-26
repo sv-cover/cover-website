@@ -523,6 +523,18 @@ class SignUpFormsController extends \Controller
 				$widget->description = 'I allow Cover to deduct €x,xx from my bank account.';
 			}));
 
+			$this->field_model->insert($form->new_field('editable', function($widget) {
+				$widget->content = sprintf(
+					"Please review Cover's [url=%s]Cancellation Policy[/url] before proceeding. By checking the box below, you confirm that you understand and agree to these terms.",
+					$this->router->generate('slug', ['slug' => 'cancellation-policy'])
+				);
+			}));
+
+			$this->field_model->insert($form->new_field('checkbox', function($widget) {
+				$widget->required = true;
+				$widget->description = 'I agree with the cancellation policy.';
+			}));
+
 			$this->field_model->db->commit();
 		}
 	}
