@@ -41,6 +41,10 @@ class SocietiesController extends \Controller
 				'constraints' => new Assert\NotBlank(),
 				'help' => __('Who are the founding members of the society?'),
 			])
+			->add('leader', TextType::class, [
+				'label' => __('Leader'),
+				'constraints' => new Assert\NotBlank()
+			])
 			->add('other_comments', TextareaType::class, [
 				'label' => __('Other comments'),
 				// allow it to be blank
