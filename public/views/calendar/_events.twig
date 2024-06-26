@@ -18,11 +18,11 @@
                     <picture>
                         <source srcset="{{ event.get_image(600) }} 1x, {{ event.get_image(900) }} 1.5x, {{ event.get_image(1200) }} 2x" media="(min-width: 400px) and (max-width: 600px)">
                         <source srcset="{{ event.get_image(400) }} 1x, {{ event.get_image(600) }} 1.5x, {{ event.get_image(800) }} 2x">
-                        <img src="{{ event.get_image(600) }}"> 
+                        <img src="{{ event.get_image(600) }}">
                     </picture>
                 </figure>
             {% endif %}
-            <div class="content">
+            <div class="event-info">
                 <div class="date">
                     <span>
                         {{ macros.format_period_short(event) }}
@@ -34,14 +34,16 @@
                     </h3>
                 </div>
                 {% if event.category %}
-                    <span class="category-label {{ event.category }}">{{ event.category }}</span>
+                    <div class="categories">
+                        {% for category in event.category|split(',') %}
+                            <span class="tag is-rounded {{ category }}">{{ category }}</span>
+                        {% endfor %}
+                    </div>
                 {% endif %}
                 {% if event.is_proposal() %}
-                    <div class="label-pending">
-                        <span>
-                            {{ __('Waiting for approval') }}
-                        </span>
-                    </div>
+                    <span class="tag is-rounded label-pending">
+                        {{ __('Waiting for approval') }}
+                    </span>
                 {% endif %}
             </div>
         </a>

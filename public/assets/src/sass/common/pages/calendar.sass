@@ -46,26 +46,21 @@ $event-overlay-padding: 1.25rem
                     margin-top: ($sidebar-width / 2) - 6rem
                     height: 6rem
 
-.calendar
-    .event-list
-        .event
-            .category-label
-                @extend .tag
-                @extend .is-rounded
-                text-transform: capitalize
-                order: 1
-                width: fit-content
-                margin-bottom: 0.5rem
-                color: $white !important
-                font-weight: $weight-bold
-                &.educational
-                    background: #EC9832
-                &.career
-                    background: #22AAA6
-                &.general
-                    background: #0A64AE
-                &.social
-                    background: #D2607E
+.event
+    .event-info
+        .tag
+            color: $white
+            font-weight: $weight-semibold
+            text-transform: capitalize
+            width: fit-content
+            &.educational
+                background: $orange
+            &.career
+                background: $cyan
+            &.general
+                background: $red
+            &.social
+                background: $purple
 
 
 .calendar:not(.is-list),
@@ -74,31 +69,34 @@ $event-overlay-padding: 1.25rem
         .event
             > a,
             .card-image
+                @extend .cover-thumbnail
                 @extend .is-2by1
                 color: $grey
-            .content
+                &:hover, &:focus
+                    outline: none
+            .event-info
                 display: grid
             .card-image:not(:last-child)
                 margin-bottom: 0
             .date
-                order: 3
+                order: 2
                 > *
                     font-size: $size-7
                     font-weight: $weight-normal
             .name
                 // Limit number of lines in browsers that support it to "deal" with long titles
                 +max-lines(2)
-                color: $white
-                font-size: $size-5
-                order: 2
+                color: $black
+                font-weight: $weight-semibold
+                font-size: $size-6
+                order: 1
                 > *
-                    font-size: $size-5
+                    font-size: $size-6
+                    font-weight: $weight-semibold
                     margin-bottom: 0
             .label-pending
-                > *
-                    font-size: $size-7
-                    color: $black
-                    background: $warning
+                @extend .is-warning
+                background: $warning
             &.is-proposal
                 opacity: .75
                 transition: opacity .125s ease-in-out
@@ -106,9 +104,12 @@ $event-overlay-padding: 1.25rem
                     opacity: 1
             &.card.is-active
                 outline: 4px solid $cover-red
-            .content
+            .event-info
                 background-color: $background
                 padding: $box-padding
+            .categories
+                margin-top: 0.5rem
+                order: 3
 
 .calendar.is-list
     .event-list
@@ -139,7 +140,7 @@ $event-overlay-padding: 1.25rem
                         width: 100%
                         object-fit: cover
                         object-position: center
-                > .content
+                > .event-info
                     @extend .media-content
                 .date
                     color: $grey
@@ -149,7 +150,6 @@ $event-overlay-padding: 1.25rem
                 .date, .name
                     margin-bottom: 0.25rem
                 .label-pending
-                    @extend .tag
                     @extend .is-warning
                 &:hover
                     background: $background

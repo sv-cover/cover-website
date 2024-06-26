@@ -12,19 +12,19 @@
 			<div class="card-image">
 				<div class="overlay is-bottom">
 					{% if event.replacement_for != 0 %}
-						<div class="label-pending">
-							<span>
-								{{ __('Updated event') }}
-							</span>
-						</div>
+                    <div class="boxed-title-wrapper">
+                        <span class="boxed-title is-size-7 label-pending">
+                            {{ __('Updated event') }}
+                        </span>
+                    </div>
 					{% endif %}
-					<div class="date">
-						<span>
+					<div class="date boxed-title-wrapper">
+						<span class="boxed-title">
 							{{ macros.format_period_short(event) }}
 						</span>
 					</div>
-					<div class="name">
-						<h3>
+					<div class="name boxed-title-wrapper">
+						<h3 class="boxed-title is-size-5">
 							{{ event.kop }}
 						</h3>
 					</div>
@@ -34,7 +34,7 @@
 						<picture>
 							<source srcset="{{ event.get_image(600) }} 1x, {{ event.get_image(900) }} 1.5x, {{ event.get_image(1200) }} 2x" media="(min-width: 400px) and (max-width: 600px)">
 							<source srcset="{{ event.get_image(400) }} 1x, {{ event.get_image(600) }} 1.5x, {{ event.get_image(800) }} 2x">
-							<img src="{{ event.get_image(600) }}"> 
+							<img src="{{ event.get_image(600) }}">
 						</picture>
 					</figure>
 				{% endif %}
@@ -115,15 +115,15 @@
 									{% else %}
 										{{ __('not set') }}
 									{% endif %}
-									(<em>{{ __('was') }}</em> 
+									(<em>{{ __('was') }}</em>
 									{% if change[1] %}
 										<a href="https://www.facebook.com/events/{{ change[1] }}/" target="_blank" rel="noopener noreferrer">event</a>
 									{%- else -%}
 										{{ __('not set') }}
 									{%- endif -%})
 								{% elseif field == 'category' %}
-									{{ change[0] }}
-									(<em>{{ __('was') }}</em> {{ change[1] ? change[1] : 'none' }})
+									{{ change[0]|split(',')|map(word => word|capitalize)|join(', ') }}
+									(<em>{{ __('was') }}</em> {{ change[1] ? change[1]|split(',')|map(word => word|capitalize)|join(', ') : 'none' }})
 								{% else %}
 									{# Don't know what to do #}
 									<a href="{{ path('calendar', {agenda_id: event.replacement_for}) }}">{{ __('original') }}</a>
