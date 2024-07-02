@@ -99,7 +99,7 @@ class View
 		$loader->addPath($vendor_twig_bridge_directory.'/Resources/views', 'symfony');
 
 		$this->twig = new TwigEnvironment($loader, [
-			'debug' => true,
+			'debug' => get_config_value('debug', false),
 			'strict_variables' => true,
 			'cache' => get_config_value('twig_cache', 'tmp/twig'),
 		]);
