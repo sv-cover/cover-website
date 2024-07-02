@@ -45,9 +45,9 @@ class DatabasePDO
 		$params[] = "options='--client_encoding=UTF8'";
 
 		/* Open connection */
-		$this->resource = new PDO('pgsql:' . implode(';', $params));
+		$this->resource = new \PDO('pgsql:' . implode(';', $params));
 
-		$this->resource->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		$this->resource->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
 		$this->resource->exec("SET NAMES 'UTF-8'; SET DateStyle = 'ISO, DMY'; SET bytea_output=escape");
 	}
@@ -90,7 +90,7 @@ class DatabasePDO
 			);
 
 		/* Return the results */
-		return $statement->fetchAll($indices ? PDO::FETCH_NUM : PDO::FETCH_ASSOC);
+		return $statement->fetchAll($indices ? \PDO::FETCH_NUM : \PDO::FETCH_ASSOC);
 	}
 
 	public function execute($query, array $input_parameters = [])
@@ -103,9 +103,9 @@ class DatabasePDO
 		/* Bind parameters (default is same default as PHP: String) */
 		foreach ($input_parameters as $placeholder => $value)
 			if (is_resource($value) && get_resource_type($value) === 'stream')
-				$statement->bindValue($placeholder, $value, PDO::PARAM_LOB);
+				$statement->bindValue($placeholder, $value, \PDO::PARAM_LOB);
 			else
-				$statement->bindValue($placeholder, $value, PDO::PARAM_STR);
+				$statement->bindValue($placeholder, $value, \PDO::PARAM_STR);
 
 		$statement->execute();
 
@@ -369,7 +369,7 @@ class DatabasePDO
 		if (!is_resource($data))
 			throw new InvalidArgumentException('DatabasePDO::write_blob expected resource as argument');
 
-		return substr($this->resource->quote(stream_get_contents($data), PDO::PARAM_LOB), 1, -1);
+		return substr($this->resource->quote(stream_get_contents($data), \PDO::PARAM_LOB), 1, -1);
 	}
 
 	public function beginTransaction()

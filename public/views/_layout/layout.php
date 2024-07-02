@@ -67,8 +67,8 @@ class LayoutViewHelper
 					'label' => __('Committees')
 				],
 				[
-					'url' => $this->router->generate('clubs'),
-					'label' => __('Clubs')
+					'url' => $this->router->generate('societies'),
+					'label' => __('Societies')
 				],
 				[
 					'url' => $this->router->generate('page', ['id' => 28]),

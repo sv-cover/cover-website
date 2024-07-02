@@ -36,9 +36,9 @@ career:
   path: /career
   controller: App\Controller\CareerController
 
-clubs:
-  path: /clubs
-  controller: App\Controller\ClubsController
+societies:
+  path: /societies
+  controller: App\Controller\SocietiesController
 
 committee_members:
   path: /committee_members
@@ -327,9 +327,9 @@ legacy:
       career:
         controller: App\Controller\CareerController
         parameters: { _route: career }
-      clubs:
-        controller: App\Controller\ClubsController
-        parameters: { _route: clubs }
+      societies:
+        controller: App\Controller\SocietiesController
+        parameters: { _route: societies }
       commissies:
         controller: App\Controller\CommitteesController
         parameters: { _route: committees }
