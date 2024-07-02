@@ -104,7 +104,7 @@ class RegistrationType extends AbstractType
 				'label' => __('Phone number'),
 				'constraints' => [
 					new Assert\NotBlank(),
-					new AssertPhoneNumber(['defaultRegion' => 'NL']),
+					new AssertPhoneNumber(defaultRegion: 'NL'),
 				]
 			])
 
