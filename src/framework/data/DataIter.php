@@ -158,7 +158,8 @@ abstract class DataIter implements JsonSerializable, ArrayAccess
 
 			$frame = array_pop($this->_getter_stack);
 
-			assert($frame['field'] == $field);
+			if ($frame['field'] != $field)
+					throw new Exception('Cache retrieval error for ' . get_class($this) . '::' . $field);
 			
 			$this->_getter_cache[$field] = [$value, array_unique($frame['dependencies'])];
 		}
@@ -370,6 +371,14 @@ abstract class DataIter implements JsonSerializable, ArrayAccess
 	{
 		return $this->set($field, $value);
 	}
+
+    public function __isset($field): bool
+    {
+        return $field == 'id'
+        	|| static::has_getter($field)
+			|| $this->has_value($field)
+			|| static::has_field($field);
+    }
 }
 
 class GenericDataIter extends DataIter

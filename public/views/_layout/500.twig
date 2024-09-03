@@ -56,14 +56,19 @@
 			</div>
 		</article>
 
-		<script src="https://cdn.ravenjs.com/3.14.0/raven.min.js"></script>
+
+		<script src="https://browser.sentry-cdn.com/7.60.0/bundle.min.js" crossorigin="anonymous"></script>
 		<script>
 			function reportUserFeedback() {
-				Raven.config({{ global.config.sentry_public_url|json_encode()|raw }});
+				Sentry.init({
+					dsn: {{ global.config.sentry_public_url|json_encode()|raw }},
+				});
 				{% if global.auth.logged_in %}
-				Raven.setUserContext({ id: {{ global.identity.member.id|json_encode()|raw }} });
+					Sentry.setContext("user", {
+						id: {{ global.identity.member.id|json_encode()|raw }},
+					});
 				{% endif %}
-				Raven.showReportDialog({ eventId: {{ sentry_id|json_encode()|raw }} });
+				Sentry.showReportDialog({ eventId: {{ sentry_id|json_encode()|raw }} });
 			}
 		</script>
 	</body>
