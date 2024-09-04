@@ -173,10 +173,10 @@ class ProfileView extends View
 			$card->addURL($member['homepage']);
 
 		// Only add a thumbnail of the photo if the member has one, and it isn't hidden.
-		if ($is_visible('foto') && $this->controller->model()->has_picture($member)) {
+		if ($is_visible('foto') && $member->get_profile_picture()) {
 			$fout = null;
 
-			$photo = $this->controller->model()->get_photo_stream($member);
+			$photo = $member->get_profile_picture()->get_stream();
 
 			$imagick = new \Imagick();
 			$imagick->readImageFile($photo['foto']);

@@ -94,7 +94,8 @@ class ProfilePictureController extends \Controller
 			return false;
 
 		// If it is outdated, close it again and tell our caller that we can't serve it.
-		if (!$this->_is_placeholder($type) && $this->model->get_photo_mtime($member) > filemtime($file_path))
+		$cached_mtime = $member->get_profile_picture()->get_mtime() ?? 0;
+		if (!$this->_is_placeholder($type) && $cached_mtime > filemtime($file_path))
 		{
 			fclose($fh);
 			return false;
@@ -125,13 +126,13 @@ class ProfilePictureController extends \Controller
 
 	protected function _generate_original(\DataIterMember $member)
 	{
-		$photo = $this->model->get_photo_stream($member);
+		$photo = $member->get_profile_picture()->get_stream();
 		
 		if (!$photo)
 			throw new \NotFoundException('Member has no photo');
 
 		$imagick = new \Imagick();
-		$imagick->readImageFile($photo['foto']);
+		$imagick->readImageFile($photo['photo']);
 
 		apply_image_orientation($imagick);
 
@@ -159,13 +160,13 @@ class ProfilePictureController extends \Controller
 
 	protected function _generate_thumbnail(\DataIterMember $member, $format, $width)
 	{
-		$photo = $this->model->get_photo_stream($member);
+		$photo = $member->get_profile_picture()->get_stream();
 		
 		if (!$photo)
 			throw new \NotFoundException('Member has no photo');
 
 		$imagick = new \Imagick();
-		$imagick->readImageFile($photo['foto']);
+		$imagick->readImageFile($photo['photo']);
 
 		apply_image_orientation($imagick);
 
@@ -292,7 +293,7 @@ class ProfilePictureController extends \Controller
 
 		$height = $format == self::FORMAT_SQUARE ? $width : 0;
 
-		if ($this->model->is_private($member, 'foto') || !$this->model->has_picture($member))
+		if ($this->model->is_private($member, 'foto') || !$member->get_profile_picture())
 			return $this->_view_cached($member, $width, $height, $this->_get_placeholder_type($member))
 				or $this->_generate_placeholder($member, $format, $width);
 		else
@@ -305,7 +306,7 @@ class ProfilePictureController extends \Controller
 		if ($this->model->is_private($member, 'foto'))
 			throw new \UnauthorizedException('Photo is private');
 
-		if (!$this->model->has_picture($member))
+		if (!$member->get_profile_picture())
 			return new \NotFoundException('Member has no photo');
 
 		return $this->_view_cached($member, 0, 0, self::TYPE_ORIGINAL)

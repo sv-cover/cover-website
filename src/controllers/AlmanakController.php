@@ -151,7 +151,12 @@ class AlmanakController extends \Controller
 			if (($this->model->get_privacy_for_field($iter, 'foto') & $this->model::VISIBLE_TO_MEMBERS) === 0)
 				continue;
 
-			$data = $this->model->get_photo_stream($iter);
+			$profile_picture = $iter->get_profile_picture();
+
+			if ($profile_picture === null)
+				continue;
+
+			$data = $profile_picture->get_stream();
 
 			// Skip members that don't have a photo
 			if ($data === null)
@@ -160,8 +165,8 @@ class AlmanakController extends \Controller
 			// And finally add the photo to the actual stream
 			$zip->addFileFromStream(
 				fileName: sprintf('%d.jpg', $iter->get_id()),
-				stream: $data['foto'],
-				lastModificationDateTime: new \DateTime(sprintf('@%d', $this->model->get_photo_mtime($iter))),
+				stream: $data['photo'],
+				lastModificationDateTime: new \DateTime($profile_picture['created_on']),
 			);
 		}
 

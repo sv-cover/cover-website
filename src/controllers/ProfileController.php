@@ -399,7 +399,9 @@ class ProfileController extends \Controller
 				if (!$fh)
 					throw new \RuntimeException(__('The uploaded file could not be opened.'));
 
-				$this->model->set_photo($iter, $fh);
+				$model = get_model('DataModelProfilePicture');
+
+				$model->set_for_member($iter, $fh);
 
 				fclose($fh);
 			} else {
