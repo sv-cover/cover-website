@@ -61,7 +61,7 @@ class SocietiesController extends \Controller
 				'help' => __('We need to know how to contact you for questions!'),
 				'constraints' => [
 					new Assert\NotBlank(),
-					new AssertPhoneNumber(['defaultRegion' => 'NL']),
+					new AssertPhoneNumber(defaultRegion: 'NL'),
 				],
 			])
 			->add('submit', SubmitType::class, [
