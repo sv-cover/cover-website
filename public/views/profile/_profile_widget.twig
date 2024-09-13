@@ -1,16 +1,4 @@
 <div class="field is-grouped  is-grouped-right">
-	{% if global.identity.member_in_committee(constant('COMMISSIE_EASY')) %}
-		{% set photo_form = view.get_photo_form() %}
-		{{ form_start(photo_form, {action: path('profile', {view: 'photo', lid: iter.id}), attr: {class: 'control', 'data-auto-submit': true, 'data-use-native-submit': true}}) }}
-			<div class="field">
-				{{ form_widget(photo_form.photo, {cta: __('Upload photo' ), attr: {title: __('Only JPEG images are allowed.')}}) }}
-				{{ form_errors(photo_form) }}
-				{{ form_errors(photo_form.photo) }}
-				{{ form_help(photo_form.photo) }}
-			</div>
-			{{ form_widget(photo_form.submit, {'label': __('Change Photo'), 'attr': {'data-auto-submit-hidden': true}}) }}
-		{{ form_end(photo_form) }}
-	{% endif %}
 	{% if view.user_can_download_vcard() %}
 		<div class="control">
 			<a href="{{ path('profile', {view: 'export_vcard', lid:iter.id}) }}" class="button" title="{{ __('Download vCard') }}">

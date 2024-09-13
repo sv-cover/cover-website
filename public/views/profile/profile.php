@@ -235,10 +235,6 @@ class ProfileView extends View
 			|| get_identity()->member_in_committee(COMMISSIE_EASY);
 	}
 
-	public function get_photo_form() {
-		return $this->controller->_get_photo_form()->createView();
-	}
-
 	public function format_member_data(DataIterMember $iter, $field)
 	{
 		switch ($field) {
