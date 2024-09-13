@@ -17,7 +17,11 @@ class DataIterProfilePicture extends DataIter
 
 	public function get_member()
 	{
-		return get_model('DataModelMember')->get_iter($this->data['member_id']);
+		try {
+			return get_model('DataModelMember')->get_iter($this->data['member_id']);
+		} catch (\DataIterNotFoundException $e) {
+			return null;
+		}
 	}
 
 	public function get_stream()
@@ -67,7 +71,7 @@ class DataModelProfilePicture extends DataModel
 			  FROM {$this->table}
 			 WHERE reviewed IS NOT NULL
 			   AND member_id = :member_id
-			 ORDER BY reviewed DESC
+			 ORDER BY created_on DESC
 			 LIMIT 1
 		";
 
@@ -81,13 +85,27 @@ class DataModelProfilePicture extends DataModel
 
 	public function set_for_member(DataIterMember $member, $fh)
 	{
-		$query = "
+		// Insert new photo
+		$insert_query = "
 			INSERT INTO {$this->table} (member_id, photo, reviewed)
 			VALUES (:member_id, :photo, false)
 		";
-		$this->db->execute($query, [
+		$this->db->execute($insert_query, [
 			':member_id' => $member->get_id(),
-			':photo' => stream_get_contents($fh)
+			':photo' => $fh
+		]);
+		$last_id = $this->db->get_last_insert_id();
+
+		// Delete all old pictures for this member. We're doing this afterwards,
+		// just in case something went wrong earlier.
+		$delete_query = "
+			DELETE FROM {$this->table}
+			 WHERE member_id = :member_id
+			   AND id != :last_id
+		";
+		$this->db->execute($delete_query, [
+			':member_id' => $member->get_id(),
+			':last_id' => $last_id,
 		]);
 	}
 
@@ -102,6 +120,7 @@ class DataModelProfilePicture extends DataModel
 			      ,created_on
 			      ,reviewed
 			  FROM {$this->table}
-		" . ($where ? " WHERE {$where}" : "");
+		" . ($where ? " WHERE {$where}" : "") .
+		" ORDER BY created_on DESC";
 	}
 }

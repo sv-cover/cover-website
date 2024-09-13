@@ -1,14 +1,16 @@
 {% if global.auth.logged_in() %}
     {% set agenda_items_to_moderate = view.layout.agenda_items_to_moderate() %}
+    {% set profile_pictures_to_review = view.layout.profile_pictures_to_review() %}
 
     {% set user_has_birthday_today = view.layout.jarigen|filter(m => m.id == global.identity.member.id )|length > 0 %}
     {% set user_is_pending =  global.identity.is_pending() %}
     {% set user_can_moderate_agenda = global.policies.Agenda.user_can_moderate(global.models.Agenda.new_iter({'replacement_for': true})) %}
+    {% set user_can_review_profile_pictures = global.policies.ProfilePicture.user_can_review(global.models.ProfilePicture.new_iter({'reviewed': false})) %}
     
-    {% set has_notification = agenda_items_to_moderate|length > 0  or user_is_pending or user_has_birthday_today %}
+    {% set has_notification = agenda_items_to_moderate|length > 0 or profile_pictures_to_review|length > 0 or user_is_pending or user_has_birthday_today %}
     {% set force_notification = user_is_pending %}
 
-    {% if has_notification or user_can_moderate_agenda %}
+    {% if has_notification or user_can_moderate_agenda or user_can_review_profile_pictures%}
         <div class="navbar-item has-dropdown is-hoverable-desktop notifications {% if has_notification %}has-unread{% endif %}">
             <a class="navbar-link is-arrowless" tabindex="0">
                 <span class="icon">
@@ -37,6 +39,14 @@
                         'There is %d event waiting for your confirmation',
                         'There are %d events waiting for your confirmation', agenda_items_to_moderate|length) }}
                     </a>    
+                {% endif %}
+
+                {% if profile_pictures_to_review|length > 0 %}
+                    <a href="{{ path('profile_pictures.list') }}" class="navbar-item cover-notification">
+                        {{ __N(
+                        'There is %d profile picture waiting for review',
+                        'There are %d profiles picture waiting for review', profile_pictures_to_review|length) }}
+                    </a>
                 {% endif %}
 
                 {% if user_is_pending %}

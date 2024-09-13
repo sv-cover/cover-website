@@ -1,0 +1,91 @@
+{% extends '@layout/layout.twig' %}
+
+{% block title __('Profile pictures') ~ ' – ' ~ parent() %}
+
+{% block content %}
+<section class="block">
+    <h1 class="title">{{ __('Review profile pictures') }}</h1>
+    <div class="content">
+        <p>
+            {{ __('Members can update their own profile pictures, with changes being effective immediately. But the board and admins get notified to make sure no inappropriate pictures will be uploaded. Review the changes to dismiss this notification for all board members and admins.') }}
+        </p>
+    </div>
+    {% for iter in unreviewed %}
+        <div class="card block">
+            <figure class="card-image">
+                <a
+                    class="image"
+                    href="{{ path('profile_pictures.member', {member_id: iter.member_id, timestamp:iter.mtime}) }}"
+                    title="{{ __('Click to enlarge the photo')|e('html_attr') }}"
+                    data-popup="image"
+                >
+                    <img
+                        src="{{ path('profile_pictures', {view: 'read', id: iter.id, format: 'square', width: 1024}) }}"
+                        alt="{{ __('Photo of %s')|format(iter.member|full_name) }}"
+                    >
+                </a>
+            </figure>
+            <div class="card-content">
+                <h2 class="title is-5">{{ __('New photo for %s')|format(iter.member|full_name_ignore_privacy) }}</h2>
+                <p>
+                    {{ __('Uploaded on') }}
+                    {{ iter['created_on']|date('Y-m-d H:i') }}
+                </p>
+
+                <form
+                    id="profile-pictures-{{ iter.id|e('url') }}-review-form"
+                    method="post"
+                    action="{{ path('profile_pictures', {view: 'review', id: iter.id}) }}"
+                >
+                    <input type="hidden" name="form[_token]" value="{{ csrf_token('profile_picture_review_' ~ iter.id) }}">
+                </form>
+            </div>
+            <footer class="card-footer">
+                <button type="submit" form="profile-pictures-{{ iter.id|e('url') }}-review-form" class="card-footer-item">
+                    {{ __('Looks good!') }}
+                </button>
+                <a href="{{ path('profile', {lid_id: iter.member_id}) }}" class="card-footer-item">
+                    {{ __('View profile') }}
+                </a>
+                {% if user_can_delete iter %}
+                    <a href="{{ path('profile_pictures', {view: 'delete', id: iter.id}) }}" title="{{ __('Delete profile picture') }}" data-popup="modal"class="card-footer-item">Delete</a>
+                {% endif %}
+            </footer>
+        </div>
+    {% else %}
+        <p>{{ __('There are no profile pictures waiting to be reviewed.') }}</p>
+    {% endfor %}
+</section>
+<section class="block">
+    <h2 class="title">{{ __('All recent profile pictures') }}</h2>
+    <div class="content">
+        <p>
+            {{ __('Just in case you missed one, here are all members who updated their picture in the last six months.') }}
+        </p>
+    </div>
+    <ul class="members-list columns is-mobile">
+        {% for iter in all %}
+            <li class="profile column is-half-mobile is-one-third-tablet is-one-quarter-desktop">
+                <a href="{{ path('profile', {lid: iter.id}) }}">
+                    <figure class="image is-128x128">
+                        <img
+                            loading="lazy"
+                            class="is-rounded"
+                            src="{{ path('profile_pictures', {view: 'read', id: iter.id, format: 'square', width: 1024}) }}"
+                            alt="{{ __('Photo of %s')|format(iter.member|full_name) }}"
+                        >
+                    </figure>
+                    <div class="profile-info">
+                        <span class="name">{{ iter.member|personal_full_name }}</span>
+                        <span class="is-size-7">Updated: {{ iter['created_on']|date('Y-m-d') }}</span>
+                    </div>
+                </a>
+            </li>
+        {% else %}
+            <li>
+                {{ __('Turns out no one updated their picture recently.') }}
+            </li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock %}

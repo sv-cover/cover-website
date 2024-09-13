@@ -33,3 +33,7 @@ BEGIN
           AND pp.created_on < v_photo.max_created_on;
     END LOOP;
 END $$;
+
+-- Delete any photos from deleted accounts
+DELETE FROM profile_pictures AS pp
+ WHERE pp.member_id not in (SELECT id FROM leden);
