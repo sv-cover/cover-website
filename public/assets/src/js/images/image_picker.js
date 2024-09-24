@@ -236,6 +236,7 @@ class ImagePicker {
 
     /**
      * Constrain the selection to be within the image.
+     * Note, this only handles scale and translation. No rotation or skew.
      */
     handleImageTransform(event) {
         const image = this.cropper.getCropperImage();

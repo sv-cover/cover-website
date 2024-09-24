@@ -3,8 +3,11 @@
         cropper-canvas
             // Make canvas always square
             height: calc(100vw - #{2 * $modal-card-body-padding})
+            // OK, not always. Make sure modal card body never overflows
+            max-height: calc(100vh - #{$modal-content-spacing-mobile} - #{4 * $modal-card-head-padding} - #{2* $modal-card-body-padding} - #{2 * $control-height})
             +tablet
                 height: $modal-content-width - (2 * $modal-card-body-padding)
+                max-height: calc(100vh - #{$modal-content-spacing-tablet} - #{4 * $modal-card-head-padding} - #{2* $modal-card-body-padding} - #{2 * $control-height})
             &.is-rounded
                 cropper-selection,
                 cropper-shade,
