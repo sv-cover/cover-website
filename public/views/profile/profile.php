@@ -4,6 +4,13 @@ use JeroenDesloovere\VCard\VCard;
 
 class ProfileView extends View
 {
+	public function scripts()
+	{
+		return array_merge(parent::scripts(), [
+			get_theme_data('assets/dist/js/images.js'),
+		]);
+	}
+
 	public function tabs(DataIterMember $iter)
 	{
 		return [

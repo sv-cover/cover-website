@@ -34,7 +34,17 @@
 			<div class="field-body">
 				<div class="field is-grouped">
 					<div class="control">
-						{{ form_widget(photo_form.photo, {cta: __('Change photo'), attr: {title: __('Only JPEG images are allowed.')}}) }}
+						{{ form_widget(photo_form.photo, {
+							cta: __('Change photo'),
+							attr: {
+								'data-image-picker': true,
+								'data-cropper-template': '.profile-picture-cropper-template',
+								'data-image-picker-modal-title': __('Crop your profile picture'),
+								'data-image-picker-modal-submit': __('Set profile picture'),
+								'data-accept-mime-type': 'image/*',
+								'data-target-mime-type': 'image/jpeg',
+							}
+						}) }}
 					</div>
 					{% if iter.profile_picture and user_can_delete iter.profile_picture %}
 					<div class="control">
@@ -46,6 +56,17 @@
 				{{ form_errors(photo_form) }}
 				{{ form_errors(photo_form.photo) }}
 				{{ form_help(photo_form.photo) }}
+				<template class="profile-picture-cropper-template">
+					<cropper-canvas background class="is-rounded">
+						<cropper-image rotatable scalable translatable initial-center-size="cover"></cropper-image>
+						<cropper-shade hidden></cropper-shade>
+						<cropper-handle action="move" plain></cropper-handle>
+						<cropper-selection initial-coverage="0.9" aspect-ratio="1" precise>
+							{# <cropper-grid role="grid" bordered covered ></cropper-grid> #}
+							<cropper-handle action="move" plain></cropper-handle>
+						</cropper-selection>
+					</cropper-canvas>
+				</template>
 			</div>
 		</div>
 		<div class="profile-field" data-auto-submit-hidden>

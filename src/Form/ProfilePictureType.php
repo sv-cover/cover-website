@@ -28,6 +28,8 @@ class ProfilePictureType extends AbstractType
 				],
 				'attr' => [
 					'accept' => 'image/jpeg',
+					'capture' => 'user',
+					'data-max-filesize' => ini_get('upload_max_filesize'),
 				],
 			])
 			->add('submit', SubmitType::class)

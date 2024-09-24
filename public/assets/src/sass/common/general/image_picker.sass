@@ -1,0 +1,14 @@
+.image-picker-modal
+    .modal-card-body
+        cropper-canvas
+            // Make canvas always square
+            height: calc(100vw - #{2 * $modal-card-body-padding})
+            +tablet
+                height: $modal-content-width - (2 * $modal-card-body-padding)
+            &.is-rounded
+                cropper-selection,
+                cropper-shade,
+                cropper-grid
+                    border-radius: 100%
+                cropper-grid
+                    overflow: hidden
