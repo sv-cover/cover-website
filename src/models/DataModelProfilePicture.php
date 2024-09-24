@@ -85,14 +85,10 @@ class DataModelProfilePicture extends DataModel
 
 	public function set_for_member(DataIterMember $member, $fh)
 	{
-		// Insert new photo
-		$insert_query = "
-			INSERT INTO {$this->table} (member_id, photo, reviewed)
-			VALUES (:member_id, :photo, false)
-		";
-		$this->db->execute($insert_query, [
-			':member_id' => $member->get_id(),
-			':photo' => $fh
+		$this->db->insert($this->table, [
+			'member_id' => $member->get_id(),
+			'photo' => $fh,
+			'reviewed' => false,
 		]);
 		$last_id = $this->db->get_last_insert_id();
 

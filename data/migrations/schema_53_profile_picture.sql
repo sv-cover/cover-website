@@ -13,6 +13,8 @@ RENAME COLUMN foto_mtime TO created_on;
 ALTER TABLE IF EXISTS profile_pictures
 ADD COLUMN reviewed boolean NOT NULL DEFAULT FALSE;
 
+ALTER SEQUENCE IF EXISTS lid_fotos_id_seq RENAME TO profile_pictures_id_seq;
+
 UPDATE profile_pictures
    SET reviewed = TRUE
  WHERE TRUE;

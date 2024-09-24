@@ -231,7 +231,7 @@ class ProfilePictureController extends \ControllerCRUD
 	{
 		$cache = $this->get_cache();
 
-		$key = sprintf('%d_original', $iter->get_id(), $format, $width);
+		$key = sprintf('%d_original', $iter->get_id());
 
 		// Return not modified if no changes since the client last checked
 		$last_modified = gmdate(DATE_RFC1123, $iter->get_mtime());
@@ -243,9 +243,9 @@ class ProfilePictureController extends \ControllerCRUD
 			return $this->run_304_not_modified();
 
 		// Get image and serve
-		$image = $cache->get($key, function (ItemInterface $item) use ($iter, $format, $width): string {
+		$image = $cache->get($key, function (ItemInterface $item) use ($iter): string {
 			$item->tag(sprintf('member_%d_picture', $iter['member_id']));
-			return $this->_generate_scaled($iter, $format, $width);
+			return $this->_generate_original($iter);
 		});
 
 		return $this->serve_image($image, $last_modified);
