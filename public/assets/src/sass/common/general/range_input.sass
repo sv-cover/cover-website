@@ -1,0 +1,68 @@
+$slider-track-color: $button-background-color
+$slider-track-height: $control-height / 4
+$slider-thumb-color: $dark !default
+$slider-thumb-hover-color: $grey-darker !default
+$slider-thumb-shadow: $button-shadow-size $button-shadow-color
+$slider-thumb-size: .75 * $control-height
+$slider-thumb-touch-size: $control-height
+
+input.input[type=range]
+    -webkit-appearance: none
+    padding: 0
+    margin: 0
+    border: none
+    outline: none
+    background: none
+    box-shadow: none
+    height: auto
+
+    &:focus,
+    &:active
+        /* Range input is not focussable, number input can be used instead */
+        outline: none
+        box-shadow: none
+    &::-moz-range-track
+        width: 100%
+        height: $slider-track-height
+        background: $slider-track-color
+    &::-moz-range-thumb
+        background: $slider-thumb-color
+        border: none
+        height: $slider-thumb-size
+        width: $slider-thumb-size
+        border-radius: 50%
+        cursor: pointer
+        box-shadow: $slider-thumb-shadow
+        &:hover,
+        &:active,
+        &:focus
+            background: $slider-thumb-hover-color
+        @media (pointer: coarse)
+            height: $slider-thumb-touch-size
+            width: $slider-thumb-touch-size
+    &::-webkit-slider-runnable-track
+        width: 100%
+        height: $slider-track-height
+        background: $slider-track-color
+    &::-webkit-slider-thumb
+        -webkit-appearance: none
+        background: $slider-thumb-color
+        border: none
+        height: $slider-thumb-size
+        width: $slider-thumb-size
+        margin-top: -.5em
+        border-radius: 50%
+        cursor: pointer
+        &:hover,
+        &:active,
+        &:focus
+            background: $slider-thumb-hover-color
+        @media (pointer: coarse)
+            height: $slider-thumb-touch-size
+            width: $slider-thumb-touch-size
+    &.has-progress
+        /* Webkit doesn't support styling of value indicator/progress */
+        &::-moz-range-progress
+            background: $primary
+            width: 100%
+            height: $slider-track-height

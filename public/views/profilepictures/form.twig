@@ -1,0 +1,44 @@
+{% extends '@layout/layout.twig' %}
+
+{% block title __('Change Photo') ~ ' – ' ~ parent() %}
+
+{% block content %}
+<h1 class="title">{{ __('Change Photo') }}</h1>
+
+{{ form_start(form, {attr: {'data-auto-submit': true, 'data-use-native-submit': true}}) }}
+    {# Fields #}
+    <div class="field">
+        <div class="field-body">
+            <p>{{ __('Your photo is not only used on this website, but also in the yearbook. Do you want to use a more recent photo? Send in the best version you have! Submissions are processed by hand, so it might take a while for the new photo to show up.') }}</p>
+        </div>
+    </div>
+    <div class="field">
+        {{ form_widget(form.photo, {
+            attr: {
+                'data-image-picker': true,
+                'data-cropper-template': '.profile-picture-cropper-template',
+                'data-image-picker-modal-title': __('Crop your profile picture'),
+                'data-image-picker-modal-submit': __('Set profile picture'),
+                'data-accept-mime-type': 'image/*',
+                'data-target-mime-type': 'image/jpeg',
+            }
+        }) }}
+        {# Global errors, there's only one field so they can be rendered here #}
+        {{ form_errors(form) }}
+        {{ form_errors(form.photo) }}
+        {{ form_help(form.photo) }}
+        <template class="profile-picture-cropper-template">
+            <cropper-canvas background class="is-rounded">
+                <cropper-image scalable translatable initial-center-size="cover"></cropper-image>
+                <cropper-shade hidden></cropper-shade>
+                <cropper-handle action="move" plain></cropper-handle>
+                <cropper-selection initial-coverage="0.9" aspect-ratio="1" precise>
+                    {# <cropper-grid role="grid" bordered covered ></cropper-grid> #}
+                    <cropper-handle action="move" plain></cropper-handle>
+                </cropper-selection>
+            </cropper-canvas>
+        </template>
+    </div>
+    {{ form_row(form.submit, {'label': __('Change Photo'), 'attr': {'data-auto-submit-hidden': true}}) }}
+{{ form_end(form) }}
+{% endblock %}

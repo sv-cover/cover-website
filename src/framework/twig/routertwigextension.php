@@ -1,7 +1,11 @@
 <?php
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class RouterTwigExtension extends Twig_Extension
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Extension\AbstractExtension as TwigAbstractExtension;
+use Twig\TwigFunction;
+
+
+class RouterTwigExtension extends TwigAbstractExtension
 {
 	public $routes;
 
@@ -20,12 +24,12 @@ class RouterTwigExtension extends Twig_Extension
 	public function getFunctions()
 	{
 		return [
-			new Twig_SimpleFunction('path', [$this, 'get_path']),
-			new Twig_SimpleFunction('url', [$this, 'get_url']),
-			new Twig_SimpleFunction('login_path', [$this, 'get_login_path']),
-			new Twig_SimpleFunction('logout_path', [$this, 'get_logout_path']),
-			new Twig_SimpleFunction('static_path', [$this, 'get_static_path']),
-			new Twig_SimpleFunction('link_static', 'get_theme_data'),
+			new TwigFunction('path', [$this, 'get_path']),
+			new TwigFunction('url', [$this, 'get_url']),
+			new TwigFunction('login_path', [$this, 'get_login_path']),
+			new TwigFunction('logout_path', [$this, 'get_logout_path']),
+			new TwigFunction('static_path', [$this, 'get_static_path']),
+			new TwigFunction('link_static', 'get_theme_data'),
 		];
 	}
 

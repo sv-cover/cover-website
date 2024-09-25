@@ -31,6 +31,7 @@
     "bulma-switch": "^2.0.4",
     "compression-webpack-plugin": "^10.0.0",
     "cover-style-system": "bitbucket:cover-webcie/cover-style-system",
+    "cropperjs": "^2.0.0-rc.2",
     "css-loader": "^6.7.1",
     "dotenv-webpack": "^7.1.0",
     "hammerjs": "^2.0.8",

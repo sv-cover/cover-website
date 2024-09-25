@@ -221,9 +221,6 @@ class DataModelPhotobookFace extends DataModel
 	 */
 	public function get_book(array $members)
 	{
-		foreach ($members as $member)
-			assert($member instanceof DataIterMember);
-
 		return new DataIterFacesPhotobook(
 				get_model('DataModelPhotobook'), -1, array(
 				'titel' => sprintf(__('Photos of %s'),
@@ -243,10 +240,8 @@ class DataModelPhotobookFace extends DataModel
 	{
 		$photo_ids = array();
 
-		foreach ($photos as $photo) {
-			assert($photo instanceof DataIterPhoto);
+		foreach ($photos as $photo)
 			$photo_ids[] = $photo->get_id();
-		}
 
 		$command = sprintf('%s opt/facedetect/suggest_faces.py %s %s >> %s 2>&1 & echo $!',
 			escapeshellcmd(get_config_value('path_to_python', 'python')),

@@ -45,7 +45,7 @@
                     <td>{{ sessions_view.format_time(session.last_active_on)|raw }}</td>
                     <td class="is-sticky is-right has-text-right is-nowrap">
                         <ul class="controls">
-                        {% spaceless %}
+                        {% apply spaceless %}
                             {% if user_can_delete session %}
                                 <li>
                                     <a href="{{ path('device_sessions.delete', {id: session.id}) }}" title="{{ __('Delete session') }}" data-popup="modal">
@@ -70,7 +70,7 @@
                                     </a>
                                 </li>
                             {% endif %}
-                        {% endspaceless %}
+                        {% endapply %}
                         </ul>
                     </td>
                 </tr>

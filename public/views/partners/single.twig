@@ -91,7 +91,7 @@
                                     <a href="{{ vacancy.absolute_path }}">
                                         <h4 class="title">{{ vacancy.title }}</h4>                                    
                                         <ul class="properties is-size-7">
-                                        {% spaceless %}
+                                        {% apply spaceless %}
                                             <li class="property" title="{{ __('Job type') }}">
                                                 <span class="icon is-small">
                                                     <i class="fas fa-hourglass-half" aria-hidden="true"></i>
@@ -107,7 +107,7 @@
                                                 </span>
                                                 {{ global.views.vacancies.study_phase_options[vacancy.study_phase] }}
                                             </li>
-                                        {% endspaceless %}
+                                        {% endapply %}
                                         </ul>
                                     </a>
                                 </li>

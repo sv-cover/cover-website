@@ -11,11 +11,11 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class ClubsController extends \Controller 
+class SocietiesController extends \Controller
 {
-	protected $view_name = 'clubs';
+	protected $view_name = 'societies';
 
-	public function run_propose_club()
+	public function run_found()
 	{
 		if (!get_auth()->logged_in())
 			throw new \UnauthorizedException();
@@ -28,27 +28,28 @@ class ClubsController extends \Controller
 		];
 
 		$form = $this->createFormBuilder($data)
-			->add('club_name', TextType::class, [
-				'label' => __('Club name'),
+			->add('society_name', TextType::class, [
+				'label' => __('Society name'),
 				'constraints' => new Assert\NotBlank(),
 			])
-			->add('description', TextareaType::class, [
-				'label' => __('What is this club for?'),
+			->add('society_purpose', TextareaType::class, [
+				'label' => __('Purpose of the society'),
 				'constraints' => new Assert\NotBlank(),
 			])
-			->add('motivation', TextareaType::class, [
-				'label' => __('Why do you want to start this club?'),
+			->add('founding_members', TextType::class, [
+				'label' => __('Founding members'),
 				'constraints' => new Assert\NotBlank(),
+				'help' => __('Who are the founding members of the society?'),
 			])
-			->add('members', TextareaType::class, [
-				'label' => __('Members'),
-				'constraints' => new Assert\NotBlank(),
-				'help' => __('Do you know people who are interesed in joining? List their names here!'),
+			->add('leader', TextType::class, [
+				'label' => __('Leader'),
+				'constraints' => new Assert\NotBlank()
 			])
-			->add('communication_platform', TextType::class, [
-				'label' => __('Preferred communication platform(s)'),
-				'constraints' => new Assert\NotBlank(),
-				'help' => __('The board will create a communication channel for you. Which platform(s) do you prefer for that?'),
+			->add('other_comments', TextareaType::class, [
+				'label' => __('Other comments'),
+				// allow it to be blank
+				'required' => false,
+				'help' => __('Anything else the Board should know when considering the request?'),
 			])
 			->add('email', EmailType::class, [
 				'label' => __('Email'),
@@ -60,7 +61,7 @@ class ClubsController extends \Controller
 				'help' => __('We need to know how to contact you for questions!'),
 				'constraints' => [
 					new Assert\NotBlank(),
-					new AssertPhoneNumber(['defaultRegion' => 'NL']),
+					new AssertPhoneNumber(defaultRegion: 'NL'),
 				],
 			])
 			->add('submit', SubmitType::class, [
@@ -70,10 +71,10 @@ class ClubsController extends \Controller
 		$form->handleRequest($this->get_request());
 
 		if ($form->isSubmitted() && $form->isValid()) {
-			$mail = parse_email_object("club_proposal.txt", ['data' => $form->getData(), 'member' => $member]);
+			$mail = parse_email_object("society_request.txt", ['data' => $form->getData(), 'member' => $member]);
 			$mail->send(get_config_value('email_bestuur'));
-			$_SESSION['alert'] = __('Club proposal submitted! You should hear from the board soon!');
-			return $this->view->redirect($this->generate_url('clubs'));
+			$_SESSION['alert'] = __('Society foundation requested! You should hear from the Board soon!');
+			return $this->view->redirect($this->generate_url('societies'));
 		}
 
 		return $this->view->render('form.twig', ['form' => $form->createView()]);

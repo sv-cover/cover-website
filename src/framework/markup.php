@@ -492,7 +492,7 @@ function markup_parse($markup, $header_offset = 0, &$placeholders = null, $flags
  */
 function markup_strip($markup)
 {
-	return preg_replace('/\[[^\[\]\s]*\]/', '', $markup);
+	return preg_replace('/\[[^\[\]\s]*\]/', '', $markup ?? '');
 }
 
 /** @group Markup
@@ -515,7 +515,7 @@ function markup_clean($text)
  */
 function markup_format_text($text)
 {
-	$text = htmlspecialchars($text, ENT_COMPAT, WEBSITE_ENCODING);
+	$text = htmlspecialchars($text ?? '', ENT_COMPAT, WEBSITE_ENCODING);
 
 	/*$text = str_replace('&','&amp;',$str);
 	$text = str_replace('"','&quot;',$str);

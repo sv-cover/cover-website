@@ -67,8 +67,8 @@ class LayoutViewHelper
 					'label' => __('Committees')
 				],
 				[
-					'url' => $this->router->generate('clubs'),
-					'label' => __('Clubs')
+					'url' => $this->router->generate('societies'),
+					'label' => __('Societies')
 				],
 				[
 					'url' => $this->router->generate('page', ['id' => 28]),
@@ -425,6 +425,13 @@ class LayoutViewHelper
 		/* Check for moderates */
 		$model = get_model('DataModelAgenda');
 		return array_filter($model->get_proposed(), [get_policy($model), 'user_can_moderate']);
+	}
+
+	public function profile_pictures_to_review()
+	{
+		/* Check for unreviewed pictures */
+		$model = get_model('DataModelProfilePicture');
+		return array_filter($model->find(['reviewed' => false]), [get_policy($model), 'user_can_review']);
 	}
 
 	public function color_mode()

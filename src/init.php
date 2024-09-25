@@ -7,18 +7,6 @@ define('IN_SITE', true);
 ini_set('display_errors', true);
 ini_set('magic_quotes_gpc', 0);
 
-class AssertionException extends RuntimeException
-{
-	public function __construct($message, $script, $line)
-	{
-		parent::__construct('Assertion failed: ' . $message);
-	}
-} 
-
-assert_options(ASSERT_CALLBACK, function($script, $line, $message) {
-	throw new AssertionException($message, $script, $line);
-});
-
 set_error_handler(function($severity, $message, $file, $line, $vars=null) {
 	if (error_reporting() & $severity)
 		throw new ErrorException($message, 0, $severity, $file, $line);
