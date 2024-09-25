@@ -7,6 +7,7 @@ require_once 'src/services/secretary.php';
 require_once 'src/framework/controllers/Controller.php';
 require_once 'src/framework/email.php';
 
+use App\Form\ProfilePictureType;
 use Misd\PhoneNumberBundle\Validator\Constraints\PhoneNumber as AssertPhoneNumber;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -220,26 +221,7 @@ class ProfileController extends \Controller
 	// TODO: is public so it can be accessed from view. Make private after UI change
 	public function _get_photo_form()
 	{
-		$form = $this->createFormBuilder()
-			->add('photo', FileType::class, [
-				'label' => __('Photo'),
-				'cta' => __('Choose photo…'),
-				'constraints' => [
-					new Assert\Image([
-						'maxSize' => ini_get('upload_max_filesize'),
-						'mimeTypes' => [
-							'image/jpeg',
-						],
-						'mimeTypesMessage' => __('Please upload a valid JPEG-image.'),
-						'sizeNotDetectedMessage' => __('The uploaded file doesn’t appear to be an image.'),
-					])
-				],
-				'attr' => [
-					'accept' => 'image/jpeg',
-				],
-			])
-			->add('submit', SubmitType::class)
-			->getForm();
+		$form = $this->createForm(ProfilePictureType::class, null, ['mapped' => false]);
 		$form->handleRequest($this->get_request());
 		return $form;
 	}
@@ -380,42 +362,6 @@ class ProfileController extends \Controller
 			'iter' => $iter,
 			'form' => $form->createView(),
 		]);
-	}
-
-	protected function run_photo(\DataIterMember $iter)
-	{
-		// Only members themselves and the AC/DCee can change photos
-		if (!$this->policy->user_can_update($iter)
-			&& !get_identity()->member_in_committee(COMMISSIE_EASY))
-			throw new \UnauthorizedException();
-
-
-		$form = $this->_get_photo_form();
-		if ($form->isSubmitted() && $form->isValid()) {
-			$file = $form['photo']->getData();
-			if (get_identity()->member_in_committee(COMMISSIE_EASY)) {
-				$fh = fopen($file->getPathname(), 'rb');
-
-				if (!$fh)
-					throw new \RuntimeException(__('The uploaded file could not be opened.'));
-
-				$this->model->set_photo($iter, $fh);
-
-				fclose($fh);
-			} else {
-				$profile_link = $this->generate_url('profile', ['lid' => $iter['id']], UrlGeneratorInterface::ABSOLUTE_URL);
-				send_mail_with_attachment(
-					'acdcee@svcover.nl',
-					'New yearbook photo for ' . $iter['full_name'],
-					"{$iter['full_name']} would like to use the attached photo as their new profile picture. Change it here: {$profile_link}",
-					sprintf('Reply-to: %s <%s>', $iter['full_name'], $iter['email']),
-					[$file->getClientOriginalName() => $file->getPathname()]);
-
-				$_SESSION['alert'] = __('Your photo has been submitted. It may take a while before it will be updated.');
-			}
-		}
-
-		return $this->view->redirect($this->generate_url('profile', ['view' => 'profile', 'lid' => $iter['id']]));
 	}
 
 	public function run_export_vcard(\DataIterMember $member)

@@ -1,0 +1,24 @@
+// head padding + footer padding + body padding + head content + footer content + slider + slider margin
+$modal-overhead: calc(#{4 * $modal-card-head-padding} + #{2* $modal-card-body-padding} + #{3 * $control-height} + #{$block-spacing})
+
+.image-picker-modal
+    .modal-card-body
+        cropper-canvas
+            // Make canvas always square
+            height: calc(100vw - #{2 * $modal-card-body-padding})
+            // OK, not always. Make sure modal card body never overflows
+            max-height: calc(100vh - #{$modal-content-spacing-mobile} - #{$modal-overhead})
+            +tablet
+                height: $modal-content-width - (2 * $modal-card-body-padding)
+                max-height: calc(100vh - #{$modal-content-spacing-tablet} - #{$modal-overhead})
+            &.is-rounded
+                cropper-selection,
+                cropper-shade,
+                cropper-grid
+                    border-radius: 100%
+                cropper-grid
+                    overflow: hidden
+        input[type='range']
+            display: block
+            width: 80%
+            margin: 0 auto

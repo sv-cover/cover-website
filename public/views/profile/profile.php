@@ -4,6 +4,13 @@ use JeroenDesloovere\VCard\VCard;
 
 class ProfileView extends View
 {
+	public function scripts()
+	{
+		return array_merge(parent::scripts(), [
+			get_theme_data('assets/dist/js/images.js'),
+		]);
+	}
+
 	public function tabs(DataIterMember $iter)
 	{
 		return [
@@ -173,10 +180,10 @@ class ProfileView extends View
 			$card->addURL($member['homepage']);
 
 		// Only add a thumbnail of the photo if the member has one, and it isn't hidden.
-		if ($is_visible('foto') && $this->controller->model()->has_picture($member)) {
+		if ($is_visible('foto') && $member->get_profile_picture()) {
 			$fout = null;
 
-			$photo = $this->controller->model()->get_photo_stream($member);
+			$photo = $member->get_profile_picture()->get_stream();
 
 			$imagick = new \Imagick();
 			$imagick->readImageFile($photo['foto']);
@@ -233,10 +240,6 @@ class ProfileView extends View
 			|| get_identity()->member_in_committee(COMMISSIE_BESTUUR)
 			|| get_identity()->member_in_committee(COMMISSIE_KANDIBESTUUR)
 			|| get_identity()->member_in_committee(COMMISSIE_EASY);
-	}
-
-	public function get_photo_form() {
-		return $this->controller->_get_photo_form()->createView();
 	}
 
 	public function format_member_data(DataIterMember $iter, $field)
