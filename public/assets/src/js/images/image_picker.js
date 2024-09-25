@@ -67,6 +67,8 @@ class ImagePicker {
 
         this.cropper = new Cropper(image, cropperOptions);
         this.cropper.getCropperImage().addEventListener('transform', this.handleImageTransform.bind(this));
+
+        this.initSlider();
     }
 
     initModal() {
@@ -109,6 +111,37 @@ class ImagePicker {
             ],
             onClose: this.handleModalClose.bind(this),
         });
+    }
+
+    initSlider() {
+        this.sliderElement = document.createElement('input');
+        this.sliderElement.classList.add('input');
+        this.sliderElement.type = 'range';
+        this.sliderElement.title = 'Slide to resize image';
+        this.sliderElement.step = 0.05;
+        this.sliderElement.setAttribute('aria-label', 'Resize image');
+
+        this.sliderElement.addEventListener('input', this.handleSlider.bind(this));
+
+        this.cropper.getCropperCanvas().classList.add('block');
+        this.modalBodyElement.appendChild(this.sliderElement);
+
+        // Somehow, initial value is not set correctly through the transform
+        // event alone. Fix by waiting.
+        setTimeout(this.updateSlider.bind(this), 100);
+    }
+
+    updateSlider() {
+        const image = this.cropper.getCropperImage();
+        const selection = this.cropper.getCropperSelection();
+
+        const minScale = Math.max(
+            selection.width / image.$image.naturalWidth,
+            selection.height / image.$image.naturalHeight,
+        );
+        this.sliderElement.min = minScale;
+        this.sliderElement.max = minScale + 1;
+        this.sliderElement.value = image.$getTransform()[0];
     }
 
     /**
@@ -257,7 +290,19 @@ class ImagePicker {
         if (event.detail.matrix.some((el, idx) => el != matrix[idx])) {
             event.preventDefault();
             image.$setTransform(matrix);
+        } else {
+            this.updateSlider();
         }
+    }
+
+    handleSlider(event) {
+        const image = this.cropper.getCropperImage();
+        const scale = parseFloat(event.target.value);
+        // image.$zoom and image.$scale are relative, need to set absolute value
+        let transform = image.$getTransform();
+        transform[0] = scale;
+        transform[3] = scale;
+        image.$setTransform(transform);
     }
 
     handleKeydown(event) {
