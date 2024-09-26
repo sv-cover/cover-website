@@ -21,7 +21,8 @@ class DataIterAgenda extends DataIter implements SearchResult
 			'private',
 			'extern',
 			'facebook_id',
-			'replacement_for'
+			'category',
+			'replacement_for',
 		];
 	}
 

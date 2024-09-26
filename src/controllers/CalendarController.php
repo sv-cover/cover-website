@@ -117,10 +117,12 @@ class CalendarController extends \ControllerCRUD
 					'member_naam' => member_full_name(get_identity()->member(), IGNORE_PRIVACY)
 				];
 
+				$category = implode(', ', array_map('ucfirst', explode(',', $iter['category'])));
+
 				mail(
 					get_config_value('defer_email_to', get_config_value('email_bestuur')),
 					'Updated event ' . $iter['kop'] . ($iter->get('kop') != $orig->get('kop') ? ' was ' . $orig->get('kop') : ''),
-					parse_email('agenda_mod.txt', array_merge($iter->data, $placeholders, ['id' => $override_id])),
+					parse_email('agenda_mod.txt', array_merge($iter->data, $placeholders, ['id' => $override_id, 'category' => $category])),
 					"From: Study Association Cover <noreply@svcover.nl>\r\n"
 				);
 			}

@@ -4,6 +4,7 @@ Name:     $kop
 From:     $van
 Until:    $tot
 Location: $locatie
+Category: $category
 
 $beschrijving
 
