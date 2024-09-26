@@ -92,7 +92,8 @@ CREATE TABLE public.agenda (
 	private smallint DEFAULT 0,
 	extern smallint DEFAULT 0 NOT NULL,
 	facebook_id character varying(20),
-	replacement_for integer
+	replacement_for integer,
+    category character varying(255) DEFAULT NULL
 );
 
 

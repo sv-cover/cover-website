@@ -181,7 +181,8 @@ CREATE TABLE agenda (
     private smallint DEFAULT 0, -- boolean
     extern smallint NOT NULL DEFAULT 0, -- boolean
     facebook_id character varying(20) DEFAULT NULL,
-    replacement_for integer DEFAULT NULL -- refers to itself
+    replacement_for integer DEFAULT NULL, -- refers to itself
+    category character varying(255) DEFAULT NULL
 );
 
 -- Todo: add a separate column for agenda item approving. Currently new
