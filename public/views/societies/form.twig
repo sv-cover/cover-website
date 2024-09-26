@@ -1,0 +1,29 @@
+{% extends '@layout/layout.twig' %}
+
+{% block title __('Found a society') ~ ' – ' ~ parent() %}
+
+{% block content %}
+<h1 class="title">{{ __('Found a society') }}</h1>
+{{ form_start(form) }}
+    <p class="field">
+        {{ __('Fill out this form to request the foundation of a new society. After submission, the board will review your request and get back to you. For more information about societies and the process of founding one, please review the %s.')|e('html')|format('<a href="https://sd.svcover.nl/Association/Guidelines%20Societies.pdf" target="_blank">Societies Guidelines</a>')|raw }}
+    </p>
+    {# Global errors #}
+    {{ form_errors(form) }}
+    {# Fields #}
+    {{ form_row(form.society_name) }}
+    {{ form_row(form.society_purpose) }}
+    {{ form_row(form.founding_members) }}
+    {{ form_row(form.leader) }}
+    {{ form_row(form.other_comments) }}
+    {{ form_row(form.email) }}
+    {{ form_row(form.phone) }}
+
+    <div class="field">
+        <div class="control buttons">
+            {{ form_widget(form.submit) }}
+            <a href="{{ path('societies') }}" class="button">{{ __('Back to societies') }}</a>
+        </div>
+    </div>
+{{ form_end(form) }}
+{% endblock %}

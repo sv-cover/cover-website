@@ -81,11 +81,12 @@ CREATE TABLE passwords (
 -- Photos are also stored separately because they are large! And currently you 
 -- can have multiple photos (although only the last is shown).
 
-CREATE TABLE lid_fotos (
+CREATE TABLE profile_pictures (
     id SERIAL PRIMARY KEY,
-    lid_id integer REFERENCES leden (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    foto bytea,
-    foto_mtime timestamp without time zone NOT NULL DEFAULT ('now'::text)::timestamp(6) without time zone
+    member_id integer REFERENCES leden (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    photo bytea,
+    created_on timestamp without time zone NOT NULL DEFAULT ('now'::text)::timestamp(6) without time zone,
+    reviewed boolean NOT NULL DEFAULT FALSE
 );
 
 --

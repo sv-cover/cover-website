@@ -80,7 +80,7 @@ class DataIterEditable extends DataIter implements SearchResult
 	{
 		$content = $this->get_locale_content($language);
 
-		return isset($content) && preg_match('/\[h1\](.+?)\[\/h1\]\s*/ism', $content, $match)
+		return isset($content) && preg_match('/\[h1\](.+?)\[\/h1\]\s*/ism', $content ?? '', $match)
 			? $match[1]
 			: $this->get('titel');
 	}
@@ -89,7 +89,7 @@ class DataIterEditable extends DataIter implements SearchResult
 	{
 		$content = $this->get_locale_content($language);
 
-		if (preg_match('/\[samenvatting\](.+?)\[\/samenvatting\]/msi', $content, $matches))
+		if (preg_match('/\[samenvatting\](.+?)\[\/samenvatting\]/msi', $content ?? '', $matches))
 			return markup_strip($matches[1]);
 
 		return $summary = summarize(markup_strip($content), 128);

@@ -1,19 +1,27 @@
 <?php 
 namespace App\Form\DataTransformer;
 
+use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
 
-class StringToDateTimeTransformer extends DateTimeToStringTransformer 
+class StringToDateTimeTransformer implements DataTransformerInterface
 {
-	public function transform($value): ?\DateTime
+	private DateTimeToStringTransformer $transformer;
+
+	public function __construct(?string $inputTimezone = null, ?string $outputTimezone = null, string $format = 'Y-m-d H:i:s', ?string $parseFormat = null)
 	{
-		return parent::reverseTransform($value);
+		$this->transformer = new DateTimeToStringTransformer($inputTimezone, $outputTimezone, $format, $parseFormat);
 	}
 
-	public function reverseTransform($value): ?string
+	public function transform(mixed $value): ?\DateTime
 	{
-		$transformed = parent::transform($value);
+		return $this->transformer->reverseTransform($value);
+	}
+
+	public function reverseTransform(mixed $value): ?string
+	{
+		$transformed = $this->transformer->transform($value);
 
 		if (empty($transformed))
 			return null;

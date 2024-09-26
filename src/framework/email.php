@@ -228,7 +228,7 @@ class MessagePart
 		// If this is a simple part (no multipart) just return the data
 		if (!$this->isMultipart())
 			return $this->decodeBody($this->body,
-				$this->header('Content-Transfer-Encoding'),
+				$this->header('Content-Transfer-Encoding')  ?? '',
 				charset($this->header('Content-Type')));
 
 		// However, if this is a multipart message, search all the sub parts for the preferred content type
@@ -365,8 +365,6 @@ class MessagePart
 
 	public function addBody($content_type, $body, $content_transfer_encoding = null)
 	{
-		assert(is_string($body));
-
 		// No previous body was set, this is the part :O
 		if ($this->body === null) {
 			$part = $this;
@@ -411,8 +409,6 @@ class MessagePart
 
 	private function makeMultipart()
 	{
-		assert(is_string($this->body));
-
 		if ($this->body !== null)
 			$this->body = [
 				new MessagePart(

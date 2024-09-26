@@ -36,9 +36,9 @@ career:
   path: /career
   controller: App\Controller\CareerController
 
-clubs:
-  path: /clubs
-  controller: App\Controller\ClubsController
+societies:
+  path: /societies
+  controller: App\Controller\SocietiesController
 
 committee_members:
   path: /committee_members
@@ -204,7 +204,7 @@ photos:
 
 
 ################################################################################
-# POlls
+# Polls
 ################################################################################
 
 poll.list:
@@ -239,12 +239,31 @@ profile:
   path: /profile
   controller: App\Controller\ProfileController
 
-profile_picture:
-  path: /profile/{lid_id<\d+>}/picture/{format}/{width<\d+>}
+profile_pictures.member:
+  path: /profile/{member_id<\d+>}/picture/{format}/{width<\d+>}
   controller: App\Controller\ProfilePictureController
   defaults:
-    format: null
+    view: member
+    format: square
     width: null
+  requirements:
+    format: square|portrait|original
+
+profile_pictures.list:
+  path: /profile_pictures
+  controller: App\Controller\ProfilePictureController
+
+profile_pictures.create:
+  path: /profile_pictures/create
+  controller: App\Controller\ProfilePictureController
+  defaults:
+    view: create
+
+profile_pictures:
+  path: /profile_pictures/{id<\d+>}/{view}
+  controller: App\Controller\ProfilePictureController
+  defaults:
+    view: read
 
 search:
   path: /search
@@ -327,18 +346,15 @@ legacy:
       career:
         controller: App\Controller\CareerController
         parameters: { _route: career }
-      clubs:
-        controller: App\Controller\ClubsController
-        parameters: { _route: clubs }
+      societies:
+        controller: App\Controller\SocietiesController
+        parameters: { _route: societies }
       commissies:
         controller: App\Controller\CommitteesController
         parameters: { _route: committees }
       forum:
         controller: App\Controller\ForumController
         parameters: { _route: forum }
-      foto:
-        controller: App\Controller\ProfilePictureController
-        parameters: { _route: profile_picture }
       fotoboek:
         controller: App\Controller\PhotosController
         parameters: { _route: photos }

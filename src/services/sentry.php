@@ -18,8 +18,10 @@ function sentry_get_client()
 
 function sentry_report_exception($e)
 {
-	if (!sentry_get_client())
+	if (sentry_get_client())
 		return Sentry\captureException($e);
+	elseif (get_config_value('debug', false))
+		throw $e;
 	return null;
 }
 

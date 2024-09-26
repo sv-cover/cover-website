@@ -14,7 +14,7 @@
 </div>
 
 
-{% for item in iters if user_can_read item %}
+{% for item in iters|filter(item => user_can_read item) %}
 <div class="card is-half-height announcement block">
 	<div class="card-content">
 		<div class="level is-marginless">
