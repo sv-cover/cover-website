@@ -44,7 +44,7 @@
                 <button type="submit" form="profile-pictures-{{ iter.id|e('url') }}-review-form" class="card-footer-item">
                     {{ __('Looks good!') }}
                 </button>
-                <a href="{{ path('profile', {lid_id: iter.member_id}) }}" class="card-footer-item">
+                <a href="{{ path('profile', {lid: iter.member_id}) }}" class="card-footer-item">
                     {{ __('View profile') }}
                 </a>
                 {% if user_can_delete iter %}
