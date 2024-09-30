@@ -599,7 +599,7 @@ ALTER TABLE public.profile_pictures_id_seq OWNER TO webcie;
 
 CREATE TABLE public.profile_pictures (
 	id integer DEFAULT nextval('public.profile_pictures_id_seq'::regclass) NOT NULL,
-    member_id integer REFERENCES leden (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    member_id integer REFERENCES public.leden (id) ON UPDATE CASCADE ON DELETE CASCADE,
     photo bytea,
     created_on timestamp without time zone NOT NULL DEFAULT ('now'::text)::timestamp(6) without time zone,
     reviewed boolean NOT NULL DEFAULT FALSE
@@ -872,8 +872,11 @@ ALTER TABLE public.registrations OWNER TO webcie;
 -- Name: sessions; Type: TABLE; Schema: public; Owner: webcie
 --
 
+CREATE TYPE session_type AS ENUM ('member', 'device');
+
 CREATE TABLE public.sessions (
 	session_id character(40) NOT NULL,
+	type session_type NOT NULL DEFAULT 'member',
 	member_id integer,
 	created_on timestamp with time zone,
 	ip_address inet,
@@ -881,7 +884,9 @@ CREATE TABLE public.sessions (
 	timeout interval,
 	application text,
 	override_member_id integer,
-	override_committees character varying(255) DEFAULT NULL::character varying
+	override_committees character varying(255) DEFAULT NULL::character varying,
+	device_enabled boolean NOT NULL DEFAULT FALSE,
+	device_name varchar(255) DEFAULT NULL
 );
 
 
