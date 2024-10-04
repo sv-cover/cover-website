@@ -100,6 +100,7 @@ class View
 
 		$this->twig = new TwigEnvironment($loader, [
 			'debug' => get_config_value('debug', false),
+			'auto_reload' => true, // Make sure template cache reloads when deploying on the server
 			'strict_variables' => true,
 			'cache' => get_config_value('twig_cache', 'tmp/twig'),
 		]);
@@ -110,9 +111,9 @@ class View
 		];
 		$form_engine = new TwigRendererEngine($form_themes, $this->twig);
 		$this->twig->addRuntimeLoader(new FactoryRuntimeLoader([
-				FormRenderer::class => function () use ($form_engine) {
-						return new FormRenderer($form_engine, get_csrf_manager());
-				},
+			FormRenderer::class => function () use ($form_engine) {
+					return new FormRenderer($form_engine, get_csrf_manager());
+			},
 		]));
 
 		$this->twig->addExtension(new IntlExtension());
