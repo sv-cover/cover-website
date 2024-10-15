@@ -37,8 +37,7 @@ class LayoutViewHelper
 		$menus['studie'] = [
 			'label' => __('Education'),
 			'submenu' => [
-				['url' => $this->router->generate('page', [
-					'id' => 149]), 'label' => __('Degree Programmes')],
+				['url' => $this->router->generate('page', ['id' => 149]), 'label' => __('Degree Programmes')],
 				// ['url' => $this->router->generate('page', ['id' => 24]),  'label' => __('Alumni')],
 				['url' => $this->router->generate('page', ['id' => 27]),  'label' => __('Student info')],
 				['url' => $this->router->generate('page', ['id' => 118]), 'label' => __('Student representation')],
