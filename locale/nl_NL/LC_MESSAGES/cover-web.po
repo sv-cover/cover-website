@@ -3525,7 +3525,7 @@ msgid "Wrong combination of e-mail address and password"
 msgstr "Verkeerde combinatie van e-mailadres en wachtwoord"
 
 #: signup.php:377
-msgid "Sign-up form for a paid activitee"
+msgid "Sign-up form for a paid activity"
 msgstr "Inschrijfformulier voor betaalde activiteit"
 
 #: themes/default/views/_layout/layout.php:10

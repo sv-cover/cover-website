@@ -255,7 +255,7 @@ class SignUpFormsController extends \Controller
 		$form->add('template', ChoiceType::class, [
 			'label' => __('Template'),
 			'choices' => [
-				__('Sign-up form for a paid activitee') => 'paid_activity',
+				__('Sign-up form for a paid activity') => 'paid_activity',
 			],
 			'help' => __('Choose a template to start with a set of predefined fields.'),
 			'placeholder' => __('Empty form'),
@@ -484,7 +484,7 @@ class SignUpFormsController extends \Controller
 	public function available_templates()
 	{
 		return [
-			'paid_activity' => __('Sign-up form for a paid activitee')
+			'paid_activity' => __('Sign-up form for a paid activity')
 		];
 	}
 
@@ -521,6 +521,18 @@ class SignUpFormsController extends \Controller
 			$this->field_model->insert($form->new_field('checkbox', function($widget) {
 				$widget->required = true;
 				$widget->description = 'I allow Cover to deduct €x,xx from my bank account.';
+			}));
+
+			$this->field_model->insert($form->new_field('editable', function($widget) {
+				$widget->content = sprintf(
+					"Please review Cover's [url=%s]Cancellation Policy[/url] before proceeding. By checking the box below, you confirm that you understand and agree to these terms.",
+					$this->router->generate('slug', ['slug' => 'cancellation-policy'])
+				);
+			}));
+
+			$this->field_model->insert($form->new_field('checkbox', function($widget) {
+				$widget->required = true;
+				$widget->description = 'I agree with the cancellation policy.';
 			}));
 
 			$this->field_model->db->commit();
