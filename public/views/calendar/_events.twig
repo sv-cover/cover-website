@@ -13,7 +13,16 @@
     {% endif %}
     <li class="event {% if event.image_url %}has-image{% endif %} {% if event.is_proposal() %}is-proposal{% endif %} column is-half-tablet is-one-third-widescreen is-one-quarter-fullhd">
         <a href="{{ path('calendar', {agenda_id: event.id}) }}">
-            <div class="overlay">
+            {% if event.image_url %}
+                <figure class="image">
+                    <picture>
+                        <source srcset="{{ event.get_image(600) }} 1x, {{ event.get_image(900) }} 1.5x, {{ event.get_image(1200) }} 2x" media="(min-width: 400px) and (max-width: 600px)">
+                        <source srcset="{{ event.get_image(400) }} 1x, {{ event.get_image(600) }} 1.5x, {{ event.get_image(800) }} 2x">
+                        <img src="{{ event.get_image(600) }}">
+                    </picture>
+                </figure>
+            {% endif %}
+            <div class="event-info">
                 <div class="date">
                     <span>
                         {{ macros.format_period_short(event) }}
@@ -24,23 +33,19 @@
                         {{ event.kop }}
                     </h3>
                 </div>
-                {% if event.is_proposal() %}
-                    <div class="label-pending">
-                        <span>
-                            {{ __('Waiting for approval') }}
-                        </span>
+                {% if event.category %}
+                    <div class="categories">
+                        {% for category in event.category|split(',') %}
+                            <span class="tag is-rounded {{ category }}">{{ category }}</span>
+                        {% endfor %}
                     </div>
                 {% endif %}
+                {% if event.is_proposal() %}
+                    <span class="tag is-rounded label-pending">
+                        {{ __('Waiting for approval') }}
+                    </span>
+                {% endif %}
             </div>
-            {% if event.image_url %}
-                <figure class="image">
-                    <picture>
-                        <source srcset="{{ event.get_image(600) }} 1x, {{ event.get_image(900) }} 1.5x, {{ event.get_image(1200) }} 2x" media="(min-width: 400px) and (max-width: 600px)">
-                        <source srcset="{{ event.get_image(400) }} 1x, {{ event.get_image(600) }} 1.5x, {{ event.get_image(800) }} 2x">
-                        <img src="{{ event.get_image(600) }}"> 
-                    </picture>
-                </figure>
-            {% endif %}
         </a>
     </li>
 {% else %}

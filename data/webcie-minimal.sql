@@ -92,7 +92,8 @@ CREATE TABLE public.agenda (
 	private smallint DEFAULT 0,
 	extern smallint DEFAULT 0 NOT NULL,
 	facebook_id character varying(20),
-	replacement_for integer
+	replacement_for integer,
+    category character varying(255) DEFAULT NULL
 );
 
 
@@ -579,10 +580,10 @@ CREATE TABLE public.leden (
 ALTER TABLE public.leden OWNER TO webcie;
 
 --
--- Name: lid_fotos_id_seq; Type: SEQUENCE; Schema: public; Owner: webcie
+-- Name: profile_pictures_id_seq; Type: SEQUENCE; Schema: public; Owner: webcie
 --
 
-CREATE SEQUENCE public.lid_fotos_id_seq
+CREATE SEQUENCE public.profile_pictures_id_seq
 	START WITH 1
 	INCREMENT BY 1
 	NO MINVALUE
@@ -590,21 +591,21 @@ CREATE SEQUENCE public.lid_fotos_id_seq
 	CACHE 1;
 
 
-ALTER TABLE public.lid_fotos_id_seq OWNER TO webcie;
+ALTER TABLE public.profile_pictures_id_seq OWNER TO webcie;
 
 --
--- Name: lid_fotos; Type: TABLE; Schema: public; Owner: webcie
+-- Name: profile_pictures; Type: TABLE; Schema: public; Owner: webcie
 --
 
-CREATE TABLE public.lid_fotos (
-	id integer DEFAULT nextval('public.lid_fotos_id_seq'::regclass) NOT NULL,
-	lid_id integer,
-	foto bytea,
-	foto_mtime timestamp without time zone DEFAULT ('now'::text)::timestamp(6) without time zone
+CREATE TABLE public.profile_pictures (
+	id integer DEFAULT nextval('public.profile_pictures_id_seq'::regclass) NOT NULL,
+    member_id integer REFERENCES public.leden (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    photo bytea,
+    created_on timestamp without time zone NOT NULL DEFAULT ('now'::text)::timestamp(6) without time zone,
+    reviewed boolean NOT NULL DEFAULT FALSE
 );
 
-
-ALTER TABLE public.lid_fotos OWNER TO webcie;
+ALTER TABLE public.profile_pictures OWNER TO webcie;
 
 --
 -- Name: links_categorie_id_seq; Type: SEQUENCE; Schema: public; Owner: webcie
@@ -871,8 +872,11 @@ ALTER TABLE public.registrations OWNER TO webcie;
 -- Name: sessions; Type: TABLE; Schema: public; Owner: webcie
 --
 
+CREATE TYPE session_type AS ENUM ('member', 'device');
+
 CREATE TABLE public.sessions (
 	session_id character(40) NOT NULL,
+	type session_type NOT NULL DEFAULT 'member',
 	member_id integer,
 	created_on timestamp with time zone,
 	ip_address inet,
@@ -880,7 +884,9 @@ CREATE TABLE public.sessions (
 	timeout interval,
 	application text,
 	override_member_id integer,
-	override_committees character varying(255) DEFAULT NULL::character varying
+	override_committees character varying(255) DEFAULT NULL::character varying,
+	device_enabled boolean NOT NULL DEFAULT FALSE,
+	device_name varchar(255) DEFAULT NULL
 );
 
 
@@ -3699,10 +3705,10 @@ COPY public.leden (id, voornaam, tussenvoegsel, achternaam, adres, postcode, woo
 
 
 --
--- Data for Name: lid_fotos; Type: TABLE DATA; Schema: public; Owner: webcie
+-- Data for Name: profile_pictures; Type: TABLE DATA; Schema: public; Owner: webcie
 --
 
-COPY public.lid_fotos (id, lid_id, foto, foto_mtime) FROM stdin;
+COPY public.profile_pictures (id, member_id, photo, created_on, created_on, reviewed) FROM stdin;
 \.
 
 
@@ -4132,10 +4138,10 @@ SELECT pg_catalog.setval('public.gastenboek_id_seq', 316342, true);
 
 
 --
--- Name: lid_fotos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: webcie
+-- Name: profile_pictures_id_seq; Type: SEQUENCE SET; Schema: public; Owner: webcie
 --
 
-SELECT pg_catalog.setval('public.lid_fotos_id_seq', 1336, true);
+SELECT pg_catalog.setval('public.profile_pictures_id_seq', 1336, true);
 
 
 --

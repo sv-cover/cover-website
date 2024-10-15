@@ -61,7 +61,7 @@
                 </td>
                 <td class="is-sticky is-right has-text-right is-nowrap">
                     <ul class="controls">
-                        {% spaceless %}
+                        {% apply spaceless %}
                             {% if user_can_delete partner %}
                                 <li>
                                     <a href="{{ path('partners', {view: 'delete', id: partner.id}) }}" title="{{ __('Delete partner') }}"  data-popup="modal">
@@ -86,7 +86,7 @@
                                     </a>
                                 </li>
                             {% endif %}
-                        {% endspaceless %}
+                        {% endapply %}
                     </ul>
                 </td>
             </tr>

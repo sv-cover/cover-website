@@ -67,7 +67,7 @@
     <figure class="media-left is-hidden-mobile">
         {% if comment.member %}
             <a class="image is-64x64" href="{{ path('profile', {lid: comment.member.id}) }}" title="{{ comment.member.full_name }}" aria-label="{{ comment.member.full_name }}">
-                <img class="is-rounded" width="64" height="64" src="{{ path('profile_picture', {lid_id: comment.member.id, format: 'square', width: 128}) }}" alt="{{ __('Photo of %s')|format(comment.member|full_name) }}">
+                <img class="is-rounded" width="64" height="64" src="{{ path('profile_pictures.member', {member_id: comment.member.id, format: 'square', width: 128}) }}" alt="{{ __('Photo of %s')|format(comment.member|full_name) }}">
             </a>
         {% else %}
             <div class="image is-64x64">
@@ -85,7 +85,7 @@
                 <span class="is-hidden-tablet">
                     {% if comment.member %}
                         <a class="image is-48x48" href="{{ path('profile', {lid: comment.member.id}) }}" title="{{ comment.member.full_name }}" aria-label="{{ comment.member.full_name }}">
-                            <img class="is-rounded" width="48" height="48" src="{{ path('profile_picture', {lid_id: comment.member.id, format: 'square', width: 96}) }}" alt="{{ __('Photo of %s')|format(comment.member|full_name) }}">
+                            <img class="is-rounded" width="48" height="48" src="{{ path('profile_pictures.member', {member_id: comment.member.id, format: 'square', width: 96}) }}" alt="{{ __('Photo of %s')|format(comment.member|full_name) }}">
                         </a>
                     {% else %}
                         <span class="image is-48x48">
@@ -206,7 +206,7 @@
         <input type="hidden" name="poll_comment[_token]" value="{{ csrf_token('poll_' ~ iter.id ~ '_comment') }}">
         <figure class="media-left is-hidden-mobile">
             <p class="image is-64x64">
-                <img class="is-rounded" width="64" height="64" src="{{ path('profile_picture', {lid_id: global.identity.member.id, format: 'square', width: 128}) }}" alt="Photo of {{ global.identity.member|personal_full_name }}">
+                <img class="is-rounded" width="64" height="64" src="{{ path('profile_pictures.member', {member_id: global.identity.member.id, format: 'square', width: 128}) }}" alt="Photo of {{ global.identity.member|personal_full_name }}">
             </p>
         </figure>
         <div class="media-content">

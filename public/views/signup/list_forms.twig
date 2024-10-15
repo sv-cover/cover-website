@@ -57,7 +57,7 @@
 					</td>
 					<td class="is-sticky is-right has-text-right is-nowrap">
 						<ul class="controls">
-						{% spaceless %}
+						{% apply spaceless %}
 							{% if user_can_update form %}
 								<li>
 									<a href="{{ path('signup', {'view': 'update_form', 'form': form.id}) }}" title="{{ __('Modify form') }}">
@@ -80,7 +80,7 @@
 									</span>
 								</a>
 							</li>
-						{% endspaceless %}
+						{% endapply %}
 						</ul>
 					</td>
 				</tr>

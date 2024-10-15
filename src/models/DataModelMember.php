@@ -160,19 +160,13 @@ class DataIterMember extends DataIter implements SearchResult
 		return $router->generate('profile', ['lid' => $this->get_id()], $reference_type);
 	}
 
-	public function has_photo()
+	public function get_profile_picture()
 	{
-		return $this->model->has_photo($this);
-	}
-
-	public function get_photo_stream()
-	{
-		return $this->model->get_photo_stream($this);
-	}
-
-	public function get_photo_mtime()
-	{
-		return $this->model->get_photo_mtime($this);
+		try {
+			return get_model('DataModelProfilePicture')->get_for_member($this);
+		} catch (\DataIterNotFoundException $e) {
+			return null;
+		}
 	}
 
 	private function _get_secretary_data()
@@ -295,43 +289,6 @@ class DataModelMember extends DataModel implements SearchProvider
 					voornaam, tussenvoegsel, achternaam');
 
 		return $this->_rows_to_iters($rows);
-	}
-
-	public function has_photo(DataIterMember $iter)
-	{
-		return (bool) $this->db->query_first('SELECT id from lid_fotos WHERE lid_id = ' . $iter->get_id());
-	}
-
-	public function get_photo_stream(DataIter $iter)
-	{
-		return $this->db->query_first('SELECT foto, length(foto) as filesize from lid_fotos WHERE lid_id = ' . $iter->get_id() . ' ORDER BY id DESC LIMIT 1');
-	}
-	
-	public function get_photo_mtime(DataIter $iter)
-	{
-		$row = $this->db->query_first('SELECT EXTRACT(EPOCH FROM foto_mtime) as mtime FROM lid_fotos WHERE lid_id = ' . $iter->get_id() . ' ORDER BY id DESC LIMIT 1');
-
-		if ($row)
-			return (int) $row['mtime'];
-
-		return 0;
-	}
-
-	public function set_photo(DataIter $iter, $fh)
-	{
-		$this->db->query(sprintf("INSERT INTO lid_fotos (lid_id, foto, foto_mtime) VALUES (%d, '%s', NOW())",
-			$iter->get_id(), $this->db->write_blob($fh)));
-	}
-
-	/**
-	  * Returns true if the member has a picture
-	  * @iter a #DataIter
-	  *
-	  * @result true if member has a picture
-	  */
-	public function has_picture(DataIter $iter)
-	{
-		return $this->has_photo($iter);
 	}
 
 	/**

@@ -68,7 +68,7 @@ class BankAccount implements \SignUpFieldType
 				return null;
 
 			return json_encode(['iban' => $contract->iban, 'bic' => $contract->bic]);
-		} catch (\RuntimeException $e) {
+		} catch (\Exception|\Error $exception) {
 			return null;
 		}
 	}

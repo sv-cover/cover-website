@@ -128,15 +128,14 @@ class AlmanakController extends \Controller
 		// Apparently nginx doesn't like zipstream
 		header('X-Accel-Buffering: no');
 
-		// Set up the output zip stream and just handle all files as large files
-		// (meaning no compression, streaming instead of reading into memory.)
-		$options = new \ZipStream\Option\Archive();
-		$options->setLargeFileSize(1);
-		$options->setLargeFileMethod(\ZipStream\Option\Method::STORE());
-		$options->setSendHttpHeaders(true);
-		$options->setOutputStream(fopen('php://output', 'wb'));
-
-		$zip = new ZipStream('almanac-' . date('Y-m-d') . '.zip', $options);
+		// Set up the output zip stream.
+		// Use no compression, streaming instead of reading into memory.
+		$zip = new ZipStream(
+			outputName: 'almanac-' . date('Y-m-d') . '.zip',
+			outputStream: fopen('php://output', 'wb'),
+			sendHttpHeaders: true,
+			defaultCompressionMethod: \ZipStream\CompressionMethod::STORE,
+		);
 
 		// Now for each book find all photos and add them to the zip stream
 		$iters = $this->model->get_from_search_first_last(null, null);
@@ -149,18 +148,26 @@ class AlmanakController extends \Controller
 		foreach ($iters as $iter)
 		{
 			// Skip all members that have hidden their photo
-			if (($this->model->get_privacy_for_field($iter, 'foto') & 1) === 0)
+			if (($this->model->get_privacy_for_field($iter, 'foto') & $this->model::VISIBLE_TO_MEMBERS) === 0)
 				continue;
+
+			$profile_picture = $iter->get_profile_picture();
+
+			if ($profile_picture === null)
+				continue;
+
+			$data = $profile_picture->get_stream();
 
 			// Skip members that don't have a photo
-			if (($data = $this->model->get_photo_stream($iter)) === null)
+			if ($data === null)
 				continue;
 
-			$metadata = new \ZipStream\Option\File();
-			$metadata->setTime(new \DateTime(sprintf('@%d', $this->model->get_photo_mtime($iter))));
-
 			// And finally add the photo to the actual stream
-			$zip->addFileFromStream(sprintf('%d.jpg', $iter->get_id()), $data['foto'], $metadata);
+			$zip->addFileFromStream(
+				fileName: sprintf('%d.jpg', $iter->get_id()),
+				stream: $data['photo'],
+				lastModificationDateTime: new \DateTime($profile_picture['created_on']),
+			);
 		}
 
 		$zip->finish();

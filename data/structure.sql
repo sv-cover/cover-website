@@ -81,11 +81,12 @@ CREATE TABLE passwords (
 -- Photos are also stored separately because they are large! And currently you 
 -- can have multiple photos (although only the last is shown).
 
-CREATE TABLE lid_fotos (
+CREATE TABLE profile_pictures (
     id SERIAL PRIMARY KEY,
-    lid_id integer REFERENCES leden (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    foto bytea,
-    foto_mtime timestamp without time zone NOT NULL DEFAULT ('now'::text)::timestamp(6) without time zone
+    member_id integer REFERENCES leden (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    photo bytea,
+    created_on timestamp without time zone NOT NULL DEFAULT ('now'::text)::timestamp(6) without time zone,
+    reviewed boolean NOT NULL DEFAULT FALSE
 );
 
 --
@@ -181,7 +182,8 @@ CREATE TABLE agenda (
     private smallint DEFAULT 0, -- boolean
     extern smallint NOT NULL DEFAULT 0, -- boolean
     facebook_id character varying(20) DEFAULT NULL,
-    replacement_for integer DEFAULT NULL -- refers to itself
+    replacement_for integer DEFAULT NULL, -- refers to itself
+    category character varying(255) DEFAULT NULL
 );
 
 -- Todo: add a separate column for agenda item approving. Currently new

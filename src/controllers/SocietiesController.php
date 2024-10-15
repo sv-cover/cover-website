@@ -41,6 +41,10 @@ class SocietiesController extends \Controller
 				'constraints' => new Assert\NotBlank(),
 				'help' => __('Who are the founding members of the society?'),
 			])
+			->add('leader', TextType::class, [
+				'label' => __('Leader'),
+				'constraints' => new Assert\NotBlank()
+			])
 			->add('other_comments', TextareaType::class, [
 				'label' => __('Other comments'),
 				// allow it to be blank
@@ -57,7 +61,7 @@ class SocietiesController extends \Controller
 				'help' => __('We need to know how to contact you for questions!'),
 				'constraints' => [
 					new Assert\NotBlank(),
-					new AssertPhoneNumber(['defaultRegion' => 'NL']),
+					new AssertPhoneNumber(defaultRegion: 'NL'),
 				],
 			])
 			->add('submit', SubmitType::class, [

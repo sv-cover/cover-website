@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -72,6 +73,20 @@ class EventType extends AbstractType
 				'required' => false,
 				'constraints' => new Assert\Callback([$this, 'validate_facebook_id']),
 			])
+			->add('category', ChoiceType::class, [
+				'label' => __('Category'),
+				'required' => true,
+				'choices' => [
+					__('General') => 'general',
+					__('Social') => 'social',
+					__('Educational') => 'educational',
+					__('Career') => 'career'
+				],
+				'expanded' => true,
+				'chips' => true,
+				'multiple' => true,
+				'constraints' => new Assert\NotBlank(),
+			])
 			->add('beschrijving', MarkupType::class, [
 				'label' => __('Description'),
 				'constraints' => new Assert\NotBlank(),
@@ -101,6 +116,22 @@ class EventType extends AbstractType
 		// Booleans are stored as int in the database
 		$builder->get('private')->addModelTransformer(new IntToBooleanTransformer());
 		$builder->get('extern')->addModelTransformer(new IntToBooleanTransformer());
+
+		// Parse categories
+		$builder->get('category')->addModelTransformer(new CallbackTransformer(
+			function ($value) {
+				if (empty($value))
+					return [];
+
+				return explode(',', $value);
+			},
+			function ($value) {
+				if (empty($value))
+					return '';
+
+				return implode(',', $value);
+			}
+		));
 
 		// Make sure we store Facebook event ID, but display event url
 		$builder->get('facebook_id')->addModelTransformer(new CallbackTransformer(

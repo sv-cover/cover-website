@@ -427,6 +427,13 @@ class LayoutViewHelper
 		return array_filter($model->get_proposed(), [get_policy($model), 'user_can_moderate']);
 	}
 
+	public function profile_pictures_to_review()
+	{
+		/* Check for unreviewed pictures */
+		$model = get_model('DataModelProfilePicture');
+		return array_filter($model->find(['reviewed' => false]), [get_policy($model), 'user_can_review']);
+	}
+
 	public function color_mode()
 	{
 		return $_COOKIE['cover_color_mode'] ?? 'light';

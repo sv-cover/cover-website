@@ -4,7 +4,7 @@
     {% endif %}
     <div class="footer footer-main">
         <ul>
-        {% spaceless %}
+        {% apply spaceless %}
             <li>
                 <a href="{{ path('contact') }}">{{ __('Contact') }}</a>
             </li>
@@ -22,7 +22,7 @@
                     {{ __('Cancellation Policy')}}
                 </a>
             </li>
-        {% endspaceless %}
+        {% endapply %}
         </ul>
     </div>
 </footer>

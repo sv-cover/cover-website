@@ -77,23 +77,31 @@
 </section>
 <section id="mailing-list-statistics">
 	<h2 class="is-sr-only">{{ __('Statistics') }}</h2>
-	<div class="columns is-multiline">
-		<figure class="column is-half">
-			<figcaption class="has-text-centered">{{ __('Starting year') }}</figcaption>
-			{{ barchart(iter.get_reach('beginjaar')) }}
-		</figure>
-		<figure class="column is-half">
-			<figcaption class="has-text-centered">{{ __('Age') }}</figcaption>
-			{{ barchart(iter.get_reach('leeftijd')) }}
-		</figure>
-		<figure class="column is-half">
-			<figcaption class="has-text-centered">{{ __('Committees') }}</figcaption>
-			{{ barchart(iter.get_reach('committee_count')) }}
-		</figure>
-		<figure class="column is-half">
-			<figcaption class="has-text-centered">{{ __('Type') }}</figcaption>
-			{{ barchart(iter.get_reach('type')) }}
-		</figure>
-	</div>
+	{% if iter.subscriptions is not empty %}
+		<div class="columns is-multiline">
+			<figure class="column is-half">
+				<figcaption class="has-text-centered">{{ __('Starting year') }}</figcaption>
+				{{ barchart(iter.get_reach('beginjaar')) }}
+			</figure>
+			<figure class="column is-half">
+				<figcaption class="has-text-centered">{{ __('Age') }}</figcaption>
+				{{ barchart(iter.get_reach('leeftijd')) }}
+			</figure>
+			<figure class="column is-half">
+				<figcaption class="has-text-centered">{{ __('Committees') }}</figcaption>
+				{{ barchart(iter.get_reach('committee_count')) }}
+			</figure>
+			<figure class="column is-half">
+				<figcaption class="has-text-centered">{{ __('Type') }}</figcaption>
+				{{ barchart(iter.get_reach('type')) }}
+			</figure>
+		</div>
+	{% else %}
+		<div class="content">
+			<p>
+				{{ __('Statistics are not available for empty lists.') }}
+			</p>
+		</div>
+	{% endif %}
 </section>
 {% endblock %}

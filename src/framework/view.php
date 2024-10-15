@@ -5,7 +5,9 @@ require_once 'src/framework/router.php';
 use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Component\Form\FormRenderer;
+use Twig\Environment as TwigEnvironment;
 use Twig\Extra\Intl\IntlExtension;
+use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 use Twig\RuntimeLoader\FactoryRuntimeLoader;
 
 const ALLOW_SUBDOMAINS = 1;
@@ -83,7 +85,7 @@ class View
 		$this->controller = $controller;
 
 		// First look in our own view directory
-		$loader = new Twig_Loader_Filesystem($path);
+		$loader = new TwigFilesystemLoader($path);
 
 		// Then, look in the top level theme views directory
 		$loader->addPath('public/views', 'theme');
@@ -96,11 +98,12 @@ class View
 		// the path to your other templates
 		$loader->addPath($vendor_twig_bridge_directory.'/Resources/views', 'symfony');
 
-		$this->twig = new Twig_Environment($loader, array(
-			'debug' => true,
+		$this->twig = new TwigEnvironment($loader, [
+			'debug' => get_config_value('debug', false),
+			'auto_reload' => true, // Make sure template cache reloads when deploying on the server
 			'strict_variables' => true,
 			'cache' => get_config_value('twig_cache', 'tmp/twig'),
-		));
+		]);
 
 		$form_themes = [
 			'@layout/form/bulma_layout.html.twig',
@@ -108,9 +111,9 @@ class View
 		];
 		$form_engine = new TwigRendererEngine($form_themes, $this->twig);
 		$this->twig->addRuntimeLoader(new FactoryRuntimeLoader([
-				FormRenderer::class => function () use ($form_engine) {
-						return new FormRenderer($form_engine, get_csrf_manager());
-				},
+			FormRenderer::class => function () use ($form_engine) {
+					return new FormRenderer($form_engine, get_csrf_manager());
+			},
 		]));
 
 		$this->twig->addExtension(new IntlExtension());
@@ -239,9 +242,9 @@ class View
 		return $this->render('@layout/404_not_found.twig', ['exception' => $e]);
 	}
 
-	public function render($template_file, array $data = array())
+	public function render($template_name, array $data = array())
 	{
-		$template = $this->twig->loadTemplate($template_file);
+		$template = $this->twig->load($template_name);
 
 		return $template->render($data);
 	}
