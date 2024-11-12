@@ -175,8 +175,8 @@ function _markup_parse_spaces(&$markup)
 function _markup_parse_simple(&$markup)
 {
 	// TODO: Replace this beast with something that has a stack!
-	$tags = array('[i]', '[/i]', '[b]', '[/b]', '[u]', '[/u]', '[s]', '[/s]', '[ol]', '[/ol]', '[ul]', '[/ul]', '[li]', '[/li]', '[center]', '[/center]', '[hl]', '[/hl]', '[small]', '[/small]');
-	$replace = array('<i>', '</i>', '<b>', '</b>', '<u>', '</u>', '<s>', '</s>', '<ol>', '</ol>', '<ul>', '</ul>', '<li>', '</li>', '<div class="text_center">', '</div>', '<span class="highlight">', '</span>', '<small>', '</small>');
+	$tags = array('[i]', '[/i]', '[b]', '[/b]', '[u]', '[/u]', '[s]', '[/s]', '[ol]', '[/ol]', '[ul]', '[/ul]', '[li]', '[/li]', '[center]', '[/center]', '[hl]', '[/hl]', '[small]', '[/small]', '[box]', '[/box]');
+	$replace = array('<i>', '</i>', '<b>', '</b>', '<u>', '</u>', '<s>', '</s>', '<ol>', '</ol>', '<ul>', '</ul>', '<li>', '</li>', '<div class="text_center">', '</div>', '<span class="highlight">', '</span>', '<small>', '</small>', '<div class="box">', '</div>');
 
 	$markup = str_replace($tags, $replace, $markup);
 }
@@ -370,25 +370,60 @@ function _markup_parse_mailinglist(&$markup, &$placeholders)
 	}
 }
 
-function _markup_parse_membersonly(&$markup, &$placeholders)
+function _markup_parse_publiconly(&$markup, &$placeholders)
 {
-	// Find [membersonly]email/id[/membersonly] placeholders and replace
-	// them by content or a login cta.
+	// Find [publiconly]public-only content[/publiconly] placeholders and replace
+	// them by content or emptyness.
 
 	$count = 0;
 
-	while (preg_match('/\[membersonly(=(?P<title>[^\]]+))?\](?P<content>.+?)\[\/membersonly\]/is', $markup, $match)) {
-		if (get_auth()->logged_in())
+	while (preg_match('/\[publiconly\](?P<content>.+?)\[\/publiconly\]/is', $markup, $match)) {
+		if (!get_auth()->logged_in())
 			$content = markup_parse($match['content']);
 		else
-			$content = sprintf('<p>This content is only visible for members.</p><a href="sessions.php?view=login&amp;referrer=%s" class="button is-primary">%s</a>', urlencode($_SERVER['REQUEST_URI']), __('Log in'));
+			$content = '';
+
+		$placeholder = sprintf('#PUBLICONLY%d#', $count++);
+
+		$placeholders[$placeholder] = $content;
+
+		$markup = str_replace_once($match[0], $placeholder, $markup);
+	}
+}
+
+
+function _markup_parse_membersonly(&$markup, &$placeholders)
+{
+	// Find [membersonly]members-only content[/membersonly] placeholders and replace
+	// them by content or a login cta.
+
+	$count = 0;
+	$router = get_router();
+
+	while (preg_match('/\[membersonly(=(?P<description>[^\]]+))?\](?P<content>.+?)\[\/membersonly\]/is', $markup, $match)) {
+		if (get_auth()->logged_in()) {
+			$content = markup_parse($match['content']);
+		} else {
+			$content = <<<END
+				<p>{description}</p>
+				<div>
+					<a href="{login_path}" class="button is-fullwidth is-primary">{login_cta}</a>
+					<div class="divider is-fullwidth">or</div>
+					<a href="{join_path}" class="button is-fullwidth">{join_cta}</a>
+				</div>
+			END;
+			$content = strtr($content, [
+				'{description}' => $match['description'] ?: __('This content is only visible for members.'),
+				'{login_path}' => $router->generate('login', ['referrer' => $_SERVER['REQUEST_URI']]),
+				'{login_cta}' => __('Log in'),
+				'{join_path}' => $router->generate('join'),
+				'{join_cta}' => __('Become a member'),
+			]);
+		}
 
 		$placeholder = sprintf('#MEMBERSONLY%d#', $count++);
 
-		if ($match['title'])
-			$placeholders[$placeholder] = sprintf('<div class="box"><h2>%s</h2>%s</div>', $match['title'], $content);
-		else
-			$placeholders[$placeholder] = sprintf('<div class="box">%s</div>', $content);
+		$placeholders[$placeholder] = $content;
 
 		$markup = str_replace_once($match[0], $placeholder, $markup);
 	}
@@ -421,6 +456,9 @@ function markup_parse($markup, $header_offset = 0, &$placeholders = null, $flags
 
 	/* Replace [mailinglist] embed */
 	_markup_parse_mailinglist($markup, $placeholders);
+
+	/* Replace [publiconly] */
+	_markup_parse_publiconly($markup, $placeholders);
 
 	/* Replace [membersonly] */
 	_markup_parse_membersonly($markup, $placeholders);
