@@ -18,10 +18,6 @@ boards:
   path: /boards
   controller: App\Controller\BoardsController
 
-books:
-  path: /books
-  controller: App\Controller\BooksController
-
 calendar:
   path: /calendar
   controller: App\Controller\CalendarController
@@ -340,9 +336,6 @@ legacy:
       besturen:
         controller: App\Controller\BoardsController
         parameters: { _route: boards }
-      boeken:
-        controller: App\Controller\BooksController
-        parameters: { _route: books }
       career:
         controller: App\Controller\CareerController
         parameters: { _route: career }
