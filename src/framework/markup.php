@@ -48,14 +48,20 @@ function _markup_parse_links(&$markup, $header_offset, &$placeholders, $flags)
 {
 	$count = 0;
 
-	while (preg_match('/\[url=(.*?)\](.*?)\[\/url\]/is', $markup, $match)) {
+	while (preg_match('/\[url(?P<classes>(\.[a-z-]+)*)=(?P<url>.*?)\](?P<text>.*?)\[\/url\]/is', $markup, $match)) {
 		$placeholder = sprintf('#LINK%d#', $count++);
 
-		$host = parse_url($match[1], PHP_URL_HOST);
+		$host = parse_url($match['url'], PHP_URL_HOST);
 
-		$target = $host !== null && $host != parse_url(ROOT_DIR_URI, PHP_URL_HOST) ? ' target="_blank"' : '';
+		$attrs = '';
+		$attrs .= (
+			$host !== null && $host != parse_url(ROOT_DIR_URI, PHP_URL_HOST)
+			? ' target="_blank"'
+			: ''
+		);
+		$attrs .= sprintf(' class="%s"', str_replace('.', ' ', $match['classes']));
 
-		$placeholders[$placeholder] = '<a rel="nofollow"' . $target . ' href="' . $match[1] . '">' . markup_parse($match[2], $header_offset, $placeholders, $flags | EXCLUDE_ANCHORS) . '</a>';
+		$placeholders[$placeholder] = '<a href="' . $match['url'] . '" rel="nofollow" ' . $attrs . '>' . markup_parse($match['text'], $header_offset, $placeholders, $flags | EXCLUDE_ANCHORS) . '</a>';
 
 		$markup = str_replace_once($match[0], $placeholder, $markup);
 	}
