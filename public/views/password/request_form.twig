@@ -5,19 +5,19 @@
 {% block content %}
 <h1 class="title">{{ __('Forgot your password?') }}</h1>
 {{ form_start(form) }}
-	<div class="field">
-		<p>{{ __('Fill in your email address and click on `Reset password`. You will then receive an email with further instructions.') }}</p>
-	</div>
-	{# Global errors #}
-	{{ form_errors(form, {attr: {class: 'error-section'}}) }}
-	{# Fields #}
-	{{ form_row(form.email) }}
+    <div class="field">
+        <p>{{ __('Fill in your email address and click on `Reset password`. You will then receive an email with further instructions.') }}</p>
+    </div>
+    {# Global errors #}
+    {{ form_errors(form, {attr: {class: 'error-section'}}) }}
+    {# Fields #}
+    {{ form_row(form.email) }}
 
-	<div class="field">
-		<div class="control buttons">
-			{{ form_widget(form.submit) }}
-			<a class="button" href="{{ path('login') }}">Cancel</a>
-		</div>
-	</div>
+    <div class="field">
+        <div class="control buttons">
+            {{ form_widget(form.submit) }}
+            <a class="button" href="{{ path('login') }}">Cancel</a>
+        </div>
+    </div>
 {{ form_end(form) }}
 {% endblock %}

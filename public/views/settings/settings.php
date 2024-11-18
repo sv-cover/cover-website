@@ -2,5 +2,5 @@
 
 class SettingsView extends CRUDView
 {
-	//
+    //
 }

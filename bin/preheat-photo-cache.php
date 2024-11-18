@@ -9,217 +9,217 @@ require_once 'src/framework/terminal.php';
 $photo_model = get_model('DataModelPhotobook');
 
 $options = array(
-	'force' => false, 
-	'recursive' => false,
-	'workers' => 0,
-	'slave' => false,
-	'verbose' => false
+    'force' => false,
+    'recursive' => false,
+    'workers' => 0,
+    'slave' => false,
+    'verbose' => false
 );
 
 $help = array(
-	'force' => 'Force generation of new thumbnails, even if they already exist and the image has not been changed.',
-	'recursive' => 'Descend into child photo books.',
-	'workers' => 'Number of workers to spawn to divide the load. If 0 this program will act as a worker.',
-	'slave' => 'Force the program in slave modus, processing any photo id passed through stdin.',
-	'verbose' => 'Print all output of the workers'
+    'force' => 'Force generation of new thumbnails, even if they already exist and the image has not been changed.',
+    'recursive' => 'Descend into child photo books.',
+    'workers' => 'Number of workers to spawn to divide the load. If 0 this program will act as a worker.',
+    'slave' => 'Force the program in slave modus, processing any photo id passed through stdin.',
+    'verbose' => 'Print all output of the workers'
 );
 
 $book_ids = parse_options($argv, $options, $help);
 
 function array_flatten($arrays)
 {
-	if (!$arrays)
-		return array();
+    if (!$arrays)
+        return array();
 
-	return call_user_func_array('array_merge', $arrays);
+    return call_user_func_array('array_merge', $arrays);
 }
 
 function get_book_photos($book_id)
 {
-	global $photo_model;
-	return $photo_model->get_book($book_id)->get_photos();
+    global $photo_model;
+    return $photo_model->get_book($book_id)->get_photos();
 }
 
 function get_book_photos_recursive($book_id)
 {
-	global $photo_model;
+    global $photo_model;
 
-	if ($book_id instanceof DataIterPhotobook)
-		$book = $book_id;
-	else
-		$book = $photo_model->get_book($book_id);
+    if ($book_id instanceof DataIterPhotobook)
+        $book = $book_id;
+    else
+        $book = $photo_model->get_book($book_id);
 
-	return array_merge($book->get_photos(),
-			array_flatten(array_map('get_book_photos_recursive', $book->get_books())));
+    return array_merge($book->get_photos(),
+            array_flatten(array_map('get_book_photos_recursive', $book->get_books())));
 }
 
 class Worker
 {
-	public $process;
+    public $process;
 
-	public $pipes;
+    public $pipes;
 
-	public $id;
+    public $id;
 
-	public function __construct()
-	{
-		static $n = 0;
-		$this->id = "w" . $n++;
-	}
+    public function __construct()
+    {
+        static $n = 0;
+        $this->id = "w" . $n++;
+    }
 }
 
 function main_master()
 {
-	global $book_ids, $options, $argv;
+    global $book_ids, $options, $argv;
 
-	$photos = array_flatten(array_map($options['recursive'] ? 'get_book_photos_recursive' : 'get_book_photos', $book_ids));
-	
-	printf("Starting %d workers for %d photos...\n", $options['workers'], count($photos));
+    $photos = array_flatten(array_map($options['recursive'] ? 'get_book_photos_recursive' : 'get_book_photos', $book_ids));
 
-	$workers = array();
+    printf("Starting %d workers for %d photos...\n", $options['workers'], count($photos));
 
-	$task_buckets = array_chunk($photos, count($photos) / $options['workers']);
+    $workers = array();
 
-	$photos_processed = 0;
+    $task_buckets = array_chunk($photos, count($photos) / $options['workers']);
 
-	$photos_total = count($photos);
+    $photos_processed = 0;
 
-	unset($photos);
+    $photos_total = count($photos);
 
-	for ($worker_index = 0; $worker_index < $options['workers']; ++$worker_index)
-	{
-		$worker = new Worker();
+    unset($photos);
 
-		$descriptor_spec = array(
-			0 => array('pipe', 'r'),  // stdin is a pipe that the child will read from
-			1 => array('pipe', 'w'),  // stdout is a pipe that the child will write to
-			2 => array('file', 'php://stderr', 'a') // stderr is a file to write to
-		);
+    for ($worker_index = 0; $worker_index < $options['workers']; ++$worker_index)
+    {
+        $worker = new Worker();
 
-		$worker_options = array('--slave');
+        $descriptor_spec = array(
+            0 => array('pipe', 'r'),  // stdin is a pipe that the child will read from
+            1 => array('pipe', 'w'),  // stdout is a pipe that the child will write to
+            2 => array('file', 'php://stderr', 'a') // stderr is a file to write to
+        );
 
-		if ($options['force'])
-			$worker_options[] = '--force';
+        $worker_options = array('--slave');
 
-		$worker->process = proc_open('php ' . $argv[0] . ' ' . implode(' ', $worker_options), $descriptor_spec, $worker->pipes);
+        if ($options['force'])
+            $worker_options[] = '--force';
 
-		fwrite($worker->pipes[0], implode("\n", array_map(function($photo) { return $photo->get_id(); }, $task_buckets[$worker_index])));
+        $worker->process = proc_open('php ' . $argv[0] . ' ' . implode(' ', $worker_options), $descriptor_spec, $worker->pipes);
 
-		// Close stdin after writing all photo ids
-		fclose($worker->pipes[0]);
+        fwrite($worker->pipes[0], implode("\n", array_map(function($photo) { return $photo->get_id(); }, $task_buckets[$worker_index])));
 
-		// Make stdout of process non-blocking
-		stream_set_blocking($worker->pipes[1], 0);
+        // Close stdin after writing all photo ids
+        fclose($worker->pipes[0]);
 
-		$workers[$worker->id] = $worker;
-	}
+        // Make stdout of process non-blocking
+        stream_set_blocking($worker->pipes[1], 0);
 
-	$workers_still_busy = true;
+        $workers[$worker->id] = $worker;
+    }
 
-	$pipes_to_poll = array();
+    $workers_still_busy = true;
 
-	foreach ($workers as $worker)
-		$pipes_to_poll[$worker->id] = $worker->pipes[1];
+    $pipes_to_poll = array();
 
-	while (count($pipes_to_poll) > 0)
-	{
-		$n_of_updates = stream_select($pipes_polled = $pipes_to_poll, $w = null, $e = null, null);
+    foreach ($workers as $worker)
+        $pipes_to_poll[$worker->id] = $worker->pipes[1];
 
-		// Is something wrong?
-		if ($n_of_updates === false)
-			throw new Exception("stream_select returned false");
+    while (count($pipes_to_poll) > 0)
+    {
+        $n_of_updates = stream_select($pipes_polled = $pipes_to_poll, $w = null, $e = null, null);
 
-		// Or is this just a timeout?
-		else if ($n_of_updates === 0)
-			continue;
+        // Is something wrong?
+        if ($n_of_updates === false)
+            throw new Exception("stream_select returned false");
 
-		// else, we have work to do!
-		foreach ($pipes_polled as $pipe)
-		{
-			$worker_id = array_search($pipe, $pipes_to_poll);
-			$worker = $workers[$worker_id];
-			
-			while ($line = fgets($worker->pipes[1]))
-			{
-				if ($options['verbose'])
-					printf("Worker %s: %s\n", $worker->id, rtrim($line, "\n"));
+        // Or is this just a timeout?
+        else if ($n_of_updates === 0)
+            continue;
 
-				++$photos_processed;
-			}
+        // else, we have work to do!
+        foreach ($pipes_polled as $pipe)
+        {
+            $worker_id = array_search($pipe, $pipes_to_poll);
+            $worker = $workers[$worker_id];
 
-			// If this worker is done, remove it from the list of pipes to poll
-			if (feof($worker->pipes[1]))
-				unset($pipes_to_poll[$worker->id]);
-		}
+            while ($line = fgets($worker->pipes[1]))
+            {
+                if ($options['verbose'])
+                    printf("Worker %s: %s\n", $worker->id, rtrim($line, "\n"));
 
-		if (!$options['verbose'])
-			printf("%s% 2d%%", str_repeat(chr(8), 3), floor($photos_processed / $photos_total * 100));
-	}
+                ++$photos_processed;
+            }
 
-	echo str_repeat(chr(8), 3) . "Done.\n";
+            // If this worker is done, remove it from the list of pipes to poll
+            if (feof($worker->pipes[1]))
+                unset($pipes_to_poll[$worker->id]);
+        }
+
+        if (!$options['verbose'])
+            printf("%s% 2d%%", str_repeat(chr(8), 3), floor($photos_processed / $photos_total * 100));
+    }
+
+    echo str_repeat(chr(8), 3) . "Done.\n";
 }
 
 function main_slave()
 {
-	global $photo_model, $options;
+    global $photo_model, $options;
 
-	$photo_ids = array();
+    $photo_ids = array();
 
-	while (!feof(STDIN)) {
-		fscanf(STDIN, "%d\n", $id);
-		$photo_ids[] = $id;
-	}
+    while (!feof(STDIN)) {
+        fscanf(STDIN, "%d\n", $id);
+        $photo_ids[] = $id;
+    }
 
-	foreach ($photo_ids as $photo_id)
-	{
-		$photo = $photo_model->get_iter($photo_id);
+    foreach ($photo_ids as $photo_id)
+    {
+        $photo = $photo_model->get_iter($photo_id);
 
-		process_photo($photo);
+        process_photo($photo);
 
-		printf("%d\n", $photo->get_id());
-	}
+        printf("%d\n", $photo->get_id());
+    }
 }
 
 function main_standalone()
 {
-	global $book_ids, $options;
-	
-	$photos = array_flatten(array_map($options['recursive'] ? 'get_book_photos_recursive' : 'get_book_photos', $book_ids));
+    global $book_ids, $options;
 
-	printf("Processing %d photos...\n", count($photos));
+    $photos = array_flatten(array_map($options['recursive'] ? 'get_book_photos_recursive' : 'get_book_photos', $book_ids));
 
-	$photos_processed = 0;
+    printf("Processing %d photos...\n", count($photos));
 
-	foreach ($photos as $photo)
-	{
-		process_photo($photo);
+    $photos_processed = 0;
 
-		++$photos_processed;
-			
-		printf("%s% 2d%%", str_repeat(chr(8), 3), floor($photos_processed / count($photos) * 100));
-	}
+    foreach ($photos as $photo)
+    {
+        process_photo($photo);
 
-	echo str_repeat(chr(8), 3) . "Done.\n";
+        ++$photos_processed;
+
+        printf("%s% 2d%%", str_repeat(chr(8), 3), floor($photos_processed / count($photos) * 100));
+    }
+
+    echo str_repeat(chr(8), 3) . "Done.\n";
 }
 
 function process_photo(DataIterPhoto $photo)
 {
-	global $photo_model, $options;
+    global $photo_model, $options;
 
-	$force_update = $options['force'] || $photo->original_has_changed();
+    $force_update = $options['force'] || $photo->original_has_changed();
 
-	if ($force_update) {
-		$photo->set_all($photo->compute_size());
-		$photo_model->update($photo);
-	}
+    if ($force_update) {
+        $photo->set_all($photo->compute_size());
+        $photo_model->update($photo);
+    }
 
-	foreach (get_config_value('precomputed_photo_scales', array()) as $dimesions)
-		$photo->get_resource($dimesions[0], $dimesions[1], $force_update);
+    foreach (get_config_value('precomputed_photo_scales', array()) as $dimesions)
+        $photo->get_resource($dimesions[0], $dimesions[1], $force_update);
 }
 
 if ($options['slave'])
-	main_slave();
+    main_slave();
 elseif ($options['workers'] > 1)
-	main_master();
+    main_master();
 else
-	main_standalone();
+    main_standalone();

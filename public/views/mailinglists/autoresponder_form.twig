@@ -5,16 +5,16 @@
 {% block content %}
 <h1 class="title">{{ __('Modify message') }}</h1>
 {{ form_start(form) }}
-	{# Global errors #}
-	{{ form_errors(form) }}
-	{# Fields #}
-	{{ form_row(form[autoresponder ~ '_subject'], {optional_tag: false}) }}
-	{{ form_row(form[autoresponder ~ '_message'], {optional_tag: false, attr: {rows: 10}}) }}
-	<div class="field">
-		<div class="control buttons">
-			{{ form_widget(form.submit, {'label': __('Change email')}) }}
-			<a href="{{ path('mailing_lists', {view: 'update', id: iter.id}) }}" class="button">{{ __('Return to mailing list') }}</a>
-		</div>
-	</div>
+    {# Global errors #}
+    {{ form_errors(form) }}
+    {# Fields #}
+    {{ form_row(form[autoresponder ~ '_subject'], {optional_tag: false}) }}
+    {{ form_row(form[autoresponder ~ '_message'], {optional_tag: false, attr: {rows: 10}}) }}
+    <div class="field">
+        <div class="control buttons">
+            {{ form_widget(form.submit, {'label': __('Change email')}) }}
+            <a href="{{ path('mailing_lists', {view: 'update', id: iter.id}) }}" class="button">{{ __('Return to mailing list') }}</a>
+        </div>
+    </div>
 {{ form_end(form) }}
 {% endblock %}

@@ -5,4 +5,4 @@
 -- in the registration or in Secretary and try again without requiring to add
 -- the registrations by hand into Secretary.
 ALTER TABLE registrations
-	ADD COLUMN confirmed_on timestamp without time zone DEFAULT NULL;
+    ADD COLUMN confirmed_on timestamp without time zone DEFAULT NULL;

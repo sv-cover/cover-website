@@ -2,5 +2,5 @@
 
 class SocietiesView extends View
 {
-	
+
 }

@@ -2,7 +2,7 @@ ALTER TABLE ONLY configuratie
     ADD CONSTRAINT configuratie_pkey PRIMARY KEY (key);
 
 ALTER TABLE ONLY configuratie
-	DROP CONSTRAINT configuratie_key_key;
+    DROP CONSTRAINT configuratie_key_key;
 
 INSERT INTO configuratie (key, value) VALUES ('schema_version', 1);
 
@@ -20,34 +20,34 @@ TRUNCATE TABLE announcements;
 
 INSERT INTO announcements (committee, subject, created_on, message)
 SELECT
-	CASE
-		WHEN forum_threads.author_type = 2 THEN forum_threads.author
-		ELSE 0 -- bestuur
-	END,
-	forum_threads.subject,
-	forum_threads.date,
-	forum_messages.message
+    CASE
+        WHEN forum_threads.author_type = 2 THEN forum_threads.author
+        ELSE 0 -- bestuur
+    END,
+    forum_threads.subject,
+    forum_threads.date,
+    forum_messages.message
 FROM
-	forum_threads
+    forum_threads
 LEFT JOIN forum_messages ON
-	forum_messages.thread = forum_threads.id
-	AND forum_messages.id IN (
-		SELECT
-			MIN(forum_messages.id)
-		FROM
-			forum_messages
-		WHERE
-			forum_messages.thread = forum_threads.id
-		GROUP BY
-			forum_messages.thread
-	)
+    forum_messages.thread = forum_threads.id
+    AND forum_messages.id IN (
+        SELECT
+            MIN(forum_messages.id)
+        FROM
+            forum_messages
+        WHERE
+            forum_messages.thread = forum_threads.id
+        GROUP BY
+            forum_messages.thread
+    )
 RIGHT JOIN commissies ON
-	commissies.id = CASE
-		WHEN forum_threads.author_type = 2 THEN forum_threads.author
-		ELSE 0 -- bestuur
-	END
+    commissies.id = CASE
+        WHEN forum_threads.author_type = 2 THEN forum_threads.author
+        ELSE 0 -- bestuur
+    END
 WHERE
-	forum_threads.forum IN (SELECT TO_NUMBER(value, '9999') FROM configuratie WHERE key = 'news_forum')
+    forum_threads.forum IN (SELECT TO_NUMBER(value, '9999') FROM configuratie WHERE key = 'news_forum')
 ORDER BY
-	forum_threads.date ASC;
+    forum_threads.date ASC;
 

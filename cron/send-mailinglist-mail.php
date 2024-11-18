@@ -14,22 +14,22 @@ ini_set('display_errors', '1');
 
 function verbose(int $return_value): int
 {
-	if ($return_value !== 0)
-		fwrite(STDERR, get_error_message($return_value) . "\n");
+    if ($return_value !== 0)
+        fwrite(STDERR, get_error_message($return_value) . "\n");
 
-	return $return_value;
+    return $return_value;
 }
 
 function main(): int
 {
-	// Copy STDIN to buffer stream because we want to stream it to the parser,
-	// but we currently also want a copy as string for the database.
-	$buffer_stream = fopen('php://temp', 'r+');
-	stream_copy_to_stream(STDIN, $buffer_stream);
-	$return_value = send_mailinglist_mail($buffer_stream); 
-	// Close the buffered message at last
-	fclose($buffer_stream);
-	return $return_value;
+    // Copy STDIN to buffer stream because we want to stream it to the parser,
+    // but we currently also want a copy as string for the database.
+    $buffer_stream = fopen('php://temp', 'r+');
+    stream_copy_to_stream(STDIN, $buffer_stream);
+    $return_value = send_mailinglist_mail($buffer_stream);
+    // Close the buffered message at last
+    fclose($buffer_stream);
+    return $return_value;
 }
 
 exit(verbose(main()));

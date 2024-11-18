@@ -1,6 +1,6 @@
 <?php
 if (defined('IN_SITE'))
-	return;
+    return;
 
 define('IN_SITE', true);
 
@@ -8,14 +8,14 @@ ini_set('display_errors', true);
 ini_set('magic_quotes_gpc', 0);
 
 set_error_handler(function($severity, $message, $file, $line, $vars=null) {
-	if (error_reporting() & $severity)
-		throw new ErrorException($message, 0, $severity, $file, $line);
+    if (error_reporting() & $severity)
+        throw new ErrorException($message, 0, $severity, $file, $line);
 });
 
 if (isset($_SERVER['HTTP_HOST']) && preg_match('/^(www\.)?svcover\.nl$/', $_SERVER['HTTP_HOST']))
-	error_reporting(E_ALL ^ E_NOTICE ^ E_USER_NOTICE ^ E_DEPRECATED ^ E_STRICT);
+    error_reporting(E_ALL ^ E_NOTICE ^ E_USER_NOTICE ^ E_DEPRECATED ^ E_STRICT);
 else
-	error_reporting(E_ALL);
+    error_reporting(E_ALL);
 
 /* Import composer packages */
 require_once 'vendor/autoload.php';

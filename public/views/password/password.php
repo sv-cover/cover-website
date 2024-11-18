@@ -2,5 +2,5 @@
 
 class PasswordView extends View
 {
-	
+
 }

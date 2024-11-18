@@ -5,16 +5,16 @@
 {% block content %}
 <h1 class="title">{{ iter.has_id ? __('Edit setting') : __('Add setting') }}</h1>
 {{ form_start(form) }}
-	{# Global errors #}
-	{{ form_errors(form) }}
-	{# Fields #}
-	{{ form_row(form.key, {attr: {readonly: iter.has_id}}) }}
-	{{ form_row(form.value) }}
-	<div class="field">
-		<div class="control buttons">
-			{{ form_widget(form.submit, {'label': iter.has_id ? __('Modify setting') : __('Add setting')}) }}
-			<a href="{{ path('settings') }}" class="button">{{ __('Back to settings') }}</a>
-		</div>
-	</div>
+    {# Global errors #}
+    {{ form_errors(form) }}
+    {# Fields #}
+    {{ form_row(form.key, {attr: {readonly: iter.has_id}}) }}
+    {{ form_row(form.value) }}
+    <div class="field">
+        <div class="control buttons">
+            {{ form_widget(form.submit, {'label': iter.has_id ? __('Modify setting') : __('Add setting')}) }}
+            <a href="{{ path('settings') }}" class="button">{{ __('Back to settings') }}</a>
+        </div>
+    </div>
 {{ form_end(form) }}
 {% endblock %}

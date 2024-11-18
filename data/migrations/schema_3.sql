@@ -1,5 +1,5 @@
 ALTER TABLE commissies ADD COLUMN
-	vacancies_ DATE DEFAULT NULL;
+    vacancies_ DATE DEFAULT NULL;
 
 UPDATE commissies SET vacancies_ = '2022-12-22' WHERE vacancies = 1;
 

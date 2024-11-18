@@ -16,21 +16,21 @@ use App\Form\DataTransformer\IntToBooleanTransformer;
  */
 class SettingsType extends AbstractType
 {
-	public function buildForm(FormBuilderInterface $builder, array $options): void
-	{
-		$builder
-			->add('key', TextType::class, [
-				'label' => __('Key'),
-				'constraints' => [
-					new Assert\NotBlank(),
-					new Assert\Length(['max' => 100]),
-				],
-			])
-			->add('value', TextareaType::class, [
-				'label' => __('Value'),
-				'constraints' => new Assert\NotBlank(),
-			])
-			->add('submit', SubmitType::class)
-		;
-	}
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->add('key', TextType::class, [
+                'label' => __('Key'),
+                'constraints' => [
+                    new Assert\NotBlank(),
+                    new Assert\Length(['max' => 100]),
+                ],
+            ])
+            ->add('value', TextareaType::class, [
+                'label' => __('Value'),
+                'constraints' => new Assert\NotBlank(),
+            ])
+            ->add('submit', SubmitType::class)
+        ;
+    }
 }

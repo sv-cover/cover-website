@@ -1,72 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=9">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<link rel="shortcut icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
-	<link rel="shortcut icon" type="image/png" href="/images/favicon-64x64.png" sizes="64x64">
-	<link rel="shortcut icon" type="image/png" href="/images/favicon-128x128.png" sizes="128x128">
-	<link rel="shortcut icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
-	<link rel="shortcut icon" type="image/png" href="/images/favicon-270x270.png" sizes="270x270">
-	<link rel="apple-touch-icon" href="/images/apple-touch-icon-180x180.png">
-	<meta name="msapplication-TileImage" content="/images/favicon-270x270.png">
+    <link rel="shortcut icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+    <link rel="shortcut icon" type="image/png" href="/images/favicon-64x64.png" sizes="64x64">
+    <link rel="shortcut icon" type="image/png" href="/images/favicon-128x128.png" sizes="128x128">
+    <link rel="shortcut icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+    <link rel="shortcut icon" type="image/png" href="/images/favicon-270x270.png" sizes="270x270">
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon-180x180.png">
+    <meta name="msapplication-TileImage" content="/images/favicon-270x270.png">
 
     <title>{% block title %}Cover{% endblock %}</title>
     <meta property="og:title" content="{{ block('title') }}" />
     <meta property="og:image" content="{% block ogimage %}/images/ogimage.jpg{% endblock %}">
 
-	<link rel="search" href="/opensearch.xml"  type="application/opensearchdescription+xml" title="Cover">
+    <link rel="search" href="/opensearch.xml"  type="application/opensearchdescription+xml" title="Cover">
 
-	{% for stylesheet in view.stylesheets %}
-	<link rel="stylesheet" href="{{ stylesheet }}" type="text/css">
-	{% endfor %}
-	
+    {% for stylesheet in view.stylesheets %}
+    <link rel="stylesheet" href="{{ stylesheet }}" type="text/css">
+    {% endfor %}
+
     <script defer src="https://use.fontawesome.com/releases/v5.10.2/js/all.js"></script>
 </head>
 <body class="has-navbar-fixed-top">
-	{% block menu %}
-		{{ include('@layout/widgets/menu.twig') }}
-	{% endblock %}
-	
-	{% if global.auth.logged_in() and global.identity.is_pending() %}
-		<section class="notification is-warning m-0">
-			<p>{{ __('Your membership application hasn’t been accepted yet by our secretary. Some pages won’t be accessible until then.') }}</p>
-		</section>
-	{% endif %}
+    {% block menu %}
+        {{ include('@layout/widgets/menu.twig') }}
+    {% endblock %}
 
-	<main class="main">
-		{% block page %}
-			<article class="section">
-				<div class="container is-content-optimized">
-					{% block content %}{% endblock %}
-				</div>
-			</article>
-		{% endblock %}
-	</main>
+    {% if global.auth.logged_in() and global.identity.is_pending() %}
+        <section class="notification is-warning m-0">
+            <p>{{ __('Your membership application hasn’t been accepted yet by our secretary. Some pages won’t be accessible until then.') }}</p>
+        </section>
+    {% endif %}
 
-	{{ include('@layout/widgets/footer.twig', {'render_sponsors': true}) }}
+    <main class="main">
+        {% block page %}
+            <article class="section">
+                <div class="container is-content-optimized">
+                    {% block content %}{% endblock %}
+                </div>
+            </article>
+        {% endblock %}
+    </main>
 
-
-	{% for script in view.scripts %}
-		<script src="{{ script }}"></script>
-	{% endfor %}
+    {{ include('@layout/widgets/footer.twig', {'render_sponsors': true}) }}
 
 
-	{% if view.layout.has_alert %}
-		<script>alert({{ view.layout.pop_alert|json_encode|raw }})</script>
-	{% endif %}
+    {% for script in view.scripts %}
+        <script src="{{ script }}"></script>
+    {% endfor %}
 
-	{% if global.db.history|length > 0 %}
-		<script>
-			console.info('Total number of queries run: %d (%0.1fms)', {{ global.db.history|length }}, {{ global.db.history|select('duration')|sum * 1000 }});
-			console.groupCollapsed("Queries");
-			{% for query in global.db.history %}
-			console.info("Duration: %0.3fms: %s", {{query.duration * 1000}}, {{query.query|json_encode()|raw}}, {{ query.backtrace|json_encode()|raw }});
-			{% endfor %}
-			console.groupEnd();
-		</script>
-	{% endif %}
+
+    {% if view.layout.has_alert %}
+        <script>alert({{ view.layout.pop_alert|json_encode|raw }})</script>
+    {% endif %}
+
+    {% if global.db.history|length > 0 %}
+        <script>
+            console.info('Total number of queries run: %d (%0.1fms)', {{ global.db.history|length }}, {{ global.db.history|select('duration')|sum * 1000 }});
+            console.groupCollapsed("Queries");
+            {% for query in global.db.history %}
+            console.info("Duration: %0.3fms: %s", {{query.duration * 1000}}, {{query.query|json_encode()|raw}}, {{ query.backtrace|json_encode()|raw }});
+            {% endfor %}
+            console.groupEnd();
+        </script>
+    {% endif %}
 </body>
 </html>

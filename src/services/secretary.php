@@ -2,168 +2,168 @@
 
 class SecretaryAPI
 {
-	private $root;
+    private $root;
 
-	private $token;
+    private $token;
 
-	private $mapping = [
-		'id' => 'id',
-		'voornaam' => 'first_name',
-		'tussenvoegsel' => 'family_name_preposition',
-		'achternaam' => 'family_name',
-		'adres' => 'street_name',
-		'postcode' => 'postal_code',
-		'woonplaats' => 'place',
-		'email' => 'email_address',
-		'telefoonnummer' => 'phone_number',
-		'beginjaar' => 'membership_year_of_enrollment',
-		'geboortedatum' => 'birth_date',
-		'geslacht' => 'gender',
-		'iban' => 'iban',
-		'bic' => 'bic',
-	];
+    private $mapping = [
+        'id' => 'id',
+        'voornaam' => 'first_name',
+        'tussenvoegsel' => 'family_name_preposition',
+        'achternaam' => 'family_name',
+        'adres' => 'street_name',
+        'postcode' => 'postal_code',
+        'woonplaats' => 'place',
+        'email' => 'email_address',
+        'telefoonnummer' => 'phone_number',
+        'beginjaar' => 'membership_year_of_enrollment',
+        'geboortedatum' => 'birth_date',
+        'geslacht' => 'gender',
+        'iban' => 'iban',
+        'bic' => 'bic',
+    ];
 
-	public function __construct($root, $user, $password)
-	{
-		$this->root = $root;
+    public function __construct($root, $user, $password)
+    {
+        $this->root = $root;
 
-		$config = get_model('DataModelConfiguratie');
-		$this->token = $config->get_value('secretary_token', null);
+        $config = get_model('DataModelConfiguratie');
+        $this->token = $config->get_value('secretary_token', null);
 
-		if (!$this->isValidToken($this->token)) {
-			$this->token = $this->requestToken($user, $password);
-			$config->set_value('secretary_token', $this->token);
-		}
-	}
+        if (!$this->isValidToken($this->token)) {
+            $this->token = $this->requestToken($user, $password);
+            $config->set_value('secretary_token', $this->token);
+        }
+    }
 
-	public function createPerson($data)
-	{
-		return $this->postJSONWithToken('persons/new.json', $data);
-	}
+    public function createPerson($data)
+    {
+        return $this->postJSONWithToken('persons/new.json', $data);
+    }
 
-	public function updatePerson($person_id, $data)
-	{
-		return $this->postJSONWithToken(sprintf('persons/%d.json', $person_id), $data);
-	}
+    public function updatePerson($person_id, $data)
+    {
+        return $this->postJSONWithToken(sprintf('persons/%d.json', $person_id), $data);
+    }
 
-	public function findPerson($person_id)
-	{
-		return $this->getJSONWithToken('persons/all.json?id=' . $person_id);
-	}
+    public function findPerson($person_id)
+    {
+        return $this->getJSONWithToken('persons/all.json?id=' . $person_id);
+    }
 
-	public function updatePersonFromIterChanges(DataIterMember $iter)
-	{
-		if (!$iter->has_id())
-			throw new InvalidArgumentException('You can only submit updates for iters that have an id');
+    public function updatePersonFromIterChanges(DataIterMember $iter)
+    {
+        if (!$iter->has_id())
+            throw new InvalidArgumentException('You can only submit updates for iters that have an id');
 
-		if (!$iter->has_secretary_changes())
-			return null;
+        if (!$iter->has_secretary_changes())
+            return null;
 
-		$data = [];
-		
-		foreach ($iter->secretary_changed_values() as $field => $value)
-			$data[$this->mapping[$field]] = $value;
+        $data = [];
 
-		return $this->updatePerson($iter->get_id(), $data);
-	}
+        foreach ($iter->secretary_changed_values() as $field => $value)
+            $data[$this->mapping[$field]] = $value;
 
-	protected function isValidToken($user_token_pair)
-	{
-		if (empty($user_token_pair) || strpos($user_token_pair, ':') === false)
-			return false;
+        return $this->updatePerson($iter->get_id(), $data);
+    }
 
-		list($user, $token) = explode(':', $user_token_pair, 2);
+    protected function isValidToken($user_token_pair)
+    {
+        if (empty($user_token_pair) || strpos($user_token_pair, ':') === false)
+            return false;
 
-		$response = $this->getJSON(sprintf('token/%s/%d.json', $token, $user));
+        list($user, $token) = explode(':', $user_token_pair, 2);
 
-		return (bool) $response->success;
-	}
+        $response = $this->getJSON(sprintf('token/%s/%d.json', $token, $user));
 
-	protected function requestToken($user, $password)
-	{
-		$response = $this->postJSON('token/new.json', ['username' => $user, 'password' => $password]);
+        return (bool) $response->success;
+    }
 
-		if (!$response->success)
-			throw new RuntimeException('Could not request new token: ' . $response->errors);
+    protected function requestToken($user, $password)
+    {
+        $response = $this->postJSON('token/new.json', ['username' => $user, 'password' => $password]);
 
-		return sprintf('%d:%s', $response->user, $response->token);
-	}
+        if (!$response->success)
+            throw new RuntimeException('Could not request new token: ' . $response->errors);
 
-	protected function getJSON($url)
-	{
-		$response = file_get_contents($this->root . $url);
-		
-		$data = json_decode($response);
-		
-		return $data;
-	}
+        return sprintf('%d:%s', $response->user, $response->token);
+    }
 
-	protected function getJSONWithToken($url)
-	{
-		// Splice in the token authentication
-		list($user, $token) = explode(':', $this->token, 2);
+    protected function getJSON($url)
+    {
+        $response = file_get_contents($this->root . $url);
 
-		// Add token to URL
-		$url = edit_url($url, ['user' => $user, 'token' => $token]);
+        $data = json_decode($response);
 
-		// Request that JSON
-		return $this->getJSON($url);
-	}
+        return $data;
+    }
 
-	protected function postJSONWithToken($url, array $data)
-	{
-		list($user, $token) = explode(':', $this->token, 2);
+    protected function getJSONWithToken($url)
+    {
+        // Splice in the token authentication
+        list($user, $token) = explode(':', $this->token, 2);
 
-		$url .= sprintf('?user=%d&token=%s', $user, $token);
+        // Add token to URL
+        $url = edit_url($url, ['user' => $user, 'token' => $token]);
 
-		return $this->postJSON($url, $data);
-	}
+        // Request that JSON
+        return $this->getJSON($url);
+    }
 
-	protected function postJSON($url, array $data)
-	{
-		try {
-			$options = array(
-				'http' => array(
-					'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-					'method'  => 'POST',
-					'content' => http_build_query($data),
-					'ignore_errors' => true
-				)
-			);
-			$context  = stream_context_create($options);
+    protected function postJSONWithToken($url, array $data)
+    {
+        list($user, $token) = explode(':', $this->token, 2);
 
-			$response = file_get_contents($this->root . $url, false, $context);
-		} catch (ErrorException $e) {
-			throw new RuntimeException('Could not send request to host.', 0, $e);
-		}
+        $url .= sprintf('?user=%d&token=%s', $user, $token);
 
-		if (!preg_match('/^HTTP\/1\.\d\s(\d+)\s/', $http_response_header[0], $match))
-			throw new RuntimeException('Could not get HTTP STATUS response header');
+        return $this->postJSON($url, $data);
+    }
 
-		if ($match[1] != '200')
-			throw new RuntimeException('Received HTTP status '. $match[1] . ': ' . $response);
+    protected function postJSON($url, array $data)
+    {
+        try {
+            $options = array(
+                'http' => array(
+                    'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+                    'method'  => 'POST',
+                    'content' => http_build_query($data),
+                    'ignore_errors' => true
+                )
+            );
+            $context  = stream_context_create($options);
 
-		if (!$response)
-			throw new RuntimeException('Could not do post request to ' . $url);
+            $response = file_get_contents($this->root . $url, false, $context);
+        } catch (ErrorException $e) {
+            throw new RuntimeException('Could not send request to host.', 0, $e);
+        }
 
-		$data = json_decode($response);
+        if (!preg_match('/^HTTP\/1\.\d\s(\d+)\s/', $http_response_header[0], $match))
+            throw new RuntimeException('Could not get HTTP STATUS response header');
 
-		if (!$data)
-			throw new RuntimeException('Could not decode response as JSON');
+        if ($match[1] != '200')
+            throw new RuntimeException('Received HTTP status '. $match[1] . ': ' . $response);
 
-		return $data;
-	}
+        if (!$response)
+            throw new RuntimeException('Could not do post request to ' . $url);
+
+        $data = json_decode($response);
+
+        if (!$data)
+            throw new RuntimeException('Could not decode response as JSON');
+
+        return $data;
+    }
 }
 
 function get_secretary()
 {
-	static $secretary;
+    static $secretary;
 
-	if (!$secretary)
-		$secretary = new SecretaryApi(
-			get_config_value('secretary_root'),
-			get_config_value('secretary_user'),
-			get_config_value('secretary_password'));
+    if (!$secretary)
+        $secretary = new SecretaryApi(
+            get_config_value('secretary_root'),
+            get_config_value('secretary_user'),
+            get_config_value('secretary_password'));
 
-	return $secretary;
+    return $secretary;
 }

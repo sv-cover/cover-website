@@ -11,25 +11,25 @@ require_once 'src/framework/controllers/ControllerCRUD.php';
  */
 class AnnouncementsController extends \ControllerCRUD
 {
-	protected $view_name = 'announcements';
-	protected $form_type = AnnouncementType::class;
+    protected $view_name = 'announcements';
+    protected $form_type = AnnouncementType::class;
 
-	public function __construct($request, $router)
-	{
-		$this->model = get_model('DataModelAnnouncement');
+    public function __construct($request, $router)
+    {
+        $this->model = get_model('DataModelAnnouncement');
 
-		parent::__construct($request, $router);
-	}
+        parent::__construct($request, $router);
+    }
 
-	public function path(string $view, \DataIter $iter = null)
-	{
-		$parameters = [
-			'view' => $view,
-		];
+    public function path(string $view, \DataIter $iter = null)
+    {
+        $parameters = [
+            'view' => $view,
+        ];
 
-		if (isset($iter))
-			$parameters['id'] = $iter->get_id();
+        if (isset($iter))
+            $parameters['id'] = $iter->get_id();
 
-		return $this->generate_url('announcements', $parameters);
-	}
+        return $this->generate_url('announcements', $parameters);
+    }
 }

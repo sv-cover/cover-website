@@ -1,6 +1,6 @@
 <?php
 if (!defined('IN_SITE'))
-	return;
+    return;
 
 define('ROOT_DIR_URI', 'https://www.svcover.nl/');
 define('INCLUDE_PATH', dirname(__FILE__));

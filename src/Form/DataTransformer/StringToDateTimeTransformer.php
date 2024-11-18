@@ -7,25 +7,25 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransf
 
 class StringToDateTimeTransformer implements DataTransformerInterface
 {
-	private DateTimeToStringTransformer $transformer;
+    private DateTimeToStringTransformer $transformer;
 
-	public function __construct(?string $inputTimezone = null, ?string $outputTimezone = null, string $format = 'Y-m-d H:i:s', ?string $parseFormat = null)
-	{
-		$this->transformer = new DateTimeToStringTransformer($inputTimezone, $outputTimezone, $format, $parseFormat);
-	}
+    public function __construct(?string $inputTimezone = null, ?string $outputTimezone = null, string $format = 'Y-m-d H:i:s', ?string $parseFormat = null)
+    {
+        $this->transformer = new DateTimeToStringTransformer($inputTimezone, $outputTimezone, $format, $parseFormat);
+    }
 
-	public function transform(mixed $value): ?\DateTime
-	{
-		return $this->transformer->reverseTransform($value);
-	}
+    public function transform(mixed $value): ?\DateTime
+    {
+        return $this->transformer->reverseTransform($value);
+    }
 
-	public function reverseTransform(mixed $value): ?string
-	{
-		$transformed = $this->transformer->transform($value);
+    public function reverseTransform(mixed $value): ?string
+    {
+        $transformed = $this->transformer->transform($value);
 
-		if (empty($transformed))
-			return null;
+        if (empty($transformed))
+            return null;
 
-		return $transformed;
-	}
+        return $transformed;
+    }
 }

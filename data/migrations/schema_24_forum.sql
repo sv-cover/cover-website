@@ -30,9 +30,9 @@ ALTER TABLE forum_threads ALTER COLUMN poll TYPE smallint;
 DELETE FROM forum_sessionreads WHERE lid_id NOT IN (SELECT id FROM leden);
 
 ALTER TABLE forum_sessionreads
-	DROP CONSTRAINT forum_sessionreads_lid_key,
-	ADD CONSTRAINT forum_sessionreads_lid_key FOREIGN KEY (lid_id) REFERENCES leden (id) ON UPDATE CASCADE ON DELETE CASCADE,
-	ADD CONSTRAINT forum_sessionreads_pkey PRIMARY KEY (lid_id, forum_id, thread_id);
+    DROP CONSTRAINT forum_sessionreads_lid_key,
+    ADD CONSTRAINT forum_sessionreads_lid_key FOREIGN KEY (lid_id) REFERENCES leden (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    ADD CONSTRAINT forum_sessionreads_pkey PRIMARY KEY (lid_id, forum_id, thread_id);
 
 -- Remove stale users
 DELETE FROM forum_visits WHERE lid_id NOT IN (SELECT id FROM leden);

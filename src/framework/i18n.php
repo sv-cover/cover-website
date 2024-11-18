@@ -1,6 +1,6 @@
 <?php
 if (!defined('IN_SITE'))
-	return;
+    return;
 
 require_once 'src/framework/config.php';
 
@@ -10,13 +10,13 @@ require_once 'src/framework/config.php';
  * to be able to mark the message as a translatable string (by using
  * gettext tools) but not actually translate it yet. A use case would be
  * to only translate the message in certain circumstances.
- * 
+ *
  * @message The message
  *
  * @result the same unaltered message
  */
 function N__($message) {
-	return $message;
+    return $message;
 }
 
 /**
@@ -25,33 +25,33 @@ function N__($message) {
  *
  */
 function init_i18n() {
-	/* Set language to use (locale needs to be available on OS) */
-	putenv('LANG='.i18n_get_locale().'.UTF-8');
-	setlocale(LC_ALL, i18n_get_locale().'.UTF-8');
+    /* Set language to use (locale needs to be available on OS) */
+    putenv('LANG='.i18n_get_locale().'.UTF-8');
+    setlocale(LC_ALL, i18n_get_locale().'.UTF-8');
 
-	// Specify location of translation tables
-	bindtextdomain('cover-web', realpath(dirname(__FILE__) . '/../../locale'));
+    // Specify location of translation tables
+    bindtextdomain('cover-web', realpath(dirname(__FILE__) . '/../../locale'));
 
-	// Choose domain
-	textdomain('cover-web');	
+    // Choose domain
+    textdomain('cover-web');
 }
 
 function __($message_id) {
-	if ($message_id == '')
-		return '';
+    if ($message_id == '')
+        return '';
 
-	return gettext($message_id);
+    return gettext($message_id);
 }
 
 function __translate_parts($message, $separators = ',') {
-	$pattern = '/(\s*[' . preg_quote($separators, '/') . ']+\s*)/';
-	$parts = preg_split($pattern, $message, -1, PREG_SPLIT_DELIM_CAPTURE);
+    $pattern = '/(\s*[' . preg_quote($separators, '/') . ']+\s*)/';
+    $parts = preg_split($pattern, $message, -1, PREG_SPLIT_DELIM_CAPTURE);
 
-	foreach ($parts as &$part)
-		if (!preg_match($pattern, $part))
-			$part = __($part);
+    foreach ($parts as &$part)
+        if (!preg_match($pattern, $part))
+            $part = __($part);
 
-	return implode('', $parts);
+    return implode('', $parts);
 }
 
 /**
@@ -62,34 +62,34 @@ function __translate_parts($message, $separators = ',') {
  * @return string number with suffix.
  */
 function ordinal($n) {
-	switch (i18n_get_locale())
-	{
-		case 'nl_NL':
-			return sprintf('%de', $n);
+    switch (i18n_get_locale())
+    {
+        case 'nl_NL':
+            return sprintf('%de', $n);
 
-		case 'en_US':
-			if ($n >= 11 && $n <= 13)
-				return sprintf('%dth', $n);
-			elseif ($n % 10 == 1)
-				return sprintf('%dst', $n);
-			elseif ($n % 10 == 2)
-				return sprintf('%dnd', $n);
-			elseif ($n % 10 == 3)
-				return sprintf('%drd', $n);
-			else
-				return sprintf('%dth', $n);
+        case 'en_US':
+            if ($n >= 11 && $n <= 13)
+                return sprintf('%dth', $n);
+            elseif ($n % 10 == 1)
+                return sprintf('%dst', $n);
+            elseif ($n % 10 == 2)
+                return sprintf('%dnd', $n);
+            elseif ($n % 10 == 3)
+                return sprintf('%drd', $n);
+            else
+                return sprintf('%dth', $n);
 
-		default:
-			return sprintf('%d', $n);
-	}
+        default:
+            return sprintf('%d', $n);
+    }
 }
 
 function _ngettext($singular, $plural, $number) {
-	return ngettext($singular, $plural, $number);
+    return ngettext($singular, $plural, $number);
 }
 
 function __N($singular, $plural, $number) {
-	return sprintf(_ngettext($singular, $plural, $number), $number);
+    return sprintf(_ngettext($singular, $plural, $number), $number);
 }
 
 /**
@@ -99,32 +99,32 @@ function __N($singular, $plural, $number) {
  * @result the current locale
  */
 function i18n_get_locale() {
-	// Bypass logic, the website should be English only now
-	return 'en_US';
+    // Bypass logic, the website should be English only now
+    return 'en_US';
 
-	if (get_auth()->logged_in())
-		$language = get_identity()->get('taal');
-	elseif (isset($_SESSION['taal']))
-		$language = $_SESSION['taal'];
-	else
-		$language = http_get_preferred_language();
-	
-	if (!isset($language) || !i18n_valid_language($language))
-		$language = get_config_value('default_language', 'en');
-	
-	$locales = _i18n_locale_map();
-	
-	return $locales[$language];
+    if (get_auth()->logged_in())
+        $language = get_identity()->get('taal');
+    elseif (isset($_SESSION['taal']))
+        $language = $_SESSION['taal'];
+    else
+        $language = http_get_preferred_language();
+
+    if (!isset($language) || !i18n_valid_language($language))
+        $language = get_config_value('default_language', 'en');
+
+    $locales = _i18n_locale_map();
+
+    return $locales[$language];
 }
 
 function _i18n_locale_map() {
-	return array_flip(_i18n_language_map());
+    return array_flip(_i18n_language_map());
 }
 
 function _i18n_language_map() {
-	return array(
-		'nl_NL' => 'nl',
-		'en_US' => 'en');
+    return array(
+        'nl_NL' => 'nl',
+        'en_US' => 'en');
 }
 
 /**
@@ -134,16 +134,16 @@ function _i18n_language_map() {
  * @result an associative array of support languages
  */
 function i18n_get_languages() {
-	static $languages = null;
-	
-	if ($languages !== null)
-		return $languages;
-	
-	$languages = array(
-		'nl' => 'Nederlands',
-		'en' => 'English');
-	
-	return $languages;
+    static $languages = null;
+
+    if ($languages !== null)
+        return $languages;
+
+    $languages = array(
+        'nl' => 'Nederlands',
+        'en' => 'English');
+
+    return $languages;
 }
 
 /**
@@ -154,9 +154,9 @@ function i18n_get_languages() {
  * @result true if the language is valid, false otherwise
  */
 function i18n_valid_language($language) {
-	$languages = i18n_get_languages();
+    $languages = i18n_get_languages();
 
-	return isset($languages[$language]);
+    return isset($languages[$language]);
 }
 
 /**
@@ -166,60 +166,60 @@ function i18n_valid_language($language) {
  * @result the current language
  */
 function i18n_get_language() {
-	static $languages = null;
+    static $languages = null;
 
-	if ($languages === null)
-		$languages = _i18n_language_map();
-	
-	$locale = i18n_get_locale();
-	
-	if (isset($languages[$locale]))
-		return $languages[$locale];
-	else
-		return get_config_value('default_language', 'en');	
+    if ($languages === null)
+        $languages = _i18n_language_map();
+
+    $locale = i18n_get_locale();
+
+    if (isset($languages[$locale]))
+        return $languages[$locale];
+    else
+        return get_config_value('default_language', 'en');
 }
 
 function http_get_preferred_language($get_sorted_list = false, $accepted_languages = null)
 {
-	if (empty($accepted_languages))
-		if (!empty($_SERVER["HTTP_ACCEPT_LANGUAGE"]))
-			$accepted_languages = $_SERVER["HTTP_ACCEPT_LANGUAGE"];
-		else
-			return null;
+    if (empty($accepted_languages))
+        if (!empty($_SERVER["HTTP_ACCEPT_LANGUAGE"]))
+            $accepted_languages = $_SERVER["HTTP_ACCEPT_LANGUAGE"];
+        else
+            return null;
 
-	// regex inspired from @GabrielAnderson on http://stackoverflow.com/questions/6038236/http-accept-language
-	if (!preg_match_all('/([a-z]{1,8}(-[a-z]{1,8})*)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i', $accepted_languages, $lang_parse))
-		return null;
+    // regex inspired from @GabrielAnderson on http://stackoverflow.com/questions/6038236/http-accept-language
+    if (!preg_match_all('/([a-z]{1,8}(-[a-z]{1,8})*)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i', $accepted_languages, $lang_parse))
+        return null;
 
-	$langs = $lang_parse[1];
-	$ranks = $lang_parse[4];
+    $langs = $lang_parse[1];
+    $ranks = $lang_parse[4];
 
-	// (create an associative array 'language' => 'preference')
-	$lang2pref = array();
-	for ($i=0; $i<count($langs); $i++)
-		$lang2pref[$langs[$i]] = (float) (!empty($ranks[$i]) ? $ranks[$i] : 1);
+    // (create an associative array 'language' => 'preference')
+    $lang2pref = array();
+    for ($i=0; $i<count($langs); $i++)
+        $lang2pref[$langs[$i]] = (float) (!empty($ranks[$i]) ? $ranks[$i] : 1);
 
-		// (comparison function for uksort)
-	$compare_language = function ($a, $b) use ($lang2pref) {
-		if ($lang2pref[$a] > $lang2pref[$b])
-			return -1;
-		elseif ($lang2pref[$a] < $lang2pref[$b])
-			return 1;
-		elseif (strlen($a) > strlen($b))
-			return -1;
-		elseif (strlen($a) < strlen($b))
-			return 1;
-		else
-			return 0;
-	};
+        // (comparison function for uksort)
+    $compare_language = function ($a, $b) use ($lang2pref) {
+        if ($lang2pref[$a] > $lang2pref[$b])
+            return -1;
+        elseif ($lang2pref[$a] < $lang2pref[$b])
+            return 1;
+        elseif (strlen($a) > strlen($b))
+            return -1;
+        elseif (strlen($a) < strlen($b))
+            return 1;
+        else
+            return 0;
+    };
 
-	// sort the languages by prefered language and by the most specific region
-	uksort($lang2pref, $compare_language);
+    // sort the languages by prefered language and by the most specific region
+    uksort($lang2pref, $compare_language);
 
-	if ($get_sorted_list)
-		return $lang2pref;
+    if ($get_sorted_list)
+        return $lang2pref;
 
-	// return the first value's key
-	reset($lang2pref);
-	return key($lang2pref);
+    // return the first value's key
+    reset($lang2pref);
+    return key($lang2pref);
 }

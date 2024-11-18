@@ -2,5 +2,5 @@
 
 class MembershipView extends View
 {
-	//
+    //
 }

@@ -28,49 +28,49 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class RedirectController extends \Controller
 {
-	public function redirect_route($parameters)
-	{
-		// Copy parameters
-		$args = $this->request->attributes->get('_route_params');
+    public function redirect_route($parameters)
+    {
+        // Copy parameters
+        $args = $this->request->attributes->get('_route_params');
 
-		// Remove any parameters we do NOT want to pass to the new route
-		unset($args['route'], $args['permanent'], $args['keepQueryParams']);
+        // Remove any parameters we do NOT want to pass to the new route
+        unset($args['route'], $args['permanent'], $args['keepQueryParams']);
 
-		// Copy $_GET into the parameters if needed
-		if (!empty($parameters['keepQueryParams']))
-			$args = array_merge($_GET, $args);
-	
-		// Generate url
-		$path = $this->router->generate($parameters['route'], $args, UrlGeneratorInterface::ABSOLUTE_URL);
+        // Copy $_GET into the parameters if needed
+        if (!empty($parameters['keepQueryParams']))
+            $args = array_merge($_GET, $args);
 
-		// Redirect
-		$permanent = $parameters['permanent'] ?? false;
-		return $this->view->redirect($path, $permanent);
-	}
+        // Generate url
+        $path = $this->router->generate($parameters['route'], $args, UrlGeneratorInterface::ABSOLUTE_URL);
 
-	public function redirect_path($parameters)
-	{
-		$permanent = $parameters['permanent'] ?? false;
+        // Redirect
+        $permanent = $parameters['permanent'] ?? false;
+        return $this->view->redirect($path, $permanent);
+    }
 
-		// Extract flags
-		$allow_external_domains = !empty($parameters['allowExternalDomains']) ? ALLOW_EXTERNAL_DOMAINS : 0;
-		$allow_subdomains = !empty($parameters['allowSubDomains']) ? ALLOW_SUBDOMAINS : 0;
+    public function redirect_path($parameters)
+    {
+        $permanent = $parameters['permanent'] ?? false;
 
-		// Redirect
-		return $this->view->redirect($parameters['path'], $permanent, $allow_external_domains | $allow_subdomains);
-	}
+        // Extract flags
+        $allow_external_domains = !empty($parameters['allowExternalDomains']) ? ALLOW_EXTERNAL_DOMAINS : 0;
+        $allow_subdomains = !empty($parameters['allowSubDomains']) ? ALLOW_SUBDOMAINS : 0;
 
-	public function run_impl()
-	{
-		$parameters = $this->request->attributes->get('_route_params');
-		if (\array_key_exists('route', $parameters)) {
-			if (\array_key_exists('path', $parameters))
-				throw new \RuntimeException('Ambiguous redirect settings: use either "route" or "path" parameter.');
-			return $this->redirect_route($parameters);
-		} else if (\array_key_exists('path', $parameters)) {
-			return $this->redirect_path($parameters);
-		}
+        // Redirect
+        return $this->view->redirect($parameters['path'], $permanent, $allow_external_domains | $allow_subdomains);
+    }
 
-		throw new \RuntimeException('Invalid redirect settings: specify the "route" or "path" parameter.');
-	}
+    public function run_impl()
+    {
+        $parameters = $this->request->attributes->get('_route_params');
+        if (\array_key_exists('route', $parameters)) {
+            if (\array_key_exists('path', $parameters))
+                throw new \RuntimeException('Ambiguous redirect settings: use either "route" or "path" parameter.');
+            return $this->redirect_route($parameters);
+        } else if (\array_key_exists('path', $parameters)) {
+            return $this->redirect_path($parameters);
+        }
+
+        throw new \RuntimeException('Invalid redirect settings: specify the "route" or "path" parameter.');
+    }
 }

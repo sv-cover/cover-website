@@ -4,8 +4,8 @@
 require 'src/init.php';
 
 function input($prompt) {
-	echo $prompt;
-	return stream_get_line(STDIN, 1024, PHP_EOL);
+    echo $prompt;
+    return stream_get_line(STDIN, 1024, PHP_EOL);
 }
 
 $member_model = get_model('DataModelMember');

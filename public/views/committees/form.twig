@@ -5,103 +5,103 @@
 {% block content %}
 <h1 class="title">{{ iter.has_id() ? __('Modify group') : __('Add a new group') }}</h1>
 {{ form_start(form) }}
-	<datalist id="committees-suggested-functions">
-		{% for name, sort in model.get_functies %}
-			<option value="{{ name }}">
-		{% endfor %}
-	</datalist>
-	{% if form.hidden is defined %}
-		<div class="field message is-danger">
-			<div class="message-body">
-				{{ form_row(form.hidden, {label_attr: {class: ''}}) }}
-			</div>
-		</div>
-	{% endif %}
-	{# Global errors #}
-	{{ form_errors(form) }}
-	{# Fields #}
-	{{ form_row(form.type) }}
-	{{ form_row(form.naam) }}
-	<div class="field">
-		<noscript>
-			{{ form_label(form.members)}}
-			<p class="control">{{ __('This feature needs JavaScript to work.') }}</p>
-		</noscript>
-		<table class="table is-fullwidth is-hoverable is-aligned">
-			<thead>
-				<tr>
-					<th id="{{ form.members.vars.id }}-member-label">{{ __('Member') }}</th>
-					<th id="{{ form.members.vars.id }}-function-label">{{ __('Function') }}</th>
-					<th class="is-narrow"></th>
-				</tr>
-			</thead>
-			<tbody id="{{ form.members.vars.id }}-members" class="growing-list" data-growing-list-template="#{{ form.members.vars.id }}-template">
-				{% for memberForm in form.members %}
-					<tr>
-						<td>
-							{{ form_widget(memberForm.member_id, {attr: { placeholder: __('Name'), 'aria-labelledby': form.members.vars.id ~ '-member-label'}}) }}
-							{{ form_errors(memberForm.member_id) }}
-						</td>
-						<td>
-							{{ form_widget(memberForm.functie, {attr: { placeholder: __('Function'), 'data-autocomplete': 'datalist', 'data-autocomplete-src': '#committees-suggested-functions', 'aria-labelledby': form.members.vars.id ~ '-function-label'}}) }}
-							{{ form_errors(memberForm.functie) }}
-						</td>
-						<td>
-							<button
-								type="button"
-								class="button remove-button"
-								title="{{ __('Remove member from group') }}"
-								aria-label="{{ __('Remove member from group') }}"
-								data-growing-list-delete
-							>
-								<span class="icon is-small">
-									<i class="fas fa-user-times" aria-hidden="true"></i>
-								</span>
-							</button>
-						</td>
-					</tr>
-				{% endfor %}
-			</tbody>
-		</table>
-		<template id="{{ form.members.vars.id }}-template">
-			<tr>
-				<td>
-					{{ form_widget(form.members.vars.prototype.member_id, {attr: { placeholder: __('Name'), 'aria-labelledby': form.members.vars.id ~ '-member-label'}}) }}
-				</td>
-				<td>
-					{{ form_widget(form.members.vars.prototype.functie, {attr: { placeholder: __('Function'), 'data-autocomplete': 'datalist', 'data-autocomplete-src': '#committees-suggested-functions', 'aria-labelledby': form.members.vars.id ~ '-function-label'}}) }}
-				</td>
-				<td class="has-text-right">
-					<button
-						type="button"
-						class="button remove-button"
-						title="{{ __('Remove member from group') }}"
-						aria-label="{{ __('Remove member from group') }}"
-						data-growing-list-delete
-					>
-						<span class="icon is-small">
-							<i class="fas fa-user-times" aria-hidden="true"></i>
-						</span>
-					</button>
-				</td>
-			</tr>
-		</template>
-		{# This make sure Symfony won't try to render the widget again… #}
-		{% do form.members.setRendered() %}
-	</div>
-	{{ form_row(form.vacancies) }}
-	<div class="field">
-		<div class="control buttons">
-			{{ form_widget(form.submit, {'label': iter.has_id() ? __('Modify %s')|format(view.available_committee_types[iter.type]) : __('Create group')}) }}
-			{% if iter.has_id %}
-				<a href="{{ path('committees', {commissie: iter.login}) }}" class="button">{{ __('Return to %s')|format(view.available_committee_types[iter.type]) }}</a>
-			{% else %}
-				<a href="{{ path('committees') }}" class="button">{{ __('Back to all committees') }}</a>
-			{% endif %}
-			{% if iter.has_id and not iter.hidden and user_can_delete iter %}
-				<a href="{{ path('committees', {view: 'delete', commissie: iter.login}) }}" class="button" data-popup="modal">{{ __('Deactivate') }}</a>
-			{% endif %}
-		</div>
-	</div>
+    <datalist id="committees-suggested-functions">
+        {% for name, sort in model.get_functies %}
+            <option value="{{ name }}">
+        {% endfor %}
+    </datalist>
+    {% if form.hidden is defined %}
+        <div class="field message is-danger">
+            <div class="message-body">
+                {{ form_row(form.hidden, {label_attr: {class: ''}}) }}
+            </div>
+        </div>
+    {% endif %}
+    {# Global errors #}
+    {{ form_errors(form) }}
+    {# Fields #}
+    {{ form_row(form.type) }}
+    {{ form_row(form.naam) }}
+    <div class="field">
+        <noscript>
+            {{ form_label(form.members)}}
+            <p class="control">{{ __('This feature needs JavaScript to work.') }}</p>
+        </noscript>
+        <table class="table is-fullwidth is-hoverable is-aligned">
+            <thead>
+                <tr>
+                    <th id="{{ form.members.vars.id }}-member-label">{{ __('Member') }}</th>
+                    <th id="{{ form.members.vars.id }}-function-label">{{ __('Function') }}</th>
+                    <th class="is-narrow"></th>
+                </tr>
+            </thead>
+            <tbody id="{{ form.members.vars.id }}-members" class="growing-list" data-growing-list-template="#{{ form.members.vars.id }}-template">
+                {% for memberForm in form.members %}
+                    <tr>
+                        <td>
+                            {{ form_widget(memberForm.member_id, {attr: { placeholder: __('Name'), 'aria-labelledby': form.members.vars.id ~ '-member-label'}}) }}
+                            {{ form_errors(memberForm.member_id) }}
+                        </td>
+                        <td>
+                            {{ form_widget(memberForm.functie, {attr: { placeholder: __('Function'), 'data-autocomplete': 'datalist', 'data-autocomplete-src': '#committees-suggested-functions', 'aria-labelledby': form.members.vars.id ~ '-function-label'}}) }}
+                            {{ form_errors(memberForm.functie) }}
+                        </td>
+                        <td>
+                            <button
+                                type="button"
+                                class="button remove-button"
+                                title="{{ __('Remove member from group') }}"
+                                aria-label="{{ __('Remove member from group') }}"
+                                data-growing-list-delete
+                            >
+                                <span class="icon is-small">
+                                    <i class="fas fa-user-times" aria-hidden="true"></i>
+                                </span>
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <template id="{{ form.members.vars.id }}-template">
+            <tr>
+                <td>
+                    {{ form_widget(form.members.vars.prototype.member_id, {attr: { placeholder: __('Name'), 'aria-labelledby': form.members.vars.id ~ '-member-label'}}) }}
+                </td>
+                <td>
+                    {{ form_widget(form.members.vars.prototype.functie, {attr: { placeholder: __('Function'), 'data-autocomplete': 'datalist', 'data-autocomplete-src': '#committees-suggested-functions', 'aria-labelledby': form.members.vars.id ~ '-function-label'}}) }}
+                </td>
+                <td class="has-text-right">
+                    <button
+                        type="button"
+                        class="button remove-button"
+                        title="{{ __('Remove member from group') }}"
+                        aria-label="{{ __('Remove member from group') }}"
+                        data-growing-list-delete
+                    >
+                        <span class="icon is-small">
+                            <i class="fas fa-user-times" aria-hidden="true"></i>
+                        </span>
+                    </button>
+                </td>
+            </tr>
+        </template>
+        {# This make sure Symfony won't try to render the widget again… #}
+        {% do form.members.setRendered() %}
+    </div>
+    {{ form_row(form.vacancies) }}
+    <div class="field">
+        <div class="control buttons">
+            {{ form_widget(form.submit, {'label': iter.has_id() ? __('Modify %s')|format(view.available_committee_types[iter.type]) : __('Create group')}) }}
+            {% if iter.has_id %}
+                <a href="{{ path('committees', {commissie: iter.login}) }}" class="button">{{ __('Return to %s')|format(view.available_committee_types[iter.type]) }}</a>
+            {% else %}
+                <a href="{{ path('committees') }}" class="button">{{ __('Back to all committees') }}</a>
+            {% endif %}
+            {% if iter.has_id and not iter.hidden and user_can_delete iter %}
+                <a href="{{ path('committees', {view: 'delete', commissie: iter.login}) }}" class="button" data-popup="modal">{{ __('Deactivate') }}</a>
+            {% endif %}
+        </div>
+    </div>
 {{ form_end(form) }}
 {% endblock %}

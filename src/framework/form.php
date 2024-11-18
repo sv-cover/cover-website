@@ -19,40 +19,40 @@ use Symfony\Component\Validator\Validation;
 
 function get_csrf_manager()
 {
-	static $csrf_manager;
-	if (!isset($csrf_manager)) {
-		// TODO: use SessionTokenStorage after proper HttpFoundation integration
-		$csrf_generator = new UriSafeTokenGenerator();
-		$csrf_storage = new NativeSessionTokenStorage();
-		$csrf_manager = new CsrfTokenManager($csrf_generator, $csrf_storage);
-	}
+    static $csrf_manager;
+    if (!isset($csrf_manager)) {
+        // TODO: use SessionTokenStorage after proper HttpFoundation integration
+        $csrf_generator = new UriSafeTokenGenerator();
+        $csrf_storage = new NativeSessionTokenStorage();
+        $csrf_manager = new CsrfTokenManager($csrf_generator, $csrf_storage);
+    }
 
-	return $csrf_manager;
+    return $csrf_manager;
 }
 
 function get_form_factory()
 {
-	static $form_factory;
+    static $form_factory;
 
-	if (!isset($form_factory)) {
-		// creates the validator - details will vary
-		$validator = Validation::createValidator();
+    if (!isset($form_factory)) {
+        // creates the validator - details will vary
+        $validator = Validation::createValidator();
 
-		$form_factory = Forms::createFormFactoryBuilder()
-			->addExtension(new HttpFoundationExtension())
-			->addExtension(new ValidatorExtension($validator))
-			->addExtension(new CsrfExtension(get_csrf_manager()))
-			->addTypeExtensions([
-				new BulmaButtonTypeExtension(),
-				new BulmaCheckboxTypeExtension(),
-				new BulmaChoiceTypeExtension(),
-				new BulmaFileTypeExtension(),
-				new ChipsChoiceTypeExtension(),
-				new OptionalCheckboxTypeExtension(),
-				new OptionalFormTypeExtension(),
-			])
-			->getFormFactory();
-	}
+        $form_factory = Forms::createFormFactoryBuilder()
+            ->addExtension(new HttpFoundationExtension())
+            ->addExtension(new ValidatorExtension($validator))
+            ->addExtension(new CsrfExtension(get_csrf_manager()))
+            ->addTypeExtensions([
+                new BulmaButtonTypeExtension(),
+                new BulmaCheckboxTypeExtension(),
+                new BulmaChoiceTypeExtension(),
+                new BulmaFileTypeExtension(),
+                new ChipsChoiceTypeExtension(),
+                new OptionalCheckboxTypeExtension(),
+                new OptionalFormTypeExtension(),
+            ])
+            ->getFormFactory();
+    }
 
-	return $form_factory;
+    return $form_factory;
 }

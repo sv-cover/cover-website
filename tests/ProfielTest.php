@@ -8,43 +8,43 @@ use \cover\test\Form;
 
 class ProfielTest extends TestCase
 {
-	use \cover\test\SessionTestTrait;
-	
-	public function testCanChangePublicFields()
-	{
-		$new_data = [
-			'postcode' => '2222BB',
-			'telefoonnummer' => '0612345678',
-			'adres' => 'bar',
-			'woonplaats' => 'new woonplaats'
-		];
+    use \cover\test\SessionTestTrait;
 
-		// First get the form (for the nonce)
-		$response = $this->simulateRequestWithSession('profiel.php', [
-			'GET' => ['lid' => self::$member_id, 'view' => 'personal']
-		]);
+    public function testCanChangePublicFields()
+    {
+        $new_data = [
+            'postcode' => '2222BB',
+            'telefoonnummer' => '0612345678',
+            'adres' => 'bar',
+            'woonplaats' => 'new woonplaats'
+        ];
 
-		$form = Form::fromResponse($response, '//div[@id="personal-tab"]//form[@method="post"]');
+        // First get the form (for the nonce)
+        $response = $this->simulateRequestWithSession('profiel.php', [
+            'GET' => ['lid' => self::$member_id, 'view' => 'personal']
+        ]);
 
-		// Merge in the new data
-		$form->fields = array_merge($form->fields, $new_data);
+        $form = Form::fromResponse($response, '//div[@id="personal-tab"]//form[@method="post"]');
 
-		$response = $form->submit([$this, 'simulateRequestWithSession']);
+        // Merge in the new data
+        $form->fields = array_merge($form->fields, $new_data);
 
-		// If the profile was correctly updated, expect a redirect
-		$this->assertEquals(1, preg_match('/^Location: profiel\.php\?lid=' . self::$member_id . '/im', $response->header),
-			"Assume we have been redirected to the profile again");
+        $response = $form->submit([$this, 'simulateRequestWithSession']);
 
-		// Also, the member data should have been updated in the database
-		$model = get_model('DataModelMember');
+        // If the profile was correctly updated, expect a redirect
+        $this->assertEquals(1, preg_match('/^Location: profiel\.php\?lid=' . self::$member_id . '/im', $response->header),
+            "Assume we have been redirected to the profile again");
 
-		$member = $model->get_iter(self::$member_id);
+        // Also, the member data should have been updated in the database
+        $model = get_model('DataModelMember');
 
-		// Assume that the data was correctly reformatted
-		$new_data['telefoonnummer'] = '+31612345678';
+        $member = $model->get_iter(self::$member_id);
 
-		foreach ($new_data as $field => $expected_value)
-			$this->assertEquals($member[$field], $expected_value,
-				"Value of field '{$field}' differs");
-	}
+        // Assume that the data was correctly reformatted
+        $new_data['telefoonnummer'] = '+31612345678';
+
+        foreach ($new_data as $field => $expected_value)
+            $this->assertEquals($member[$field], $expected_value,
+                "Value of field '{$field}' differs");
+    }
 }

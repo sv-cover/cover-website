@@ -2,185 +2,185 @@
 
 class WikiRemoteCallException extends Exception
 {
-	//
+    //
 }
 
 class DataIterWiki extends DataIter implements SearchResult
 {
-	static public function fields()
-	{
-		return [];
-	}
+    static public function fields()
+    {
+        return [];
+    }
 
-	public function get_search_relevance()
-	{
-		return normalize_search_rank($this->get('score'));
-	}
+    public function get_search_relevance()
+    {
+        return normalize_search_rank($this->get('score'));
+    }
 
-	public function get_search_type()
-	{
-		return 'wiki';
-	}
+    public function get_search_type()
+    {
+        return 'wiki';
+    }
 
-	public function get_absolute_path($url = false)
-	{
-		return sprintf(get_config_value('wiki_public_url'), $this->get('id'));
-	}
+    public function get_absolute_path($url = false)
+    {
+        return sprintf(get_config_value('wiki_public_url'), $this->get('id'));
+    }
 }
 
 class DataModelWiki implements SearchProvider
 {
-	private $_wiki_url;
+    private $_wiki_url;
 
-	public function __construct($db)
-	{
-		$this->_wiki_url = get_config_value('wiki_url');
-	}
+    public function __construct($db)
+    {
+        $this->_wiki_url = get_config_value('wiki_url');
+    }
 
-	public function isConfigured()
-	{
-		return $this->_wiki_url != null;
-	}
+    public function isConfigured()
+    {
+        return $this->_wiki_url != null;
+    }
 
-	public function search($query, $limit = null)
-	{
-		try {
-			if (!$this->isConfigured())
-				throw new WikiRemoteCallException('Wiki data model is not configured', 1);
-		
-			$results = $this->_call('dokuwiki.search', [$query]);
-		
-			$iters = [];
+    public function search($query, $limit = null)
+    {
+        try {
+            if (!$this->isConfigured())
+                throw new WikiRemoteCallException('Wiki data model is not configured', 1);
 
-			foreach ($results as $result)
-				$iters[] = new DataIterWiki(null, $result['id'], $result);
+            $results = $this->_call('dokuwiki.search', [$query]);
 
-			return $iters;
-		} catch (WikiRemoteCallException $e) {
-			return [];
-		}
-	}
+            $iters = [];
 
-	private function _encodeMethodCall($method, array $args)
-	{
-		$body = new DOMDocument('1.0', 'UTF-8');
-		$methodCall = $body->createElement('methodCall');
-		$body->appendChild($methodCall);
+            foreach ($results as $result)
+                $iters[] = new DataIterWiki(null, $result['id'], $result);
 
-		$methodName = $body->createElement('methodName', $method);
-		$methodCall->appendChild($methodName);
+            return $iters;
+        } catch (WikiRemoteCallException $e) {
+            return [];
+        }
+    }
 
-		$params = $body->createElement('params');
-		$methodCall->appendChild($params);
+    private function _encodeMethodCall($method, array $args)
+    {
+        $body = new DOMDocument('1.0', 'UTF-8');
+        $methodCall = $body->createElement('methodCall');
+        $body->appendChild($methodCall);
 
-		foreach ($args as $arg) {
-			$param = $body->createElement('param');
-			$params->appendChild($param);
+        $methodName = $body->createElement('methodName', $method);
+        $methodCall->appendChild($methodName);
 
-			$value = $body->createElement('value');
-			$param->appendChild($value);
+        $params = $body->createElement('params');
+        $methodCall->appendChild($params);
 
-			if (is_int($arg))
-				$value->appendChild($body->createElement('i4', $arg));
-			elseif (is_string($arg))
-				$value->appendChild($body->createElement('string', $arg));
-			else
-				throw new Exception('Sorry, not implemented');
-		}
+        foreach ($args as $arg) {
+            $param = $body->createElement('param');
+            $params->appendChild($param);
 
-		return $body->saveXML();
-	}
+            $value = $body->createElement('value');
+            $param->appendChild($value);
 
-	private function _decodeMethodResponse($xml)
-	{
-		try {
-			$doc = new SimpleXMLElement($xml);
+            if (is_int($arg))
+                $value->appendChild($body->createElement('i4', $arg));
+            elseif (is_string($arg))
+                $value->appendChild($body->createElement('string', $arg));
+            else
+                throw new Exception('Sorry, not implemented');
+        }
 
-			$value = $doc->params[0]->param[0]->value[0]->children()[0];
+        return $body->saveXML();
+    }
 
-			return $this->_decodeValue($value);
-		} catch (Exception $e) {
-			throw new WikiRemoteCallException('Could not decode response', 2, $e);
-		}
-	}
+    private function _decodeMethodResponse($xml)
+    {
+        try {
+            $doc = new SimpleXMLElement($xml);
 
-	private function _decodeValue(SimpleXMLElement $element)
-	{
-		switch ($element->getName())
-		{
-			case 'array':
-				return $this->_decodeArray($element);
+            $value = $doc->params[0]->param[0]->value[0]->children()[0];
 
-			case 'struct':
-				return $this->_decodeStruct($element);
+            return $this->_decodeValue($value);
+        } catch (Exception $e) {
+            throw new WikiRemoteCallException('Could not decode response', 2, $e);
+        }
+    }
 
-			case 'string':
-				return $this->_decodeString($element);
+    private function _decodeValue(SimpleXMLElement $element)
+    {
+        switch ($element->getName())
+        {
+            case 'array':
+                return $this->_decodeArray($element);
 
-			case 'int':
-				return $this->_decodeInt($element);
+            case 'struct':
+                return $this->_decodeStruct($element);
 
-			default:
-				throw new RuntimeException('Not implemented: ' . $element->getName());
-		}
-	}
+            case 'string':
+                return $this->_decodeString($element);
 
-	private function _decodeArray(SimpleXMLElement $element)
-	{
-		$elements = [];
+            case 'int':
+                return $this->_decodeInt($element);
 
-		foreach ($element->data[0]->value as $value)
-			$elements[] = $this->_decodeValue($value->children()[0]);
+            default:
+                throw new RuntimeException('Not implemented: ' . $element->getName());
+        }
+    }
 
-		return $elements;
-	}
+    private function _decodeArray(SimpleXMLElement $element)
+    {
+        $elements = [];
 
-	private function _decodeStruct(SimpleXMLElement $element)
-	{
-		$data = [];
+        foreach ($element->data[0]->value as $value)
+            $elements[] = $this->_decodeValue($value->children()[0]);
 
-		foreach ($element->member as $member)
-		{
-			$name = strval($member->name[0]);
-			$value = $this->_decodeValue($member->value[0]->children()[0]);
-			$data[$name] = $value;
-		}
+        return $elements;
+    }
 
-		return $data;
-	}
+    private function _decodeStruct(SimpleXMLElement $element)
+    {
+        $data = [];
 
-	private function _decodeString(SimpleXMLElement $element)
-	{
-		return strval($element);
-	}
+        foreach ($element->member as $member)
+        {
+            $name = strval($member->name[0]);
+            $value = $this->_decodeValue($member->value[0]->children()[0]);
+            $data[$name] = $value;
+        }
 
-	private function _decodeInt(SimpleXMLElement $element)
-	{
-		return intval(strval($element));
-	}
+        return $data;
+    }
 
-	private function _call($method, array $args)
-	{
-		$body = $this->_encodeMethodCall($method, $args);
+    private function _decodeString(SimpleXMLElement $element)
+    {
+        return strval($element);
+    }
 
-		$headers = ['Content-Type: text/xml'];
+    private function _decodeInt(SimpleXMLElement $element)
+    {
+        return intval(strval($element));
+    }
 
-		// If we are logged in, carry that session over to the wiki to access restricted pages
-		if (get_auth()->get_session())
-			$headers[] = sprintf('Cookie: cover_session_id=%s', get_auth()->get_session()->get('session_id'));
+    private function _call($method, array $args)
+    {
+        $body = $this->_encodeMethodCall($method, $args);
 
-		$opts = [
-			'http' => [
-				'method' => 'POST',
-				'header' => implode("\r\n", $headers),
-				'content' => $body
-			]
-		];
+        $headers = ['Content-Type: text/xml'];
 
-		$context = stream_context_create($opts);
+        // If we are logged in, carry that session over to the wiki to access restricted pages
+        if (get_auth()->get_session())
+            $headers[] = sprintf('Cookie: cover_session_id=%s', get_auth()->get_session()->get('session_id'));
 
-		$response = file_get_contents($this->_wiki_url, false, $context);
+        $opts = [
+            'http' => [
+                'method' => 'POST',
+                'header' => implode("\r\n", $headers),
+                'content' => $body
+            ]
+        ];
 
-		return $this->_decodeMethodResponse($response);
-	}
+        $context = stream_context_create($opts);
+
+        $response = file_get_contents($this->_wiki_url, false, $context);
+
+        return $this->_decodeMethodResponse($response);
+    }
 }

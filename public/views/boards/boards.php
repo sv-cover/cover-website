@@ -2,5 +2,5 @@
 
 class BoardsView extends CRUDView
 {
-	
+
 }

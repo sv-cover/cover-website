@@ -6,50 +6,50 @@ require_once 'src/framework/data/DataModel.php';
  */
 class DataModelCommitteeMembers extends DataModel
 {
-	public function __construct($db)
-	{
-		parent::__construct($db, 'committee_members');
-	}
-	
-	public function get_active_members($type = null, $include_hidden = false)
-	{
-		$committee_conditions = "";
+    public function __construct($db)
+    {
+        parent::__construct($db, 'committee_members');
+    }
 
-		if ($type !== null)
-			$committee_conditions .= sprintf('AND c.type = %d', $type);
+    public function get_active_members($type = null, $include_hidden = false)
+    {
+        $committee_conditions = "";
 
-		if (!$include_hidden)
-			$committee_conditions .= 'AND c.hidden = 0';
+        if ($type !== null)
+            $committee_conditions .= sprintf('AND c.type = %d', $type);
 
-		$rows = $this->db->query("SELECT DISTINCT
-			l.id,
-			l.voornaam,
-			l.tussenvoegsel,
-			l.achternaam,
-			l.email,
-			l.privacy,
-			array_agg(c.id) as commissie_ids,
-			COUNT(c.id) as commissie_count
-			FROM
-				committee_members a
-			LEFT JOIN leden l ON
-				a.member_id = l.id
-			JOIN commissies c ON 
-				a.committee_id = c.id
-				$committee_conditions
-			GROUP BY
-				l.id,
-				l.voornaam,
-				l.tussenvoegsel,
-				l.achternaam,
-				l.email,
-				l.privacy
-			ORDER BY
-				voornaam,
-				tussenvoegsel,
-				achternaam ASC
-		");
+        if (!$include_hidden)
+            $committee_conditions .= 'AND c.hidden = 0';
 
-		return $this->_rows_to_iters($rows);
-	}
+        $rows = $this->db->query("SELECT DISTINCT
+            l.id,
+            l.voornaam,
+            l.tussenvoegsel,
+            l.achternaam,
+            l.email,
+            l.privacy,
+            array_agg(c.id) as commissie_ids,
+            COUNT(c.id) as commissie_count
+            FROM
+                committee_members a
+            LEFT JOIN leden l ON
+                a.member_id = l.id
+            JOIN commissies c ON
+                a.committee_id = c.id
+                $committee_conditions
+            GROUP BY
+                l.id,
+                l.voornaam,
+                l.tussenvoegsel,
+                l.achternaam,
+                l.email,
+                l.privacy
+            ORDER BY
+                voornaam,
+                tussenvoegsel,
+                achternaam ASC
+        ");
+
+        return $this->_rows_to_iters($rows);
+    }
 }

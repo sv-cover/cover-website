@@ -1,10 +1,10 @@
 -- Delete duplicate rows
 DELETE FROM pollvoters WHERE EXISTS (
-	SELECT 'x'
-	FROM pollvoters i
-	WHERE i.lid = pollvoters.lid
-	  AND i.poll = pollvoters.poll
-	  AND i.ctid < pollvoters.ctid
+    SELECT 'x'
+    FROM pollvoters i
+    WHERE i.lid = pollvoters.lid
+      AND i.poll = pollvoters.poll
+      AND i.ctid < pollvoters.ctid
 );
 
 -- Create a UNIQUE index on the lid-poll combination

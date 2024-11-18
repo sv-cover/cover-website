@@ -7,32 +7,32 @@ require_once 'src/framework/controllers/ControllerCRUD.php';
 
 class VacanciesController extends \ControllerCRUD
 {
-	protected $view_name = 'vacancies';
-	protected $form_type = VacancyType::class;
+    protected $view_name = 'vacancies';
+    protected $form_type = VacancyType::class;
 
-	public function __construct($request, $router)
-	{
-		$this->model = \get_model('DataModelVacancy');
+    public function __construct($request, $router)
+    {
+        $this->model = \get_model('DataModelVacancy');
 
-		parent::__construct($request, $router);
+        parent::__construct($request, $router);
 
-	}
+    }
 
-	public function path(string $view, \DataIter $iter = null)
-	{
-		$parameters = [
-			'view' => $view,
-		];
+    public function path(string $view, \DataIter $iter = null)
+    {
+        $parameters = [
+            'view' => $view,
+        ];
 
-		if (isset($iter))
-			$parameters['id'] = $iter->get_id();
+        if (isset($iter))
+            $parameters['id'] = $iter->get_id();
 
-		return $this->generate_url('vacancies', $parameters);
-	}
+        return $this->generate_url('vacancies', $parameters);
+    }
 
-	protected function _index()
-	{
-		$filter_conditions = array_intersect_key($_GET, array_flip($this->model::FILTER_FIELDS));
-		return $this->model->filter($filter_conditions);
-	}
+    protected function _index()
+    {
+        $filter_conditions = array_intersect_key($_GET, array_flip($this->model::FILTER_FIELDS));
+        return $this->model->filter($filter_conditions);
+    }
 }

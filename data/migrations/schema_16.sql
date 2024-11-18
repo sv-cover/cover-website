@@ -5,8 +5,8 @@ CREATE TABLE applications (
 );
 
 ALTER TABLE mailinglijsten_abonnementen
-	DROP CONSTRAINT mailinglijsten_abonnementen_lid_id_fkey;
+    DROP CONSTRAINT mailinglijsten_abonnementen_lid_id_fkey;
 
 ALTER TABLE mailinglijsten_abonnementen
-	ADD CONSTRAINT mailinglijsten_abonnementen_lid_id_fkey FOREIGN KEY (lid_id)
-	REFERENCES leden (id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT mailinglijsten_abonnementen_lid_id_fkey FOREIGN KEY (lid_id)
+    REFERENCES leden (id) ON UPDATE CASCADE ON DELETE CASCADE;

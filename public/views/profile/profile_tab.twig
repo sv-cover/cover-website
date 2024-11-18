@@ -6,119 +6,119 @@
 
 {% block tab_content %}
 <section class="block">
-	{{ form_start(photo_form, {action: path('profile_pictures.create', {member_id: iter.id, referrer:global.server.REQUEST_URI}), attr: {'data-auto-submit': true, 'data-use-native-submit': true}}) }}
-		<div class="profile-field">
-			<div class="field-body">
-				<h2 class="title is-4">{{ __('Profile Picture') }}</h2>
-			</div>
-		</div>
-		<div class="profile-field">
-			{% if iter.profile_picture and iter.is_private('foto') %}
-				<div class="field-label">
-					<figure class="image is-128x128">
-						<img class="is-rounded" src="{{ path('profile_pictures', {id: iter.profile_picture.id, format: 'square', width: 256}) }}" width="128">
-					</figure>
-				</div>
-			{% endif %}
-			<div class="field-body content">
-				<p>{{ __('Your profile picture is not only used on this website, but also in the yearbook. Do you want to change it? Send in the best version you have!') }}</p>
-				{% if iter.is_private('foto') %}
-					<p>
-						<strong class="has-text-danger">{{ __('Beware! You’ve set your photo privacy settings to <em>nobody</em>.')|raw }}</strong>
-						{{ __('That means no one can see your picture, even if you update it. Change your privacy settings if you want people to see your new photo!') }}
-					</p>
-				{% endif %}
-			</div>
-		</div>
-		<div class="profile-field">
-			<div class="field-body">
-				<div class="field is-grouped">
-					<div class="control">
-						{{ form_widget(photo_form.photo, {
-							cta: __('Change photo'),
-							attr: {
-								'data-image-picker': true,
-								'data-cropper-template': '.profile-picture-cropper-template',
-								'data-image-picker-modal-title': __('Crop your profile picture'),
-								'data-image-picker-modal-submit': __('Set profile picture'),
-								'data-accept-mime-type': 'image/*',
-								'data-target-mime-type': 'image/jpeg',
-							}
-						}) }}
-					</div>
-					{% if iter.profile_picture and user_can_delete iter.profile_picture %}
-					<div class="control">
-						<a href="{{ path('profile_pictures', {view: 'delete', id: iter.profile_picture.id}) }}" title="{{ __('Delete profile picture') }}" data-popup="modal" class="button">{{ __('Delete photo') }}</a>
-					</div>
-					{% endif %}
-				</div>
-				{# Global errors, there's only one field so they can be rendered here #}
-				{{ form_errors(photo_form) }}
-				{{ form_errors(photo_form.photo) }}
-				{{ form_help(photo_form.photo) }}
-				<template class="profile-picture-cropper-template">
-					<cropper-canvas background class="is-rounded">
-						<cropper-image scalable translatable initial-center-size="contain"></cropper-image>
-						<cropper-shade hidden></cropper-shade>
-						<cropper-handle action="move" plain></cropper-handle>
-						<cropper-selection initial-coverage="0.9" aspect-ratio="1" precise>
-							{# <cropper-grid role="grid" bordered covered ></cropper-grid> #}
-							<cropper-handle action="move" plain></cropper-handle>
-						</cropper-selection>
-					</cropper-canvas>
-				</template>
-			</div>
-		</div>
-		<div class="profile-field" data-auto-submit-hidden>
-			<div class="field-body">
-				{{ form_widget(photo_form.submit, {'label': __('Save'), 'attr': {'data-auto-submit-hidden': true}}) }}
-			</div>
-		</div>
-	{{ form_end(photo_form) }}
+    {{ form_start(photo_form, {action: path('profile_pictures.create', {member_id: iter.id, referrer:global.server.REQUEST_URI}), attr: {'data-auto-submit': true, 'data-use-native-submit': true}}) }}
+        <div class="profile-field">
+            <div class="field-body">
+                <h2 class="title is-4">{{ __('Profile Picture') }}</h2>
+            </div>
+        </div>
+        <div class="profile-field">
+            {% if iter.profile_picture and iter.is_private('foto') %}
+                <div class="field-label">
+                    <figure class="image is-128x128">
+                        <img class="is-rounded" src="{{ path('profile_pictures', {id: iter.profile_picture.id, format: 'square', width: 256}) }}" width="128">
+                    </figure>
+                </div>
+            {% endif %}
+            <div class="field-body content">
+                <p>{{ __('Your profile picture is not only used on this website, but also in the yearbook. Do you want to change it? Send in the best version you have!') }}</p>
+                {% if iter.is_private('foto') %}
+                    <p>
+                        <strong class="has-text-danger">{{ __('Beware! You’ve set your photo privacy settings to <em>nobody</em>.')|raw }}</strong>
+                        {{ __('That means no one can see your picture, even if you update it. Change your privacy settings if you want people to see your new photo!') }}
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="profile-field">
+            <div class="field-body">
+                <div class="field is-grouped">
+                    <div class="control">
+                        {{ form_widget(photo_form.photo, {
+                            cta: __('Change photo'),
+                            attr: {
+                                'data-image-picker': true,
+                                'data-cropper-template': '.profile-picture-cropper-template',
+                                'data-image-picker-modal-title': __('Crop your profile picture'),
+                                'data-image-picker-modal-submit': __('Set profile picture'),
+                                'data-accept-mime-type': 'image/*',
+                                'data-target-mime-type': 'image/jpeg',
+                            }
+                        }) }}
+                    </div>
+                    {% if iter.profile_picture and user_can_delete iter.profile_picture %}
+                    <div class="control">
+                        <a href="{{ path('profile_pictures', {view: 'delete', id: iter.profile_picture.id}) }}" title="{{ __('Delete profile picture') }}" data-popup="modal" class="button">{{ __('Delete photo') }}</a>
+                    </div>
+                    {% endif %}
+                </div>
+                {# Global errors, there's only one field so they can be rendered here #}
+                {{ form_errors(photo_form) }}
+                {{ form_errors(photo_form.photo) }}
+                {{ form_help(photo_form.photo) }}
+                <template class="profile-picture-cropper-template">
+                    <cropper-canvas background class="is-rounded">
+                        <cropper-image scalable translatable initial-center-size="contain"></cropper-image>
+                        <cropper-shade hidden></cropper-shade>
+                        <cropper-handle action="move" plain></cropper-handle>
+                        <cropper-selection initial-coverage="0.9" aspect-ratio="1" precise>
+                            {# <cropper-grid role="grid" bordered covered ></cropper-grid> #}
+                            <cropper-handle action="move" plain></cropper-handle>
+                        </cropper-selection>
+                    </cropper-canvas>
+                </template>
+            </div>
+        </div>
+        <div class="profile-field" data-auto-submit-hidden>
+            <div class="field-body">
+                {{ form_widget(photo_form.submit, {'label': __('Save'), 'attr': {'data-auto-submit-hidden': true}}) }}
+            </div>
+        </div>
+    {{ form_end(photo_form) }}
 </section>
 
 <section class="block">
-	{{ form_start(profile_form, {action: path('profile', {'view': 'profile', 'lid': iter.id})}) }}
-		<div class="profile-field">
-			<div class="field-body">
-				<h2 class="title is-4">{{ __('Profile Information') }}</h2>
-			</div>
-		</div>
-		<div class="profile-field">
-			<div class="field-body">
-				<p>{{ __('Your profile details are used to give your profile page a personal touch.') }}</p>
-				{# Global errors #}
-				{{ form_errors(profile_form) }}
-			</div>
-		</div>
-		{{ profile_field(profile_form.nick, {optional_tag: false}) }}
-		{{ profile_field(profile_form.avatar, {optional_tag: false}) }}
-		{{ profile_field(profile_form.homepage, {optional_tag: false}) }}
-		<div class="profile-field">
-			<div class="field-body">
-				{{ form_widget(profile_form.submit, {label: __('Save'), color: 'default'}) }}
-			</div>
-		</div>
-	{{ form_end(profile_form) }}
+    {{ form_start(profile_form, {action: path('profile', {'view': 'profile', 'lid': iter.id})}) }}
+        <div class="profile-field">
+            <div class="field-body">
+                <h2 class="title is-4">{{ __('Profile Information') }}</h2>
+            </div>
+        </div>
+        <div class="profile-field">
+            <div class="field-body">
+                <p>{{ __('Your profile details are used to give your profile page a personal touch.') }}</p>
+                {# Global errors #}
+                {{ form_errors(profile_form) }}
+            </div>
+        </div>
+        {{ profile_field(profile_form.nick, {optional_tag: false}) }}
+        {{ profile_field(profile_form.avatar, {optional_tag: false}) }}
+        {{ profile_field(profile_form.homepage, {optional_tag: false}) }}
+        <div class="profile-field">
+            <div class="field-body">
+                {{ form_widget(profile_form.submit, {label: __('Save'), color: 'default'}) }}
+            </div>
+        </div>
+    {{ form_end(profile_form) }}
 </section>
 
 <section class="block">
-	{{ form_start(password_form, {action: path('profile', {'view': 'profile', 'lid': iter.id})}) }}
-		<div class="profile-field">
-			<div class="field-body">
-				<h2 class="title is-4">{{ __('Change Password') }}</h2>
-				{# Global errors #}
-				{{ form_errors(password_form) }}
-			</div>
-		</div>
-		{{ profile_field(password_form.current, {attr: {autocomplete: 'current-password'}}) }}
-		{{ profile_field(password_form.password.first, {attr: {autocomplete: 'new-password'}}) }}
-		{{ profile_field(password_form.password.second, {attr: {autocomplete: 'new-password'}}) }}
-		<div class="profile-field">
-			<div class="field-body">
-				{{ form_widget(password_form.submit, {label: __('Change password'), color: 'default'}) }}
-			</div>
-		</div>
-	{{ form_end(password_form) }}
+    {{ form_start(password_form, {action: path('profile', {'view': 'profile', 'lid': iter.id})}) }}
+        <div class="profile-field">
+            <div class="field-body">
+                <h2 class="title is-4">{{ __('Change Password') }}</h2>
+                {# Global errors #}
+                {{ form_errors(password_form) }}
+            </div>
+        </div>
+        {{ profile_field(password_form.current, {attr: {autocomplete: 'current-password'}}) }}
+        {{ profile_field(password_form.password.first, {attr: {autocomplete: 'new-password'}}) }}
+        {{ profile_field(password_form.password.second, {attr: {autocomplete: 'new-password'}}) }}
+        <div class="profile-field">
+            <div class="field-body">
+                {{ form_widget(password_form.submit, {label: __('Change password'), color: 'default'}) }}
+            </div>
+        </div>
+    {{ form_end(password_form) }}
 </section>
 {% endblock %}

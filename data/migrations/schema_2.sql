@@ -1,5 +1,5 @@
 ALTER TABLE fotos ADD COLUMN
-	added_on timestamp without time zone DEFAULT NULL;
+    added_on timestamp without time zone DEFAULT NULL;
 
 CREATE TABLE foto_boeken_visit (
     boek_id integer NOT NULL REFERENCES foto_boeken (id) ON UPDATE CASCADE ON DELETE CASCADE,

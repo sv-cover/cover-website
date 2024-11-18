@@ -12,18 +12,18 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class CommitteeMemberType extends AbstractType
 {
-	public function buildForm(FormBuilderInterface $builder, array $options): void
-	{
-		$builder
-			->add('member_id', MemberIdType::class, [
-				'label' => __('Member'),
-				'constraints' => [
-					new Member(),
-				],
-			])
-			->add('functie', TextType::class, [
-				'label' => __('Function'),
-			])
-		;
-	}
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->add('member_id', MemberIdType::class, [
+                'label' => __('Member'),
+                'constraints' => [
+                    new Member(),
+                ],
+            ])
+            ->add('functie', TextType::class, [
+                'label' => __('Function'),
+            ])
+        ;
+    }
 }

@@ -10,214 +10,214 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormInterface;
 
 class CommitteesController extends \ControllerCRUD
-{	
-	protected $_var_id = 'commissie';
+{
+    protected $_var_id = 'commissie';
 
-	protected $view_name = 'committees';
+    protected $view_name = 'committees';
 
-	protected $form_type = CommitteeType::class;
+    protected $form_type = CommitteeType::class;
 
-	public $mode;
+    public $mode;
 
-	public function __construct($request, $router)
-	{
-		$this->model = get_model('DataModelCommissie');
-		
-		parent::__construct($request, $router);
-	}
+    public function __construct($request, $router)
+    {
+        $this->model = get_model('DataModelCommissie');
 
-	public function path(string $view, \DataIter $iter = null)
-	{
-		$parameters = [
-			'view' => $view,
-		];
+        parent::__construct($request, $router);
+    }
 
-		if (isset($iter))
-			$parameters[$this->_var_id] = $iter['login'];
+    public function path(string $view, \DataIter $iter = null)
+    {
+        $parameters = [
+            'view' => $view,
+        ];
 
-		return $this->generate_url('committees', $parameters);
-	}
+        if (isset($iter))
+            $parameters[$this->_var_id] = $iter['login'];
 
-	public function new_iter()
-	{
-		/* Set intial values in form (note the difference between an initial value and empty_data) */
-		return $this->model->new_iter(['type' => \DataModelCommissie::TYPE_COMMITTEE]);
-	}
+        return $this->generate_url('committees', $parameters);
+    }
 
-	protected function _create(\DataIter $iter, FormInterface $form)
-	{
-		if (!parent::_create($iter, $form))
-			return false;
+    public function new_iter()
+    {
+        /* Set intial values in form (note the difference between an initial value and empty_data) */
+        return $this->model->new_iter(['type' => \DataModelCommissie::TYPE_COMMITTEE]);
+    }
 
-		$members = $form['members']->getData();
-		if (!empty($members))
-			$this->model->set_members($iter, $members);
+    protected function _create(\DataIter $iter, FormInterface $form)
+    {
+        if (!parent::_create($iter, $form))
+            return false;
 
-		return true;
-	}
+        $members = $form['members']->getData();
+        if (!empty($members))
+            $this->model->set_members($iter, $members);
 
-	protected function _update(\DataIter $iter, FormInterface $form)
-	{
-		if (!parent::_update($iter, $form))
-			return false;
+        return true;
+    }
 
-		$members = $form['members']->getData();
-		$this->model->set_members($iter, empty($members) ? [] : $members);
+    protected function _update(\DataIter $iter, FormInterface $form)
+    {
+        if (!parent::_update($iter, $form))
+            return false;
 
-		return true;
-	}
+        $members = $form['members']->getData();
+        $this->model->set_members($iter, empty($members) ? [] : $members);
 
-	protected function _delete(\DataIter $iter)
-	{
-		// Some committees already have pages etc. We will mark the committee as hidden.
-		// That way they remain in the history of Cover and could, if needed, be reactivated.
-		$iter['hidden'] = true;
+        return true;
+    }
 
-		// We'll also remove all its members at least
-		$iter['members'] = [];
+    protected function _delete(\DataIter $iter)
+    {
+        // Some committees already have pages etc. We will mark the committee as hidden.
+        // That way they remain in the history of Cover and could, if needed, be reactivated.
+        $iter['hidden'] = true;
 
-		return $this->model->update($iter);
-	}
+        // We'll also remove all its members at least
+        $iter['members'] = [];
 
-	protected function _read($id)
-	{
-		if (!ctype_digit($id))
-			return $this->model->get_from_name($id);
-		else
-			return parent::_read($id);
-	}
+        return $this->model->update($iter);
+    }
 
-	/**
-	 * Override ControllerCRUD::run_index to also restrict the model to the same type as the iter.
-	 */ 
-	public function run_index()
-	{
-		$committees = $this->model->get(\DataModelCommissie::TYPE_COMMITTEE);			
-		$working_groups = $this->model->get(\DataModelCommissie::TYPE_WORKING_GROUP);
+    protected function _read($id)
+    {
+        if (!ctype_digit($id))
+            return $this->model->get_from_name($id);
+        else
+            return parent::_read($id);
+    }
 
-		$iters = [
-			'committees' => array_filter($committees, array(get_policy($this->model), 'user_can_read')),
-			'working_groups' => array_filter($working_groups, array(get_policy($this->model), 'user_can_read')),
-		];
+    /**
+     * Override ControllerCRUD::run_index to also restrict the model to the same type as the iter.
+     */
+    public function run_index()
+    {
+        $committees = $this->model->get(\DataModelCommissie::TYPE_COMMITTEE);
+        $working_groups = $this->model->get(\DataModelCommissie::TYPE_WORKING_GROUP);
 
-		return $this->view()->render_index($iters);
-	}
+        $iters = [
+            'committees' => array_filter($committees, array(get_policy($this->model), 'user_can_read')),
+            'working_groups' => array_filter($working_groups, array(get_policy($this->model), 'user_can_read')),
+        ];
 
-	/**
-	 * Override ControllerCRUD::run_read to also restrict the model to the same type as the iter.
-	 */ 
-	public function run_read(\DataIter $iter)
-	{
-		if ($iter['hidden'])
-			throw new \NotFoundException('This committee/group is no longer available');
+        return $this->view()->render_index($iters);
+    }
 
-		if (!get_policy($this->model)->user_can_read($iter))
-			throw new \UnauthorizedException('You are not allowed to read this ' . get_class($iter) . '.');
+    /**
+     * Override ControllerCRUD::run_read to also restrict the model to the same type as the iter.
+     */
+    public function run_read(\DataIter $iter)
+    {
+        if ($iter['hidden'])
+            throw new \NotFoundException('This committee/group is no longer available');
 
-		$iters = $this->model->get($iter['type']);
+        if (!get_policy($this->model)->user_can_read($iter))
+            throw new \UnauthorizedException('You are not allowed to read this ' . get_class($iter) . '.');
 
-		return $this->view()->render_read($iter, [
-			'iters' => $iters,
-			'interest_reported' => !empty($_GET['interest_reported'])
-		]);
-	}
+        $iters = $this->model->get($iter['type']);
 
-	public function run_update(\DataIter $iter)
-	{
-		if (!\get_policy($this->model)->user_can_update($iter))
-			throw new \UnauthorizedException('You are not allowed to edit this ' . get_class($iter) . '.');
+        return $this->view()->render_read($iter, [
+            'iters' => $iters,
+            'interest_reported' => !empty($_GET['interest_reported'])
+        ]);
+    }
 
-		$success = false;
+    public function run_update(\DataIter $iter)
+    {
+        if (!\get_policy($this->model)->user_can_update($iter))
+            throw new \UnauthorizedException('You are not allowed to edit this ' . get_class($iter) . '.');
 
-		$builder = get_form_factory()->createBuilder($this->form_type, $iter, ['mapped' => false]);
+        $success = false;
 
-		// Add field to reactivate deactivated groups
-		if (!empty($iter['hidden'])) {
-			$builder->add('hidden', CheckboxType::class, [
-				'label' => __('This group is deactivated.'),
-				'help' => __('Uncheck this box and submit to reactivate.'),
-				'required' => false,
-			]);
-			$builder->get('hidden')->addModelTransformer(new IntToBooleanTransformer());
-		}
+        $builder = get_form_factory()->createBuilder($this->form_type, $iter, ['mapped' => false]);
 
-		// Populate members field
-		// TODO: this is terribly inefficiënt
-		$members = array_map(function($member) { return ['member_id' => $member['id'], 'functie' => $member['functie']];}, $iter->get_members());
-		$builder->get('members')->setData($members);
+        // Add field to reactivate deactivated groups
+        if (!empty($iter['hidden'])) {
+            $builder->add('hidden', CheckboxType::class, [
+                'label' => __('This group is deactivated.'),
+                'help' => __('Uncheck this box and submit to reactivate.'),
+                'required' => false,
+            ]);
+            $builder->get('hidden')->addModelTransformer(new IntToBooleanTransformer());
+        }
 
-		$form = $builder->getForm();
-		$form->handleRequest($this->get_request());
+        // Populate members field
+        // TODO: this is terribly inefficiënt
+        $members = array_map(function($member) { return ['member_id' => $member['id'], 'functie' => $member['functie']];}, $iter->get_members());
+        $builder->get('members')->setData($members);
 
-		if ($form->isSubmitted() && $form->isValid())
-			if ($this->_update($iter, $form))
-				$success = true;
-			else
-				$form->addError(new FormError(__('Something went wrong while processing the form.')));
+        $form = $builder->getForm();
+        $form->handleRequest($this->get_request());
 
-		return $this->view()->render_update($iter, $form, $success);
-	}
+        if ($form->isSubmitted() && $form->isValid())
+            if ($this->_update($iter, $form))
+                $success = true;
+            else
+                $form->addError(new FormError(__('Something went wrong while processing the form.')));
 
-	public function run_show_interest(\DataIter $iter)
-	{
-		if (!get_identity()->is_member())
-			throw new \UnauthorizedException('Only members can apply for a committee');
+        return $this->view()->render_update($iter, $form, $success);
+    }
 
-		if (!get_policy($this->model)->user_can_read($iter))
-			throw new \UnauthorizedException('You are not allowed to read this ' . get_class($iter) . '.');
+    public function run_show_interest(\DataIter $iter)
+    {
+        if (!get_identity()->is_member())
+            throw new \UnauthorizedException('Only members can apply for a committee');
 
-		$form = $this->createFormBuilder($iter, ['csrf_token_id' => 'committee_interest_' . $iter['id']])
-			->add('submit', SubmitType::class)
-			->getForm();
-		$form->handleRequest($this->get_request());
+        if (!get_policy($this->model)->user_can_read($iter))
+            throw new \UnauthorizedException('You are not allowed to read this ' . get_class($iter) . '.');
 
-		if ($form->isSubmitted() && $form->isValid()) {
-			if (get_config_value('path_to_committee_interest_log'))
-				error_log(sprintf("%s - %s (%d) is interested in %s.\n", date('c'), get_identity()->member()['full_name'], get_identity()->member()['id'], $iter['naam']), 3, get_config_value('path_to_committee_interest_log'));
+        $form = $this->createFormBuilder($iter, ['csrf_token_id' => 'committee_interest_' . $iter['id']])
+            ->add('submit', SubmitType::class)
+            ->getForm();
+        $form->handleRequest($this->get_request());
 
-			$mail = parse_email_object("interst_in_committee.txt", [
-				'committee' => $iter,
-				'member' => get_identity()->member()
-			]);
-			$mail->send('intern@svcover.nl');
+        if ($form->isSubmitted() && $form->isValid()) {
+            if (get_config_value('path_to_committee_interest_log'))
+                error_log(sprintf("%s - %s (%d) is interested in %s.\n", date('c'), get_identity()->member()['full_name'], get_identity()->member()['id'], $iter['naam']), 3, get_config_value('path_to_committee_interest_log'));
 
-			return $this->view->redirect($this->generate_url('committees', ['view' => 'read', $this->_var_id => $iter['login'], 'interest_reported' => true]));
-		}
+            $mail = parse_email_object("interst_in_committee.txt", [
+                'committee' => $iter,
+                'member' => get_identity()->member()
+            ]);
+            $mail->send('intern@svcover.nl');
 
-		return $this->view->redirect($this->generate_url('committees', ['view' => 'read', $this->_var_id => $iter['login']]));
-	}
+            return $this->view->redirect($this->generate_url('committees', ['view' => 'read', $this->_var_id => $iter['login'], 'interest_reported' => true]));
+        }
 
-	/**
-	 * The Thrash! All (including deleted) committees/groups/others/etc
-	 */
-	public function run_archive()
-	{
-		$iters = $this->model->get(null, true);
+        return $this->view->redirect($this->generate_url('committees', ['view' => 'read', $this->_var_id => $iter['login']]));
+    }
 
-		return $this->view->render_archive($iters);
-	}
+    /**
+     * The Thrash! All (including deleted) committees/groups/others/etc
+     */
+    public function run_archive()
+    {
+        $iters = $this->model->get(null, true);
 
-	public function run_slide()
-	{
-		// for debugging purposes
-		if (isset($_GET['commissie'])) {
-			$committee = $this->model->get_from_name($_GET['commissie']);
-		} else {
-			// Pick a random commissie
-			$committee = $this->model->get_random(\DataModelCommissie::TYPE_COMMITTEE, true);
-		}
-		return $this->view->render_slide($committee);
-	}
+        return $this->view->render_archive($iters);
+    }
 
-	/**
-	 * Override the default ControllerCRUD::run_impl to allow either ?commissie= and ?id=.
-	 */
-	protected function run_impl()
-	{
-		// Support for old urls
-		if (isset($_GET['id']) && !isset($_GET['commissie']))
-			$_GET['commissie'] = $_GET['id'];
+    public function run_slide()
+    {
+        // for debugging purposes
+        if (isset($_GET['commissie'])) {
+            $committee = $this->model->get_from_name($_GET['commissie']);
+        } else {
+            // Pick a random commissie
+            $committee = $this->model->get_random(\DataModelCommissie::TYPE_COMMITTEE, true);
+        }
+        return $this->view->render_slide($committee);
+    }
 
-		return parent::run_impl();
-	}
+    /**
+     * Override the default ControllerCRUD::run_impl to allow either ?commissie= and ?id=.
+     */
+    protected function run_impl()
+    {
+        // Support for old urls
+        if (isset($_GET['id']) && !isset($_GET['commissie']))
+            $_GET['commissie'] = $_GET['id'];
+
+        return parent::run_impl();
+    }
 }

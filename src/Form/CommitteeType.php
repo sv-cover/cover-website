@@ -14,48 +14,48 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class CommitteeType extends AbstractType
 {
-	public function buildForm(FormBuilderInterface $builder, array $options): void
-	{
-		$builder
-			->add('type', ChoiceType::class, [
-				'label' => __('Type'),
-				'choices'  => [
-					__('Committee') => \DataModelCommissie::TYPE_COMMITTEE,
-					__('Working Group') => \DataModelCommissie::TYPE_WORKING_GROUP,
-					__('Other') => \DataModelCommissie::TYPE_OTHER,
-				],
-				'expanded' => true,
-				'chips' => true,
-			])
-			->add('naam', TextType::class, [
-				'label' => __('Name'),
-				'constraints' => new Assert\NotBlank(),
-			])
-			->add('members', CollectionType::class, [
-				'label' => __('Members'),
-				'entry_type' => CommitteeMemberType::class,
-				'entry_options'  => [
-					'label' => __('Member'),
-				],
-				'allow_add' => true,
-				'allow_delete' => true,
-				'delete_empty' =>  function ($value = null) {
-					return !count(array_filter($value, function ($value) { return !empty($value); }));
-				},
-				'required' => false,
-				'mapped' => false,
-			])
-			->add('vacancies', DateType::class, [
-				'label' => __('Looking for new members until'),
-				'required' => false,
-				'widget' => 'single_text',
-				'help' => __("A banner with the face of the Commissioner of Internal Affairs is shown on the pages of groups that have vacancies. If there's no specific deadline, enter a value more than a year into the future. If the committee or working group is not looking for new members, leave the field empty."),
-			])
-			->add('submit', SubmitType::class)
-		;
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->add('type', ChoiceType::class, [
+                'label' => __('Type'),
+                'choices'  => [
+                    __('Committee') => \DataModelCommissie::TYPE_COMMITTEE,
+                    __('Working Group') => \DataModelCommissie::TYPE_WORKING_GROUP,
+                    __('Other') => \DataModelCommissie::TYPE_OTHER,
+                ],
+                'expanded' => true,
+                'chips' => true,
+            ])
+            ->add('naam', TextType::class, [
+                'label' => __('Name'),
+                'constraints' => new Assert\NotBlank(),
+            ])
+            ->add('members', CollectionType::class, [
+                'label' => __('Members'),
+                'entry_type' => CommitteeMemberType::class,
+                'entry_options'  => [
+                    'label' => __('Member'),
+                ],
+                'allow_add' => true,
+                'allow_delete' => true,
+                'delete_empty' =>  function ($value = null) {
+                    return !count(array_filter($value, function ($value) { return !empty($value); }));
+                },
+                'required' => false,
+                'mapped' => false,
+            ])
+            ->add('vacancies', DateType::class, [
+                'label' => __('Looking for new members until'),
+                'required' => false,
+                'widget' => 'single_text',
+                'help' => __("A banner with the face of the Commissioner of Internal Affairs is shown on the pages of groups that have vacancies. If there's no specific deadline, enter a value more than a year into the future. If the committee or working group is not looking for new members, leave the field empty."),
+            ])
+            ->add('submit', SubmitType::class)
+        ;
 
 
-		// 'van' and 'tot' are strings in dataiter, with timezone info
-		$builder->get('vacancies')->addModelTransformer(new StringToDateTimeTransformer(null, null, 'Y-m-d'));
-	}
+        // 'van' and 'tot' are strings in dataiter, with timezone info
+        $builder->get('vacancies')->addModelTransformer(new StringToDateTimeTransformer(null, null, 'Y-m-d'));
+    }
 }

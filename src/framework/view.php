@@ -15,288 +15,288 @@ const ALLOW_EXTERNAL_DOMAINS = 2;
 
 
 /**
-	* A Class implementing the default view. New views should subclass this one.
-	* creating functions in the same directory as the view, with the extension .phtml
-	* will allow a call to function_name().
-	*
-	*/
+    * A Class implementing the default view. New views should subclass this one.
+    * creating functions in the same directory as the view, with the extension .phtml
+    * will allow a call to function_name().
+    *
+    */
 class ViewNotFoundException extends RuntimeException {
-	//
+    //
 }
 
 class TwigAccessor
 {
-	private $callback;
+    private $callback;
 
-	public function __construct($callback)
-	{
-		$this->callback = $callback;
-	}
+    public function __construct($callback)
+    {
+        $this->callback = $callback;
+    }
 
-	public function __call($argument, array $args)
-	{
-		return call_user_func($this->callback, $argument);
-	}
+    public function __call($argument, array $args)
+    {
+        return call_user_func($this->callback, $argument);
+    }
 }
 
 class View
 {
-	static public function byName($view, Controller $controller = null)
-	{
-		$possible_paths = [
-			'public/views/' . $view . '/' . $view . '.php',
-			'public/views/' . $view . '.php'
-		];
+    static public function byName($view, Controller $controller = null)
+    {
+        $possible_paths = [
+            'public/views/' . $view . '/' . $view . '.php',
+            'public/views/' . $view . '.php'
+        ];
 
-		$file = find_file($possible_paths);
+        $file = find_file($possible_paths);
 
-		if ($file === null)
-			throw new ViewNotFoundException("Cannot find view $view");
-		
-		require_once($file);
+        if ($file === null)
+            throw new ViewNotFoundException("Cannot find view $view");
 
-		$view_name = $view . 'View';
+        require_once($file);
 
-		if (!class_exists($view_name))
-			throw new RuntimeException("Expected the class $view_name in $file");
+        $view_name = $view . 'View';
 
-		$refl = new ReflectionClass($view_name);
-		return $refl->newInstance($controller, dirname($file));
-	}
+        if (!class_exists($view_name))
+            throw new RuntimeException("Expected the class $view_name in $file");
 
-	protected $controller;
+        $refl = new ReflectionClass($view_name);
+        return $refl->newInstance($controller, dirname($file));
+    }
 
-	protected $layout;
+    protected $controller;
 
-	protected $twig;
+    protected $layout;
 
-	/**
-	 * View constructor.
-	 * @param Controller|null $controller
-	 * @param null $path
-	 * @throws Twig_Error_Loader
-	 */
-	public function __construct(Controller $controller = null, $path = null)
-	{
-		// Default $path to @theme so View::render() is at least somewhat useful.
-		if (!$path)
-			$path = 'public/views';
+    protected $twig;
 
-		$this->controller = $controller;
+    /**
+     * View constructor.
+     * @param Controller|null $controller
+     * @param null $path
+     * @throws Twig_Error_Loader
+     */
+    public function __construct(Controller $controller = null, $path = null)
+    {
+        // Default $path to @theme so View::render() is at least somewhat useful.
+        if (!$path)
+            $path = 'public/views';
 
-		// First look in our own view directory
-		$loader = new TwigFilesystemLoader($path);
+        $this->controller = $controller;
 
-		// Then, look in the top level theme views directory
-		$loader->addPath('public/views', 'theme');
+        // First look in our own view directory
+        $loader = new TwigFilesystemLoader($path);
 
-		// And add a shortcut to the layout directory through @layout
-		$loader->addPath('public/views/_layout', 'layout');
+        // Then, look in the top level theme views directory
+        $loader->addPath('public/views', 'theme');
 
-		$app_variable_reflection = new \ReflectionClass('\Symfony\Bridge\Twig\AppVariable');
-		$vendor_twig_bridge_directory = dirname($app_variable_reflection->getFileName());
-		// the path to your other templates
-		$loader->addPath($vendor_twig_bridge_directory.'/Resources/views', 'symfony');
+        // And add a shortcut to the layout directory through @layout
+        $loader->addPath('public/views/_layout', 'layout');
 
-		$this->twig = new TwigEnvironment($loader, [
-			'debug' => get_config_value('debug', false),
-			'auto_reload' => true, // Make sure template cache reloads when deploying on the server
-			'strict_variables' => true,
-			'cache' => get_config_value('twig_cache', 'tmp/twig'),
-		]);
+        $app_variable_reflection = new \ReflectionClass('\Symfony\Bridge\Twig\AppVariable');
+        $vendor_twig_bridge_directory = dirname($app_variable_reflection->getFileName());
+        // the path to your other templates
+        $loader->addPath($vendor_twig_bridge_directory.'/Resources/views', 'symfony');
 
-		$form_themes = [
-			'@layout/form/bulma_layout.html.twig',
-			'@layout/form/custom_types.html.twig'
-		];
-		$form_engine = new TwigRendererEngine($form_themes, $this->twig);
-		$this->twig->addRuntimeLoader(new FactoryRuntimeLoader([
-			FormRenderer::class => function () use ($form_engine) {
-					return new FormRenderer($form_engine, get_csrf_manager());
-			},
-		]));
+        $this->twig = new TwigEnvironment($loader, [
+            'debug' => get_config_value('debug', false),
+            'auto_reload' => true, // Make sure template cache reloads when deploying on the server
+            'strict_variables' => true,
+            'cache' => get_config_value('twig_cache', 'tmp/twig'),
+        ]);
 
-		$this->twig->addExtension(new IntlExtension());
-		$this->twig->addExtension(new FormExtension());
+        $form_themes = [
+            '@layout/form/bulma_layout.html.twig',
+            '@layout/form/custom_types.html.twig'
+        ];
+        $form_engine = new TwigRendererEngine($form_themes, $this->twig);
+        $this->twig->addRuntimeLoader(new FactoryRuntimeLoader([
+            FormRenderer::class => function () use ($form_engine) {
+                    return new FormRenderer($form_engine, get_csrf_manager());
+            },
+        ]));
 
-		$router = $this->controller ? $this->controller->get_router() : get_router();
+        $this->twig->addExtension(new IntlExtension());
+        $this->twig->addExtension(new FormExtension());
 
-		require_once 'src/framework/twig/policytwigextension.php';
-		$this->twig->addExtension(new PolicyTwigExtension());
+        $router = $this->controller ? $this->controller->get_router() : get_router();
 
-		require_once 'src/framework/twig/i18ntwigextension.php';
-		$this->twig->addExtension(new I18NTwigExtension());
+        require_once 'src/framework/twig/policytwigextension.php';
+        $this->twig->addExtension(new PolicyTwigExtension());
 
-		require_once 'src/framework/twig/routertwigextension.php';
-		$this->twig->addExtension(new RouterTwigExtension($router));
+        require_once 'src/framework/twig/i18ntwigextension.php';
+        $this->twig->addExtension(new I18NTwigExtension());
 
-		require_once 'src/framework/twig/htmltwigextension.php';
-		$this->twig->addExtension(new HTMLTwigExtension());
+        require_once 'src/framework/twig/routertwigextension.php';
+        $this->twig->addExtension(new RouterTwigExtension($router));
 
-		require_once 'public/views/_layout/layout.php';
-		$this->layout = new LayoutViewHelper($router);
+        require_once 'src/framework/twig/htmltwigextension.php';
+        $this->twig->addExtension(new HTMLTwigExtension());
 
-		foreach ($this->_globals() as $key => $var)
-			$this->twig->addGlobal($key, $var);
-	}
+        require_once 'public/views/_layout/layout.php';
+        $this->layout = new LayoutViewHelper($router);
 
-	protected function _globals()
-	{
-		return [
-			'view' => $this,
-			'controller' => $this->controller,
-			'model' => $this->controller ? $this->controller->model() : null,
-			'global' => [
-				'auth' => get_auth(),
-				'identity' => get_identity(),
-				'db' => get_db(),
-				'server' => $_SERVER,
-				'GET' => $_GET,
-				'POST' => $_POST,
-				'request' => $this->controller ? $this->controller->get_request() : get_request(),
-				'i18n' => [
-					'language' => i18n_get_language(),
-					'languages' => i18n_get_languages()
-				],
-				'models' => new TwigAccessor(function($model) {
-					return get_model('DataModel' . $model);
-				}),
-				'controllers' => new TwigAccessor(function($controller) {
-					return null;
-				}),
-				'views' => new TwigAccessor(function($view) {
-					return View::byName($view);
-				}),
-				'policies' => new TwigAccessor(function($model) {
-					return get_policy('DataModel' . $model);
-				}),
-				'config' => new TwigAccessor(function($key) {
-					return get_config_value($key);
-				})
-			]
-		];
-	}
+        foreach ($this->_globals() as $key => $var)
+            $this->twig->addGlobal($key, $var);
+    }
 
-	public function scripts()
-	{
-		return [
-			get_theme_data('assets/dist/js/cover.js'),
-		];
-	}
+    protected function _globals()
+    {
+        return [
+            'view' => $this,
+            'controller' => $this->controller,
+            'model' => $this->controller ? $this->controller->model() : null,
+            'global' => [
+                'auth' => get_auth(),
+                'identity' => get_identity(),
+                'db' => get_db(),
+                'server' => $_SERVER,
+                'GET' => $_GET,
+                'POST' => $_POST,
+                'request' => $this->controller ? $this->controller->get_request() : get_request(),
+                'i18n' => [
+                    'language' => i18n_get_language(),
+                    'languages' => i18n_get_languages()
+                ],
+                'models' => new TwigAccessor(function($model) {
+                    return get_model('DataModel' . $model);
+                }),
+                'controllers' => new TwigAccessor(function($controller) {
+                    return null;
+                }),
+                'views' => new TwigAccessor(function($view) {
+                    return View::byName($view);
+                }),
+                'policies' => new TwigAccessor(function($model) {
+                    return get_policy('DataModel' . $model);
+                }),
+                'config' => new TwigAccessor(function($key) {
+                    return get_config_value($key);
+                })
+            ]
+        ];
+    }
 
-	public function stylesheets()
-	{
-		$color_mode = $_COOKIE['cover_color_mode'] ?? 'light';
-		if ($color_mode === 'dark')
-			$base = [get_theme_data('assets/dist/css/cover-dark.css')];
-		else
-			$base = [get_theme_data('assets/dist/css/cover.css')];
-		return array_merge($base, []);
-	}
+    public function scripts()
+    {
+        return [
+            get_theme_data('assets/dist/js/cover.js'),
+        ];
+    }
 
-	public function layout()
-	{
-		return $this->layout;
-	}
+    public function stylesheets()
+    {
+        $color_mode = $_COOKIE['cover_color_mode'] ?? 'light';
+        if ($color_mode === 'dark')
+            $base = [get_theme_data('assets/dist/css/cover-dark.css')];
+        else
+            $base = [get_theme_data('assets/dist/css/cover.css')];
+        return array_merge($base, []);
+    }
 
-	public function redirect($url, $permanent = false, $flags = 0)
-	{
-		// parse and selectively rebuild the url to prevent
-		// weird tricks where a custom form redirects you to
-		// outside the Cover website.
-		$parts = parse_url($url);
+    public function layout()
+    {
+        return $this->layout;
+    }
 
-		$url = '';
+    public function redirect($url, $permanent = false, $flags = 0)
+    {
+        // parse and selectively rebuild the url to prevent
+        // weird tricks where a custom form redirects you to
+        // outside the Cover website.
+        $parts = parse_url($url);
 
-		if (($flags & ALLOW_EXTERNAL_DOMAINS)
-			|| ($flags & ALLOW_SUBDOMAINS)
-				&& isset($parts['host'])
-				&& is_same_domain($parts['host'], $_SERVER['HTTP_HOST'])) {
-			$url = '//' . $parts['host'];
-		}
+        $url = '';
 
-		if (isset($parts['path']))
-			$url .= $parts['path'];
+        if (($flags & ALLOW_EXTERNAL_DOMAINS)
+            || ($flags & ALLOW_SUBDOMAINS)
+                && isset($parts['host'])
+                && is_same_domain($parts['host'], $_SERVER['HTTP_HOST'])) {
+            $url = '//' . $parts['host'];
+        }
 
-		if (isset($parts['query']))
-			$url .= '?' . $parts['query'];
+        if (isset($parts['path']))
+            $url .= $parts['path'];
 
-		if (isset($parts['fragment']))
-			$url .= '#' . $parts['fragment'];
+        if (isset($parts['query']))
+            $url .= '?' . $parts['query'];
 
-		if ($permanent)
-			header('Status: 301 Moved Permanently');
+        if (isset($parts['fragment']))
+            $url .= '#' . $parts['fragment'];
 
-		header('Location: ' . $url);
-		return '<a href="' . htmlentities($url, ENT_QUOTES) . '">' . __('You are being redirected. Click here to continue.') . '</a>';
-	}
+        if ($permanent)
+            header('Status: 301 Moved Permanently');
 
-	public function render_401_unauthorized(UnauthorizedException $e) {
-		header('Status: 401 Unauthorized');
-		header('WWW-Authenticate: FormBased');
-		return $this->render('@layout/401_unauthorized.twig', ['exception' => $e]);
-	}
+        header('Location: ' . $url);
+        return '<a href="' . htmlentities($url, ENT_QUOTES) . '">' . __('You are being redirected. Click here to continue.') . '</a>';
+    }
 
-	public function render_404_not_found(NotFoundException $e) {
-		header('Status: 404 Not Found');
-		return $this->render('@layout/404_not_found.twig', ['exception' => $e]);
-	}
+    public function render_401_unauthorized(UnauthorizedException $e) {
+        header('Status: 401 Unauthorized');
+        header('WWW-Authenticate: FormBased');
+        return $this->render('@layout/401_unauthorized.twig', ['exception' => $e]);
+    }
 
-	public function render($template_name, array $data = array())
-	{
-		$template = $this->twig->load($template_name);
+    public function render_404_not_found(NotFoundException $e) {
+        header('Status: 404 Not Found');
+        return $this->render('@layout/404_not_found.twig', ['exception' => $e]);
+    }
 
-		return $template->render($data);
-	}
+    public function render($template_name, array $data = array())
+    {
+        $template = $this->twig->load($template_name);
 
-	public function render_json(array $data)
-	{
-		header('Content-Type: application/json');
-		return json_encode($data);
-	}
+        return $template->render($data);
+    }
 
-	protected function _get_preferred_response()
-	{
-		return isset($_SERVER['HTTP_ACCEPT'])
-			? parse_http_accept($_SERVER['HTTP_ACCEPT'], ['application/json', 'text/html', '*/*'])
-			: 'text/html';
-	}
+    public function render_json(array $data)
+    {
+        header('Content-Type: application/json');
+        return json_encode($data);
+    }
+
+    protected function _get_preferred_response()
+    {
+        return isset($_SERVER['HTTP_ACCEPT'])
+            ? parse_http_accept($_SERVER['HTTP_ACCEPT'], ['application/json', 'text/html', '*/*'])
+            : 'text/html';
+    }
 }
 
 
 class CRUDView extends View
 {
-	public function render_delete(DataIter $iter, $form, $success)
-	{
-		if ($success)
-			return $this->redirect($this->controller->path('index'));
-		else
-			return $this->render('confirm_delete.twig', ['iter' => $iter, 'form' => $form->createView()]);
-	}
+    public function render_delete(DataIter $iter, $form, $success)
+    {
+        if ($success)
+            return $this->redirect($this->controller->path('index'));
+        else
+            return $this->render('confirm_delete.twig', ['iter' => $iter, 'form' => $form->createView()]);
+    }
 
-	public function render_create(DataIter $iter, $form, $success)
-	{
-		if ($success)
-			return $this->redirect($this->controller->path('read', $iter));
-		else
-			return $this->render('form.twig', ['iter' => $iter, 'form' => $form->createView()]);
-	}
+    public function render_create(DataIter $iter, $form, $success)
+    {
+        if ($success)
+            return $this->redirect($this->controller->path('read', $iter));
+        else
+            return $this->render('form.twig', ['iter' => $iter, 'form' => $form->createView()]);
+    }
 
-	public function render_read(DataIter $iter, array $extra = [])
-	{
-		return $this->render('single.twig', array_merge($extra, compact('iter')));
-	}
+    public function render_read(DataIter $iter, array $extra = [])
+    {
+        return $this->render('single.twig', array_merge($extra, compact('iter')));
+    }
 
-	public function render_update(DataIter $iter, $form, $success)
-	{
-		if ($success)
-			return $this->redirect($this->controller->path('read', $iter));
-		else
-			return $this->render('form.twig', ['iter' => $iter, 'form' => $form->createView()]);
-	}
+    public function render_update(DataIter $iter, $form, $success)
+    {
+        if ($success)
+            return $this->redirect($this->controller->path('read', $iter));
+        else
+            return $this->render('form.twig', ['iter' => $iter, 'form' => $form->createView()]);
+    }
 
-	public function render_index($iters)
-	{
-		return $this->render('index.twig', compact('iters'));
-	}
+    public function render_index($iters)
+    {
+        return $this->render('index.twig', compact('iters'));
+    }
 }

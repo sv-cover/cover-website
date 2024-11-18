@@ -9,19 +9,19 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class PhotoCommentType extends AbstractType
 {
-	public function buildForm(FormBuilderInterface $builder, array $options): void
-	{
-		$builder
-			->add('reactie', TextareaType::class, [
-				'label' => __('Comment'),
-				'constraints' => [
-					new Assert\NotBlank(),
-				],
-				'attr' => [
-					'placeholder' => __('Type your comment here…'),
-				],
-			])
-			->add('submit', SubmitType::class)
-		;
-	}
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->add('reactie', TextareaType::class, [
+                'label' => __('Comment'),
+                'constraints' => [
+                    new Assert\NotBlank(),
+                ],
+                'attr' => [
+                    'placeholder' => __('Type your comment here…'),
+                ],
+            ])
+            ->add('submit', SubmitType::class)
+        ;
+    }
 }
