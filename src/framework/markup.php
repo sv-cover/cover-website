@@ -379,7 +379,7 @@ function _markup_parse_publiconly(&$markup, &$placeholders)
 
 	while (preg_match('/\[publiconly\](?P<content>.+?)\[\/publiconly\]/is', $markup, $match)) {
 		if (!get_auth()->logged_in())
-			$content = markup_parse($match['content']);
+			$content = markup_parse(trim($match['content']));
 		else
 			$content = '';
 
@@ -402,7 +402,7 @@ function _markup_parse_membersonly(&$markup, &$placeholders)
 
 	while (preg_match('/\[membersonly(=(?P<description>[^\]]+))?\](?P<content>.+?)\[\/membersonly\]/is', $markup, $match)) {
 		if (get_auth()->logged_in()) {
-			$content = markup_parse($match['content']);
+			$content = markup_parse(trim($match['content']));
 		} else {
 			$content = <<<END
 				<p>{description}</p>
