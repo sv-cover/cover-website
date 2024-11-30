@@ -452,7 +452,15 @@ class ProfileController extends AbstractController
                 'member_id' => $iter['id'],
             ]);
 
-        $debitsPerBatch = \array_group_by($debits, fn($d) => $d['batch_id']);
+        // Group debits per batch
+        $debitsPerBatch = [];
+        foreach ($debits as $debit) {
+            $key = (string) $debit['batch_id'];
+            if (isset($debitsPerBatch[$key]))
+                $debitsPerBatch[$key][] = $debit;
+            else
+                $debitsPerBatch[$key] = [$debit];
+        }
 
         return $this->render('profile/incassomatic_tab.html.twig', [
             'iter' => $iter,

@@ -1,6 +1,7 @@
 <?php
 use App\Legacy\Database\DataIter;
 use App\Legacy\Database\DataModel;
+use Symfony\Component\String\ByteString;
 
 class DataIterEmailConfirmationToken extends DataIter
 {
@@ -32,7 +33,7 @@ class DataModelEmailConfirmationToken extends DataModel
     public function create_token(DataIterMember $member, $email)
     {
         $token = $this->new_iter([
-            'key' => randstr(40),
+            'key' => ByteString::fromRandom(40)->toString(),
             'member_id' => $member['id'],
             'email' => $email,
             'created_on' => new DateTime()

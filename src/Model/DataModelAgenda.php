@@ -355,6 +355,6 @@ class DataModelAgenda extends DataModel implements SearchProviderInterface
                 ? sprintf(' LIMIT %d', $limit)
                 : ''));
 
-        return array_select($rows, 'locatie');
+        return array_column($rows, 'locatie');
     }
 }

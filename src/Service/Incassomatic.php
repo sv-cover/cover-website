@@ -57,7 +57,6 @@ class Incassomatic
     public function getCurrentContract(\DataIterMember $member): array|bool
     {
         $contracts = $this->getContracts($member);
-        $contracts = [];
         // Only show valid contracts
         return \current(\array_filter($contracts, fn($c) => $c['is_geldig']));
     }

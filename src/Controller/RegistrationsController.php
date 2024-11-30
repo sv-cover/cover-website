@@ -19,6 +19,7 @@ use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\String\ByteString;
 
 class RegistrationsController extends AbstractController
 {
@@ -142,7 +143,7 @@ class RegistrationsController extends AbstractController
             $data['option_mailing'] = true;
 
             // Same as email confirmation / password reset
-            $token = \randstr(40);
+            $token = ByteString::fromRandom(40)->toString();
 
             // Store this info temporarily in the database and send a confirmation mail
             $this->db->insert('registrations', [

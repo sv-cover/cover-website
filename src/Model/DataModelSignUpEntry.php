@@ -55,21 +55,6 @@ class DataIterSignUpEntry extends DataIter
 
         return $this->model->get_values($this);
     }
-
-    public function get_values_by_name()
-    {
-        $fields_by_id = array_combine(
-            array_select($this['form']['fields'], 'id'),
-            array_values($this['form']['fields']));
-
-        $values = $this['values'];
-
-        return array_combine(
-            array_map(function($id) use ($fields_by_id) {
-                return $fields_by_id[$id];
-            }, array_keys($values)),
-            array_values($values));
-    }
 }
 
 class DataModelSignUpEntry extends DataModel
@@ -98,10 +83,7 @@ class DataModelSignUpEntry extends DataModel
     public function get_values(DataIter $iter)
     {
         $rows = $this->db->query("SELECT field_id, value FROM sign_up_entry_values WHERE entry_id = :id", false, [':id' => $iter['id']]);
-
-        return array_combine(
-            array_select($rows, 'field_id'),
-            array_select($rows, 'value'));
+        return array_column($rows, 'value', 'field_id');
     }
 
     protected function _generate_query($where)

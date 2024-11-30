@@ -2,20 +2,6 @@
 if (!defined('IN_SITE'))
     return;
 
-/** @group Functions
- * Generate a string with random characters of a certain length
- * @length optional; the length of the generated string
- * (defaults to 8)
- *
- * TODO: Replace with something that encodes more characters? a-zA-Z0-9 would be nice…
- *
- * @result a string with random characters
- */
-function randstr($length = 8) {
-    $length = ($length < 4) ? 4 : $length;
-    return bin2hex(random_bytes(($length-($length%2))/2));
-}
-
 /**
  * Format a string with php-style variables with optional modifiers.
  *
@@ -70,53 +56,6 @@ function format_string($format, $params)
 function optional($value)
 {
     return !empty($value) ? ' ' . $value : '';
-}
-
-
-/**
- * Shortcut to add and remove query parameters from urls. First all parameters
- * named in $remove are removed, then parameters from $add are recursively
- * merged with the existing parameters in the url.
- *
- * @param string $url the url to edit
- * @param string[] $add key-value pairs of query parameters to add to the url
- * @param string[] $remove keys of query parameters to remove.
- * @return string
- */
-function edit_url($url, array $add = array(), array $remove = array())
-{
-    $query_start = strpos($url, '?');
-
-    $fragment_start = strpos($url, '#');
-
-    $query_end = $fragment_start !== false
-        ? $fragment_start
-        : strlen($url);
-
-    if ($query_start !== false)
-        parse_str(substr($url, $query_start + 1, $query_end - $query_start), $query);
-    else
-        $query = array();
-
-    foreach ($remove as $key)
-        if (isset($query[$key]))
-            unset($query[$key]);
-
-    $query = array_merge_recursive($query, $add);
-
-    $query_str = http_build_query($query);
-
-    $out = $query_start !== false
-        ? substr($url, 0, $query_start)
-        : $url;
-
-    if ($query_str != '')
-        $out .= '?' . $query_str;
-
-    if ($fragment_start !== false)
-        $out .= substr($url, $fragment_start);
-
-    return $out;
 }
 
 /**
@@ -202,22 +141,6 @@ function parse_email_object($file, array $variables = array())
     return new SimpleEmail($subject, ltrim($body), implode("\r\n", $headers));
 }
 
-
-function get_theme_data($file, $include_filemtime = true) {
-    if (substr($file, 0, 1) === '/')
-        $path = $file;
-    else
-        $path = '/' . $file;
-
-    $abs_path = realpath($_SERVER["DOCUMENT_ROOT"]) . $path;
-
-    if ($include_filemtime && file_exists($abs_path))
-        $path .= '?' . filemtime($abs_path);
-
-    return $path;
-}
-
-
 /** @group Functions
  * Implode a list while separating it with , (except for the last item
  * for which "and" is used instead of a comma
@@ -275,43 +198,6 @@ function format_date_relative($time)
     }
     else
         return date('F j, Y', $time);
-}
-
-// almost dead: only used in View:byName
-function find_file(array $search_paths)
-{
-    foreach ($search_paths as $path)
-        if (file_exists($path))
-            return $path;
-
-    return null;
-}
-
-function parse_http_accept($header, array $available = array())
-{
-    $accepted = array();
-
-    foreach (explode(',', $header) as $type)
-    {
-        $type = trim($type);
-
-        if (preg_match('/;q=(\d+(?:\.\d+)?)$/', $type, $match))
-            $weight = floatval($match[1]);
-        else
-            $weight = 1.0;
-
-        $accepted[] = $type;
-        $weights[] = $weight;
-    }
-
-    array_multisort($weights, SORT_NUMERIC, SORT_DESC, $accepted);
-
-    if (count($available) > 0)
-        foreach ($accepted as $preferred)
-            if (in_array($preferred, $available))
-                return $preferred;
-
-    return $available;
 }
 
 function set_domain_cookie($name, $value, $cookie_time = 0)
@@ -402,12 +288,6 @@ function path_subtract($full_path, $basedir)
     return ltrim(substr($full_path, strlen($basedir)), '/');
 }
 
-function sanitize_filename($string)
-{
-    // Source: http://stackoverflow.com/a/2727693
-    return preg_replace(array('/\s/', '/\.[\.]+/', '/[^\w_\.\-]/'), array('_', '.', ''), $string);
-}
-
 function crc32_file($path)
 {
     return hash_file('CRC32', $path, false);
@@ -418,113 +298,7 @@ function encode_data_uri($mime_type, $data)
     return 'data:' . $mime_type . ';base64,' . base64_encode($data);
 }
 
-function curry_call_method($method, $arguments = [])
-{
-    $arguments = func_get_args();
-    array_shift($arguments);
-
-    return function($object) use ($method, $arguments) {
-        return call_user_func_array([$object, $method], $arguments);
-    };
-}
-
-/**
- * Really really simple mail function for attachments that barely uses any memory
- * because it streams like everything!
- */
-function send_mail_with_attachment($to, $subject, $message, $additional_headers, array $attachments)
-{
-    // Alternative sendmail implementations may not like this "oi" flag, which could result in a broken pipe. Remove temporarily if you're running into issues on your test environment.
-    $fout = popen(ini_get('sendmail_path') . ' -oi', 'w');
-
-    if (!$fout)
-        throw new Exception("Could not open sendmail");
-
-    $boundary = md5(microtime());
-
-    // Headers and dummy message
-    fwrite($fout,
-        "MIME-Version: 1.0\r\n"
-        . ($additional_headers ? (trim($additional_headers, "\r\n") . "\r\n") : "")
-        . "To: $to\r\n"
-        . "Subject: $subject\r\n"
-        . "Content-Type: multipart/mixed; boundary=\"$boundary\"\r\n"
-        . "\r\n"
-    . "This is a mime-encoded message"
-        . "\r\n\r\n");
-
-    // Message content
-    fwrite($fout, "--$boundary\r\n"
-        . "Content-Type: text/plain; charset=\"UTF-8\"\r\n"
-        . "Content-Transfer-Encoding: quoted-printable\r\n\r\n");
-
-    $filter = stream_filter_append($fout, 'convert.quoted-printable-encode',
-        STREAM_FILTER_WRITE, ["line-length" => 80, "line-break-chars" => "\r\n"]);
-
-    if (is_resource($message))
-        stream_copy_to_stream($message, $fout);
-    else
-        fwrite($fout, $message);
-
-    stream_filter_remove($filter);
-
-    fwrite($fout, "\r\n");
-
-    foreach ($attachments as $file_name => $file)
-    {
-        $file_handle = is_resource($file) ? $file : fopen($file, 'rb');
-        // Attachment
-        fwrite($fout, "\r\n--$boundary\r\n"
-            . "Content-Type: application/octet-stream; name=\"" . addslashes($file_name) . "\"\r\n"
-            . "Content-Transfer-Encoding: base64\r\n"
-            . "Content-Disposition: attachment\r\n\r\n");
-
-        $filter = stream_filter_append($fout, 'convert.base64-encode',
-            STREAM_FILTER_WRITE, ["line-length" => 80, "line-break-chars" => "\r\n"]);
-
-        stream_copy_to_stream($file_handle, $fout);
-
-        stream_filter_remove($filter);
-
-        fclose($file_handle);
-    }
-
-    fwrite($fout, "\r\n--$boundary--\r\n");
-
-    fclose($fout);
-}
-
-function array_find(array $elements, callable $test)
-{
-    foreach ($elements as $index => $element)
-        if (call_user_func($test, $element, $index))
-            return $element;
-
-    return null;
-}
-
-function array_group_by($array, $key_accessor)
-{
-    $groups = array();
-
-    foreach ($array as $element) {
-        $key = (string) call_user_func($key_accessor, $element);
-        if (isset($groups[$key]))
-            $groups[$key][] = $element;
-        else
-            $groups[$key] = [$element];
-    }
-
-    return $groups;
-}
-
-function array_select($array, $property, $default_value = null)
-{
-    return array_map(function($iter) use ($property, $default_value) {
-        return isset($iter[$property]) ? $iter[$property] : $default_value;
-    }, $array);
-}
-
+// only used in DataModelEditable::get_summary
 function summarize($text, $length)
 {
     $text = trim($text);
@@ -593,13 +367,6 @@ function strip_exif_data(\Imagick $image)
     // Reset those profiles (if there were any in the first place)
     if ($profiles)
         $image->profileImage('icc', $profiles['icc']);
-}
-
-function is_safe_redirect($redirect)
-{
-    $redirect_parts = parse_url($redirect);
-    return in_array($redirect_parts['scheme'], ['http', 'https'])
-        && $redirect_parts['host'] == $_SERVER['HTTP_HOST'];
 }
 
 function get_filemanager_url($path, $width=null)

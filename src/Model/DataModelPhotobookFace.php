@@ -264,7 +264,7 @@ class DataModelPhotobookFace extends DataModel
         if (count($photos) === 0)
             return [];
 
-        $photo_ids = array_map(curry_call_method('get_id'), $photos);
+        $photo_ids = \array_column($photos, 'id');
 
         $query = $this->db->query(sprintf("
             SELECT
