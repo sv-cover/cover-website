@@ -3,11 +3,25 @@
 namespace App\Policy;
 
 use App\Legacy\Database\DataIter;
-use App\Legacy\Policy\AbstractPolicy;
+use App\Legacy\Policy\PolicyInterface;
+use App\Service\Authentication;
 
 // NB: this policy is currently only used for device sessions.
-class PolicySession extends AbstractPolicy
+class PolicySession implements PolicyInterface
 {
+    protected \IdentityProvider $identity;
+
+    public static function getSupportedModel(): string
+    {
+        return \DataModelSession::class;
+    }
+
+    public function __construct(
+        protected Authentication $auth,
+    ) {
+        $this->identity = $auth->getIdentity();
+    }
+
     public function userCanCreate(DataIter $session): bool
     {
         return false;

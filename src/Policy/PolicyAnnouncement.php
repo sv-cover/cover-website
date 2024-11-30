@@ -3,10 +3,24 @@
 namespace App\Policy;
 
 use App\Legacy\Database\DataIter;
-use App\Legacy\Policy\AbstractPolicy;
+use App\Legacy\Policy\PolicyInterface;
+use App\Service\Authentication;
 
-class PolicyAnnouncement extends AbstractPolicy
+class PolicyAnnouncement implements PolicyInterface
 {
+    protected \IdentityProvider $identity;
+
+    public static function getSupportedModel(): string
+    {
+        return \DataModelAnnouncement::class;
+    }
+
+    public function __construct(
+        protected Authentication $auth,
+    ) {
+        $this->identity = $auth->getIdentity();
+    }
+
     public function userCanCreate(DataIter $announcement): bool
     {
         if (isset($announcement['committee_id']))

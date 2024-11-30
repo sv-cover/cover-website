@@ -3,10 +3,24 @@
 namespace App\Policy;
 
 use App\Legacy\Database\DataIter;
-use App\Legacy\Policy\AbstractPolicy;
+use App\Legacy\Policy\PolicyInterface;
+use App\Service\Authentication;
 
-class PolicyAgenda extends AbstractPolicy
+class PolicyAgenda implements PolicyInterface
 {
+    protected \IdentityProvider $identity;
+
+    public static function getSupportedModel(): string
+    {
+        return \DataModelAgenda::class;
+    }
+
+    public function __construct(
+        protected Authentication $auth,
+    ) {
+        $this->identity = $auth->getIdentity();
+    }
+
     public function userCanCreate(DataIter $event): bool
     {
         // Anyone who is in a committee can create agenda items (for said committee)

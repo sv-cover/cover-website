@@ -3,10 +3,16 @@
 namespace App\Policy;
 
 use App\Legacy\Database\DataIter;
-use App\Legacy\Policy\AbstractPolicy;
+use App\Legacy\Policy\PolicyInterface;
+use App\Service\Authentication;
 
-class PolicyWiki extends AbstractPolicy
+class PolicyWiki implements PolicyInterface
 {
+    public static function getSupportedModel(): string
+    {
+        return \DataModelWiki::class;
+    }
+
     public function userCanCreate(DataIter $wiki): bool
     {
         return false;

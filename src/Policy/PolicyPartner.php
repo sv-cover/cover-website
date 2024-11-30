@@ -3,10 +3,24 @@
 namespace App\Policy;
 
 use App\Legacy\Database\DataIter;
-use App\Legacy\Policy\AbstractPolicy;
+use App\Legacy\Policy\PolicyInterface;
+use App\Service\Authentication;
 
-class PolicyPartner extends AbstractPolicy
+class PolicyPartner implements PolicyInterface
 {
+    protected \IdentityProvider $identity;
+
+    public static function getSupportedModel(): string
+    {
+        return \DataModelPartner::class;
+    }
+
+    public function __construct(
+        protected Authentication $auth,
+    ) {
+        $this->identity = $auth->getIdentity();
+    }
+
     public function userCanCreate(DataIter $partner): bool
     {
         return $this->identity->member_in_committee(COMMISSIE_BESTUUR)

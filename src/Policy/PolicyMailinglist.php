@@ -3,10 +3,24 @@
 namespace App\Policy;
 
 use App\Legacy\Database\DataIter;
-use App\Legacy\Policy\AbstractPolicy;
+use App\Legacy\Policy\PolicyInterface;
+use App\Service\Authentication;
 
-class PolicyMailinglist extends AbstractPolicy
+class PolicyMailinglist implements PolicyInterface
 {
+    protected \IdentityProvider $identity;
+
+    public static function getSupportedModel(): string
+    {
+        return \DataModelMailinglist::class;
+    }
+
+    public function __construct(
+        protected Authentication $auth,
+    ) {
+        $this->identity = $auth->getIdentity();
+    }
+
     public function userCanCreate(DataIter $iter): bool
     {
         // Only AC/DCee members can create a mailing list

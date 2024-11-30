@@ -3,13 +3,27 @@
 namespace App\Policy;
 
 use App\Legacy\Database\DataIter;
-use App\Legacy\Policy\AbstractPolicy;
+use App\Legacy\Policy\PolicyInterface;
+use App\Service\Authentication;
 
 // Note that since working groups are just special committees, all
 // these rules also apply to them!
 
-class PolicyBestuur extends AbstractPolicy
+class PolicyBestuur implements PolicyInterface
 {
+    protected \IdentityProvider $identity;
+
+    public static function getSupportedModel(): string
+    {
+        return \DataModelBestuur::class;
+    }
+
+    public function __construct(
+        protected Authentication $auth,
+    ) {
+        $this->identity = $auth->getIdentity();
+    }
+
     public function userCanCreate(DataIter $committee): bool
     {
         return $this->identity->member_in_committee(COMMISSIE_BESTUUR);

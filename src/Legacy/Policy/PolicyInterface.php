@@ -6,6 +6,8 @@ use App\Legacy\Database\DataIter;
 
 interface PolicyInterface
 {
+    public static function getSupportedModel(): string;
+
     public function userCanCreate(DataIter $iter): bool;
 
     public function userCanRead(DataIter $iter): bool;

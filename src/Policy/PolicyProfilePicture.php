@@ -3,11 +3,26 @@
 namespace App\Policy;
 
 use App\Legacy\Database\DataIter;
-use App\Legacy\Policy\AbstractPolicy;
+use App\Legacy\Policy\PolicyInterface;
+use App\Service\Authentication;
+use App\Service\Database;
 
-
-class PolicyProfilePicture extends AbstractPolicy
+class PolicyProfilePicture implements PolicyInterface
 {
+    protected \IdentityProvider $identity;
+
+    public static function getSupportedModel(): string
+    {
+        return \DataModelProfilePicture::class;
+    }
+
+    public function __construct(
+        protected Authentication $auth,
+        protected Database $db,
+    ) {
+        $this->identity = $auth->getIdentity();
+    }
+
     public function userCanCreate(DataIter $iter): bool
     {
         if (!$this->auth->loggedIn)

@@ -3,10 +3,26 @@
 namespace App\Policy;
 
 use App\Legacy\Database\DataIter;
-use App\Legacy\Policy\AbstractPolicy;
+use App\Legacy\Policy\PolicyInterface;
+use App\Policy\PolicyMember;
+use App\Service\Authentication;
 
-class PolicyPhotobook extends AbstractPolicy
+class PolicyPhotobook implements PolicyInterface
 {
+    protected \IdentityProvider $identity;
+
+    public static function getSupportedModel(): string
+    {
+        return \DataModelPhotobook::class;
+    }
+
+    public function __construct(
+        protected Authentication $auth,
+        protected PolicyMember $policyMember,
+    ) {
+        $this->identity = $auth->getIdentity();
+    }
+
     private function _wasMemberAtTheTime(DataIter $book) {
         if ($this->identity->member() === null)
             return false;
@@ -65,8 +81,7 @@ class PolicyPhotobook extends AbstractPolicy
         // or if their whole profile has been made inaccessible
         if ($book instanceof \DataIterFacesPhotobook && !$this->identity->member_in_committee(COMMISSIE_BESTUUR))
             foreach ($book['members'] as $member)
-                // TODO SFY
-                if (!get_policy($member)->userCanRead($member) || $member->is_private('foto', true))
+                if (!$this->policyMember->userCanRead($member) || $member->is_private('foto', true))
                     return false;
 
         // Older photo books are not visible for non-members
