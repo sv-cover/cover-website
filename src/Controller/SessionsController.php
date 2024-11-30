@@ -6,6 +6,7 @@ use App\Exception\InactiveMemberException;
 use App\Exception\UnauthorizedException;
 use App\Form\Type\CommitteeIdType;
 use App\Form\Type\MemberIdType;
+use App\Legacy\Authentication\ImpersonatingIdentityProvider;
 use App\Service\Authentication;
 use App\Service\Database;
 use App\Utils\UrlUtils;
@@ -70,7 +71,7 @@ class SessionsController extends AbstractController
     {
         $identity = $auth->getIdentity();
 
-        if (!($identity instanceof \ImpersonatingIdentityProvider))
+        if (!($identity instanceof ImpersonatingIdentityProvider))
             throw new UnauthorizedException();
 
         $referrer = $request->query->get('referrer', $this->generateUrl('homepage'));

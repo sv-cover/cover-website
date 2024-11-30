@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Exception\UnauthorizedException;
 use App\Form\DeviceSessionType;
+use App\Legacy\Authentication\DeviceIdentityProvider;
 use App\Service\Authentication;
 use App\Service\Database;
 use App\Service\Policy;
@@ -44,7 +45,7 @@ class DeviceSessionsController extends AbstractController
     #[Route('/sessions/device/create', name: 'device_sessions.create', methods: ['GET', 'POST'])]
     public function create(Authentication $auth, Request $request): Response
     {
-        if (!$auth->loggedIn && !($auth->getIdentity() instanceof \DeviceSessionProvider))
+        if (!$auth->loggedIn && !($auth->getIdentity() instanceof DeviceIdentityProvider))
             $auth->getAuth()->create_device_session($request->headers->get('user-agent'));
 
         return $this->render('device_sessions/create.html.twig');
@@ -53,7 +54,7 @@ class DeviceSessionsController extends AbstractController
     #[Route('/sessions/device/logout', name: 'device_sessions.logout', methods: ['GET'])]
     public function logout(Authentication $auth, Request $request): RedirectResponse
     {
-        if ($auth->getIdentity() instanceof \DeviceSessionProvider)
+        if ($auth->getIdentity() instanceof DeviceIdentityProvider)
             $auth->getAuth()->logout();
 
         return $this->redirectToRoute('device_sessions.list');

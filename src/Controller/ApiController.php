@@ -6,6 +6,8 @@ require_once 'src/Legacy/mailing_list.php';
 
 use App\Exception\NotFoundException;
 use App\Exception\UnauthorizedException;
+use App\Legacy\Authentication\ConstantSessionProvider;
+use App\Legacy\Authentication\DeviceIdentityProvider;
 use App\Service\Authentication;
 use App\Service\Database;
 use App\Service\Policy;
@@ -282,12 +284,12 @@ class ApiController extends AbstractController
         if (!$session)
             throw new \InvalidArgumentException('Invalid session id');
 
-        $auth = new \ConstantSessionProvider($session);
+        $auth = new ConstantSessionProvider($session);
 
         $ident = $this->auth->getIdentityProvider($auth);
 
         // Can't do anything with a device session
-        if (is_a($ident, \DeviceIdentityProvider::class))
+        if (is_a($ident, DeviceIdentityProvider::class))
             return [];
 
         $fields = \array_merge(\DataIterMember::fields(), ['type']);
@@ -329,7 +331,7 @@ class ApiController extends AbstractController
 
         $sessionModel = $this->db->getModel('DataModelSession');
         $session = $sessionModel->get_iter($sessionId);
-        $auth = new \ConstantSessionProvider($session);
+        $auth = new ConstantSessionProvider($session);
         $ident = $this->auth->getIdentityProvider($auth);
 
         $committeeModel = $this->db->getModel('DataModelCommissie');

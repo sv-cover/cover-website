@@ -19,7 +19,7 @@
 </header>
 
 <section class="content block">
-    {% set is_device_session = not auth.loggedIn and auth.identity is instanceof('\DeviceIdentityProvider') %}
+    {% set is_device_session = not auth.loggedIn and auth.identity is instanceof('\\App\\Legacy\\Authentication\\DeviceIdentityProvider') %}
     {% if is_device_session and not auth.identity.is_device %}
         <figure class="image">
             {# Use external service to create QR code. Since this is for admin functionality and it doesn't share any personal data, it's fine. Please consider GDPR if you're planning to copy this for somewhere else. Documentation: https://goqr.me/api/ #}

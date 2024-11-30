@@ -2,6 +2,7 @@
 
 namespace App\Policy;
 
+use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Policy\PolicyInterface;
 use App\Service\Authentication;
@@ -9,7 +10,7 @@ use App\Service\Authentication;
 // NB: this policy is currently only used for device sessions.
 class PolicySession implements PolicyInterface
 {
-    protected \IdentityProvider $identity;
+    protected IdentityProviderInterface $identity;
 
     public static function getSupportedModel(): string
     {

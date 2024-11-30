@@ -2,6 +2,13 @@
 
 namespace App\Service;
 
+use App\Legacy\Authentication\CookieSessionProvider;
+use App\Legacy\Authentication\DeviceIdentityProvider;
+use App\Legacy\Authentication\GuestIdentityProvider;
+use App\Legacy\Authentication\ImpersonatingIdentityProvider;
+use App\Legacy\Authentication\MemberIdentityProvider;
+use App\Legacy\Authentication\SessionProviderInterface;
+
 class Authentication
 {
     private $authenticator;
@@ -10,8 +17,8 @@ class Authentication
 
     public function getAuth()
     {
-        if ($this->authenticator === null && \CookieSessionProvider::class)
-            $this->authenticator = new \CookieSessionProvider();
+        if ($this->authenticator === null && CookieSessionProvider::class)
+            $this->authenticator = new CookieSessionProvider();
         return $this->authenticator;
     }
 
@@ -27,17 +34,17 @@ class Authentication
         return $this->identity;
     }
 
-    public function getIdentityProvider(\SessionProvider $authenticator)
+    public function getIdentityProvider(SessionProviderInterface $authenticator)
     {
         if (empty($authenticator->get_session()))
-            $identity = new \GuestIdentityProvider();
+            $identity = new GuestIdentityProvider();
         elseif ($authenticator->get_session()->get('type') === 'device')
-            $identity = new \DeviceIdentityProvider($authenticator);
+            $identity = new DeviceIdentityProvider($authenticator);
         else
-            $identity = new \MemberIdentityProvider($authenticator);
+            $identity = new MemberIdentityProvider($authenticator);
 
         if ($identity->member_in_committee(COMMISSIE_EASY))
-            $identity = new \ImpersonatingIdentityProvider($authenticator);
+            $identity = new ImpersonatingIdentityProvider($authenticator);
 
         return $identity;
     }

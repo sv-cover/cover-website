@@ -23,7 +23,6 @@ require_once 'src/Legacy/proxies.php';
 require_once 'src/Legacy/constants.php';
 require_once 'src/Legacy/member.php';
 require_once 'src/Legacy/functions.php';
-require_once 'src/Legacy/auth.php';
 require_once 'src/Legacy/i18n.php';
 require_once 'src/Legacy/markup.php';
 require_once 'src/Legacy/email.php';

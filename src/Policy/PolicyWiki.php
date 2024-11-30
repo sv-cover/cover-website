@@ -2,6 +2,7 @@
 
 namespace App\Policy;
 
+use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Policy\PolicyInterface;
 use App\Service\Authentication;
