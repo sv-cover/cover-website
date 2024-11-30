@@ -154,14 +154,14 @@ class Menu
                         'color' => 'cover',
                     ],
                 ],
-                // [
-                //     'label' => __('Sticker map'),
-                //     'url' => $this->router->generate('stickers'),
-                //     'icon' => [
-                //         'fa' => 'fas fa-map-marked-alt',
-                //         'color' => 'cover',
-                //     ],
-                // ],
+                [
+                    'label' => __('Sticker map'),
+                    'url' => $this->router->generate('stickers.list'),
+                    'icon' => [
+                        'fa' => 'fas fa-map-marked-alt',
+                        'color' => 'cover',
+                    ],
+                ],
             ]
         ];
 
