@@ -28,7 +28,7 @@ function init_i18n() {
     setlocale(LC_ALL, i18n_get_locale().'.UTF-8');
 
     // Specify location of translation tables
-    bindtextdomain('cover-web', realpath(dirname(__FILE__) . '/../../locale'));
+    bindtextdomain('cover-web', realpath(dirname(__FILE__) . '/../../translations'));
 
     // Choose domain
     textdomain('cover-web');
