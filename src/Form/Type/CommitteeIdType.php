@@ -1,6 +1,7 @@
 <?php
 namespace App\Form\Type;
 
+use App\Service\Authentication;
 use App\Service\Database;
 use App\Form\ChoiceList\CommitteeChoiceLoader;
 use Symfony\Component\Form\AbstractType;
@@ -12,6 +13,7 @@ use Symfony\Component\OptionsResolver\Options;
 class CommitteeIdType extends AbstractType
 {
     public function __construct(
+        private Authentication $auth,
         private Database $db,
     ) {
     }
@@ -31,7 +33,7 @@ class CommitteeIdType extends AbstractType
             'choice_loader' => function (Options $options) {
                 return ChoiceList::loader(
                     $this,
-                    new CommitteeChoiceLoader($this->db, $options['show_all'], $options['show_own']),
+                    new CommitteeChoiceLoader($this->auth, $this->db, $options['show_all'], $options['show_own']),
                     [$options['show_all'], $options['show_own']]
                 );
             },

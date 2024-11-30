@@ -25,8 +25,8 @@ class SignUpFieldsController extends AbstractController
         private Database $db,
         private Policy $policy,
     ){
-        $this->fieldModel = get_model('DataModelSignUpField');
-        $this->formModel = get_model('DataModelSignUpForm');
+        $this->fieldModel = $db->getModel('DataModelSignUpField');
+        $this->formModel = $db->getModel('DataModelSignUpForm');
     }
 
     #[Route('/create', name: 'sign_up_fields.create', methods: ['GET', 'POST'])]

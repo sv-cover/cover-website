@@ -2,6 +2,7 @@
 namespace App\Form;
 
 use App\Form\Type\CommitteeIdType;
+use App\Service\Authentication;
 use App\Service\Database;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
@@ -21,6 +22,7 @@ use App\Form\DataTransformer\StringToDateTimeTransformer;
 class SignUpFormType extends AbstractType
 {
     public function __construct(
+        private Authentication $auth,
         private Database $db,
     ) {
     }
@@ -79,11 +81,11 @@ class SignUpFormType extends AbstractType
 
         // Only show your own committees if you're not admin
         if (
-            !\get_identity()->member_in_committee(COMMISSIE_BESTUUR)
-            && !\get_identity()->member_in_committee(COMMISSIE_KANDIBESTUUR)
-            && !\get_identity()->member_in_committee(COMMISSIE_EASY)
+            !$this->auth->identity->member_in_committee(COMMISSIE_BESTUUR)
+            && !$this->auth->identity->member_in_committee(COMMISSIE_KANDIBESTUUR)
+            && !$this->auth->identity->member_in_committee(COMMISSIE_EASY)
         )
-            $filter['committee_id__in'] = \get_identity()->member()->get('committees');
+            $filter['committee_id__in'] = $this->auth->identity->member()->get('committees');
 
         $events = $this->db->getModel('DataModelAgenda')->find($filter);
 

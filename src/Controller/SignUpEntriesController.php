@@ -29,8 +29,8 @@ class SignUpEntriesController extends AbstractController
         private SignUpFormManager $manager,
         private Policy $policy,
     ){
-        $this->entryModel = get_model('DataModelSignUpEntry');
-        $this->formModel = get_model('DataModelSignUpForm');
+        $this->entryModel = $db->getModel('DataModelSignUpEntry');
+        $this->formModel = $db->getModel('DataModelSignUpForm');
     }
 
     public function eventPage(Authentication $auth, \DataIterAgenda $event): Response

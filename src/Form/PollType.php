@@ -4,6 +4,7 @@ namespace App\Form;
 use App\Form\Type\CommitteeIdType;
 use App\Form\Type\MarkupType;
 use App\Form\DataTransformer\StringToDateTimeTransformer;
+use App\Service\Authentication;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -15,13 +16,18 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class PollType extends AbstractType
 {
+    public function __construct(
+        private Authentication $auth,
+    ) {
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('committee_id', CommitteeIdType::class, [
                 'label' => __('Author'),
                 'required' => false,
-                'placeholder' => \get_identity()->member()->get_full_name() ?? __('You'),
+                'placeholder' => $this->auth->identity->member()->get_full_name() ?? __('You'),
             ])
             ->add('question', MarkupType::class, [
                 'label' => __('Question'),

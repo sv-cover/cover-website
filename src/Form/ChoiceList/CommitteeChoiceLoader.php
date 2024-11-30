@@ -1,6 +1,7 @@
 <?php
 namespace App\Form\ChoiceList;
 
+use App\Service\Authentication;
 use App\Service\Database;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
@@ -9,6 +10,7 @@ use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 class CommitteeChoiceLoader implements ChoiceLoaderInterface
 {
     public function __construct(
+        private Authentication $auth,
         private Database $db,
         private bool $showAll = false,
         private bool $showOwn = true,
@@ -52,12 +54,12 @@ class CommitteeChoiceLoader implements ChoiceLoaderInterface
 
     public function filterCommittees($value) {
         if (
-            \get_identity()->member_in_committee(COMMISSIE_BESTUUR)
-            || \get_identity()->member_in_committee(COMMISSIE_KANDIBESTUUR)
-            || \get_identity()->member_in_committee(COMMISSIE_EASY)
+            $this->auth->identity->member_in_committee(COMMISSIE_BESTUUR)
+            || $this->auth->identity->member_in_committee(COMMISSIE_KANDIBESTUUR)
+            || $this->auth->identity->member_in_committee(COMMISSIE_EASY)
         )
             return true;
 
-        return $this->showAll || \get_identity()->member_in_committee($value);
+        return $this->showAll || $this->auth->identity->member_in_committee($value);
     }
 }

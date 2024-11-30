@@ -27,7 +27,7 @@ class SignUpFormsController extends AbstractController
         private Policy $policy,
         private SignUpFormManager $manager,
     ){
-        $this->model = get_model('DataModelSignUpForm');
+        $this->model = $db->getModel('DataModelSignUpForm');
     }
 
     #[Route('/sign_up', name: 'sign_up_forms.list', methods: ['GET'])]
