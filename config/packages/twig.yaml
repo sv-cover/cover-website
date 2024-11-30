@@ -1,0 +1,21 @@
+twig:
+    file_name_pattern: '*.twig'
+    paths:
+        'templates/_layout': 'layout'
+    globals:
+        auth: '@App\Service\Authentication'
+        db: '@App\Service\Database'
+        menu: '@App\Service\Menu'
+        policy: '@App\Service\Policy'
+        photo_utils: '@App\Utils\PhotoUtils'
+        search_utils: '@App\Utils\SearchUtils'
+        sign_up_utils: '@App\SignUp\SignUpFormManager'
+        config:
+            filemanager_url: '%app.filemanager_root%'
+    form_themes:
+        - '@layout/form/bulma_layout.html.twig'
+        - '@layout/form/custom_types.html.twig'
+
+when@test:
+    twig:
+        strict_variables: true

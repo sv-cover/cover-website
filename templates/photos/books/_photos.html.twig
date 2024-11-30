@@ -1,0 +1,30 @@
+{% from 'photos/macros.html.twig' import gallery %}
+
+{# Prepare context: make sure the hard things are done only once #}
+{% set likes = db.getModel('DataModelPhotobookLike').count_for_photos(photos) %}
+{% set my_likes = auth.loggedIn ? db.getModel('DataModelPhotobookLike').get_for_lid(auth.identity.member) : [] %}
+
+{% set visibility = [] %}
+{% if book is instanceof('\DataIterFacesPhotobook') %}
+    {% set visibility = db.getModel('DataModelPhotobookPrivacy').get_visibility_for_photos(photos, auth.identity.member) %}
+{% endif %}
+
+{% set unread_photos = photos|filter(p => p.read_status == 'unread') %}
+{% set read_photos = photos|filter(p => p.read_status == 'read') %}
+
+{# Actually render albums #}
+{% if unread_photos is not empty %}
+    <article class="block">
+        <h2 class="title is-4">{{ __('New since your last visit') }}</h2>
+        {{ gallery(unread_photos, _context) }}
+    </article>
+{% endif %}
+
+{% if read_photos is not empty %}
+    <article class="block">
+        {% if unread_photos is not empty %}
+            <h2 class="title is-4">{{ __('Older photos') }}</h2>
+        {% endif %}
+        {{ gallery(read_photos, _context) }}
+    </article>
+{% endif %}

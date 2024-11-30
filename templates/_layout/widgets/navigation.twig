@@ -1,0 +1,42 @@
+<nav class="navbar is-cover is-fixed-top" role="navigation" aria-label="main navigation">
+    <div class="container is-fullhd is-flex">
+        <div class="navbar-brand is-inline-flex">
+            <a role="button" class="navbar-burger is-hoverable" aria-label="menu" aria-expanded="false" data-trigger data-target="navbar-main" tabindex="0">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+            <a class="navbar-item cover-logo" href="/">
+                <img src="{{ asset('images/cover_logo.png') }}" alt="Cover">
+            </a>
+        </div>
+
+        <div id="navbar-main" class="navbar-menu">
+            <div class="navbar-start">
+            {% for menu_id, menu in menu.main %}
+                {% if menu.submenu is defined %}
+                    <div class="navbar-item has-dropdown is-hoverable {{ menu.class|default('') }}">
+                        <a class="navbar-link is-arrowless"{% if menu.title is defined %} title="{{ menu.title }}"{% endif %} tabindex="0">
+                            {{ menu.label }}
+                        </a>
+                        <div class="navbar-dropdown">
+                            {% for submenu_item in menu.submenu %}
+                                <a href="{{ submenu_item.url }}" class="navbar-item {{ menu.class|default('') }}" target="{{ submenu_item.target|default() }}" {% if submenu_item.title is defined %} title="{{ submenu_item.title }}"{% endif %}>{{ submenu_item.label }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{{ menu.url }}"  target="{{ menu.target|default('') }}" class="navbar-item {{ menu.class|default('') }}" {% if menu.title is defined %} title="{{ menu.title }}"{% endif %}>{{ menu.label }}</a>
+                {% endif %}
+            {% endfor %}
+            </div>
+
+        </div>
+        <div class="navbar-controls">
+            {{ include('@layout/widgets/search.twig') }}
+            {{ include('@layout/widgets/applications.twig') }}
+            {{ render(controller('App\\Controller\\NotificationsController::menu')) }}
+            {{ include('@layout/widgets/user.twig') }}
+        </div>
+    </div>
+</nav>

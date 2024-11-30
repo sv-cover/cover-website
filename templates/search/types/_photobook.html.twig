@@ -1,0 +1,30 @@
+{% from 'photos/macros.html.twig' import gallery %}
+
+{% macro summary(book) -%}
+    {% set parts = [] %}
+    {% if book.num_books > 0 %}
+        {% set parts = parts|merge([__N('%d book', '%d books', book.num_books)]) %}
+    {% endif %}
+    {% if book.num_photos > 0 %}
+        {% set parts = parts|merge([__N('%d photo', '%d photos', book.num_photos)]) %}
+    {% endif %}
+    {{ __('Photo album with %s made on %s.')|format(parts|human_join, book.date) }}
+{%- endmacro %}
+
+<h2 class="title is-5">
+    <a href="{{ path('photo_books.single', {id: result.id}) }}" data-search-main-link>{{ result.titel }}</a>
+    <small>
+        {{ result.date|date('Y, M j') }}
+    </small>
+</h2>
+<p class="subtitle is-7">
+    {{ __('Photo album in %s')|format('<a href="%s">%s</a>'|format(path('photos', {book: result.parent.id}), result.parent.titel|e('html')))|raw }}
+</p>
+{% if result.num_photos > 0 %}
+    <p class="is-sr-only">{{ _self.summary(result) }}</p>
+    <div class="search-photos">
+        {{ gallery(result.get_photos[0:10], {'book': result}) }}
+    </div>
+{% else %}
+    <p class="content">{{ _self.summary(result) }}</p>
+{% endif %}

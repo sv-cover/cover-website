@@ -22,5 +22,5 @@ Here's a list of the Symfony components that have currently been integrated:
 
 - [Forms](/docs/forms.md)
 - [Routing](https://symfony.com/doc/current/create_framework/routing.html)
-- [Twig](https://twig.symfony.com/doc/2.x/)
+- [Twig](https://twig.symfony.com/doc/3.x/)
 - There's more to come ;)

@@ -1,27 +1,25 @@
 <?php
-chdir (dirname(__FILE__) . '/..');
-set_include_path ( dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' );
 
-require_once 'src/init.php';
-require_once 'src/framework/router.php';
+use App\Kernel;
+use Symfony\Component\HttpFoundation\Request;
 
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+require_once dirname(__DIR__).'/vendor/autoload_runtime.php';
 
-try {
-    $router = get_router();
-    $context = $router->getContext();
-    $parameters = $router->match($context->getPathInfo());
-    $controller_class = $parameters['_controller'];
+//> Old Cover stuff
 
-    $request = get_request();
-    $request->attributes->add($parameters);
+require_once dirname(__DIR__).'/src/Legacy/init.php';
 
-    unset($parameters['_route'], $parameters['_controller']);
-    $request->attributes->set('_route_params', $parameters);
+//< Old Cover stuff
 
-    $controller = new $controller_class($request, $router);
-    $controller->run();
-} catch (ResourceNotFoundException $e) {
-    $view = new \View();
-    echo $view->render_404_not_found(new \NotFoundException());
-}
+// Make kernel globally available for legacy compatibility
+global $kernel;
+
+return function (array $context) {
+    global $kernel;
+    $kernel = new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+    $request = Request::createFromGlobals();
+    $response = $kernel->handle($request);
+    $response->send();
+    $kernel->terminate($request, $response);
+    // return new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+};

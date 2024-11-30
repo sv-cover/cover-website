@@ -1,0 +1,91 @@
+{% extends '@layout/layout.html.twig' %}
+
+{% block title %}
+    {{ __('Groups') }} – {{ parent() }}
+{% endblock %}
+
+{% block content %}
+{# {% set grouped = iters|group_by('hidden') %} #}
+<div class="level">
+    <div class="level-left">
+        <h1 class="title">{{ __('Groups') }}</h1>
+    </div>
+    {% if policy.userCanCreate('DataModelCommissie') %}
+        <div class="level-right buttons">
+            <a href="{{ path('committees.create') }}" class="button">{{ __('New committee') }}</a>
+        </div>
+    {% endif %}
+</div>
+
+<article class="block">
+    <h2 class="title is-4">{{ __('Active') }}</h2>
+    <table class="table is-fullwidth">
+        <thead>
+            <tr>
+                <th>{{ __('Name') }}</th>
+                <th>{{ __('Members') }}</th>
+                <th>{{ __('Type') }}</th>
+                <th class="is-narrow"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for committee in iters|filter(c => not c.hidden) %}
+                <tr>
+                    <td>{{ committee.naam }}</td>
+                    <td>{{ committee.member_count }}</td>
+                    <td>{{ constant('DataModelCommissie::TYPE_OPTIONS')[committee.type]|title }}</td>
+                    <td class="has-text-right is-nowrap">
+                        {% if not committee.hidden and policy.userCanDelete(committee) %}
+                            <a href="{{ path('committees.delete', {slug: committee.login}) }}" data-popup="modal">
+                                <span class="icon">
+                                    <i class="fas fa-trash" aria-hidden="true"></i>
+                                </span>
+                                <span class="is-sr-only">{{ __('Deactivate') }}</span>
+                            </a>
+                        {% endif %}
+                        {% if policy.userCanUpdate(committee) %}
+                            <a href="{{ path('committees.update', {slug: committee.login}) }}">
+                                <span class="icon">
+                                    <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                                </span>
+                                <span class="is-sr-only">{{ __('Edit') }}</span>
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</article>
+
+<article class="block">
+    <h2 class="title is-4">{{ __('Inactive') }}</h2>
+    <table class="table is-fullwidth">
+        <thead>
+            <tr>
+                <th>{{ __('Name') }}</th>
+                <th>{{ __('Type') }}</th>
+                <th class="is-narrow"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for committee in iters|filter(c => c.hidden) %}
+                <tr>
+                    <td>{{ committee.naam }}</td>
+                    <td>{{ constant('DataModelCommissie::TYPE_OPTIONS')[committee.type]|title }}</td>
+                    <td class="has-text-right is-nowrap">
+                        {% if policy.userCanUpdate(committee) %}
+                            <a href="{{ path('committees.update', {slug: committee.login}) }}">
+                                <span class="icon">
+                                    <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                                </span>
+                                <span class="is-sr-only">{{ __('Edit') }}</span>
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</article>
+{% endblock %}

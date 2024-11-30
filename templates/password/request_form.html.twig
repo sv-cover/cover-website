@@ -1,0 +1,23 @@
+{% extends '@layout/layout.html.twig' %}
+
+{% block title __('Forgot your password?') ~ ' – ' ~ parent() %}
+
+{% block content %}
+<h1 class="title">{{ __('Forgot your password?') }}</h1>
+{{ form_start(form) }}
+    <div class="field">
+        <p>{{ __('Fill in your email address and click “Reset password.” You will then receive an email with further instructions.') }}</p>
+    </div>
+    {# Global errors #}
+    {{ form_errors(form, {attr: {class: 'error-section'}}) }}
+    {# Fields #}
+    {{ form_row(form.email) }}
+
+    <div class="field">
+        <div class="control buttons">
+            {{ form_widget(form.submit) }}
+            <a class="button" href="{{ path('login') }}">Cancel</a> {# Use regular path function for login url, don't want to redirect the user back here. #}
+        </div>
+    </div>
+{{ form_end(form) }}
+{% endblock %}

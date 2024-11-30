@@ -1,0 +1,109 @@
+{% extends '@layout/layout.html.twig' %}
+
+{% block title __('Partners') ~ ' – ' ~ parent() %}
+
+{% block content %}
+<header class="level is-mobile">
+    <div class="level-left">
+        <h1 class="title">{{ __('Partners') }}</h1>
+    </div>
+    <div class="level-right buttons">
+        {% if policy.userCanCreate('DataModelPartner') %}
+            <a href="{{ path('partners.create') }}" class="button">
+                <span class="icon">
+                    <i class="fas fa-plus" aria-hidden="true"></i>
+                </span>
+                <span>{{ __('New partner')  }}</span>
+            </a>
+        {% endif %}
+    </div>
+</header>
+<section class="table-container">
+    <table class="table is-fullwidth is-hoverable">
+        <thead>
+            <tr>
+                <th>{{ __('Name') }}</th>
+                <th>{{ __('Type') }}</th>
+                <th>{{ __('Profile') }}</th>
+                <th>{{ __('Banner') }}</th>
+                <th>{{ __('Vacancies') }}</th>
+                <th class="is-sticky is-right is-nowrap is-narrow"></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for partner in iters %}
+            <tr>
+                <td class="is-nowrap">
+                    <a href="{{ path('partners.single', {id: partner.id}) }}">
+                        {{ partner.name }}
+                    </a>
+                </td>
+                <td>
+                    <span class="tag">{{ constant('DataModelPartner::TYPE_OPTIONS')[partner.type] }}</span>
+                </td>
+                <td>
+                    {% if partner.has_profile_visible %}
+                        <span class="icon">
+                            <i class="fas fa-check" aria-hidden="true"></i>
+                            <span class="is-sr-only">{{ __('Profile is visible')}}</span>
+                        </span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if partner.has_banner_visible %}
+                        <span class="icon">
+                            <i class="fas fa-check" aria-hidden="true"></i>
+                            <span class="is-sr-only">{{ __('Banner is visible')}}</span>
+                        </span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ path('vacancies.list', {'partner[]': partner.id}) }}">
+                        {{ partner.vacancies|length }}
+                    </a>
+                </td>
+                <td class="is-sticky is-right has-text-right is-nowrap">
+                    <ul class="controls">
+                        {# TODO SFY: spaceless deprecated #}
+                        {% apply spaceless %}
+                            {% if policy.userCanDelete(partner) %}
+                                <li>
+                                    <a href="{{ path('partners.delete', {id: partner.id}) }}" title="{{ __('Delete partner') }}"  data-popup="modal">
+                                        <span class="icon is-small">
+                                            <i class="fas fa-trash" aria-hidden="true"></i>
+                                        </span>
+                                        <span class="is-sr-only">
+                                            {{ __('Delete partner') }}
+                                        </span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% if policy.userCanUpdate(partner) %}
+                                <li>
+                                    <a href="{{ path('partners.update', {id: partner.id}) }}" title="{{ __('Modify partner') }}">
+                                        <span class="icon is-small">
+                                            <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                                        </span>
+                                        <span class="is-sr-only">
+                                            {{ __('Modify partner') }}
+                                        </span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endapply %}
+                    </ul>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">
+                    <p class="has-text-centered">
+                        {{ __('No partners found :(') }}
+                    </p>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

@@ -1,21 +1,16 @@
 # Forms
 
-Forms are defined and rendered using the Symfony Form component (as of July 2023 we're using version 5.4). This document outlines available documentation, specifics on our implementation, additional notes, and some examples (recipes) of ways to tackle problems.
+Forms are defined and rendered using the Symfony Form component (as of November 2024 we're using version 7.1). This document outlines available documentation, specifics on our implementation, additional notes, and some examples (recipes) of ways to tackle problems.
 
 
 ## Documentation
 The Symfony Form component is reasonably well documented by Symfony.
 
-- [Stand-alone documentation](https://symfony.com/doc/current/components/form.html) This documentation is most applicable to our current situation.
-- [Integrated documentation](https://symfony.com/doc/current/forms.html) Documentation on Forms component integrated in the Symfony framework. Not as useful to us as the stand-alone version, but might be interesting nonetheless.
+- [Integrated documentation](https://symfony.com/doc/current/forms.html) This documentation is most applicable to our current situation.
+- [Stand-alone documentation](https://symfony.com/doc/current/components/form.html) Documentation on stand-alone forms component for use outside of Symfony. Not as useful to us as the stand-alone version, but might be interesting nonetheless.
 - [Built-in form types](https://symfony.com/doc/current/reference/forms/types.html) List of form types provided by Symfony. These are used to define fields.
 - [Built-in constraints](https://symfony.com/doc/current/reference/constraints.html) List of validation constraints provided by Symfony.
 - [Symfony Form GitHub](https://github.com/symfony/Form) Not for the faint of heart, but sometimes necessary as Symfony doesn't provide much documentation for very specific situations.
-
-## Our implementation
-Our implementation doesn't deviate too much from the standard Symfony Form implementation, other than the occasional extension. Our [`Controller`](/src/framework/controller/Controller.php) even offers a similar API for building forms as Symfony's controller by defining a `createForm` and `createFormBuilder` with the same signatures.
-
-Where in the codebase to define forms might be somewhat counter intuitive. Here's the current logic: if a FormType directly corresponds with a DataModel (or DataIter) it is defined in [`/src/Form`](/src/Form), otherwise it is defined in the controller that uses it. If a form does not correspond to a DataModel but needs to be used across multiple controllers, it may also be defined in `/src/Form`, but does not occur at the moment.
 
 ### Integration with DataIter
 Our "ORM" (that might be too generous) was not designed with Symfony Form in mind, so occasionally some effort is needed to make it work. Mostly when converting date(time) fields and booleans.
@@ -28,7 +23,7 @@ An example of both of these transformers in use can be seen in [`EventType`](/sr
 
 Note that constraint validation is harder for fields that use a transformer, as transformers are run before constraints (see Notes).
 
-In some cases, it might be beneficial to disable mapping of fields entirely and instead handle the situation manually. For an example, see the members field in [`CommitteeType`](/src/Form/CommitteeType.php) and the [`CommitteesController`](/src/controllers/CommitteesController.php).
+In some cases, it might be beneficial to disable mapping of fields entirely and instead handle the situation manually. For an example, see the members field in [`CommitteeType`](/src/Form/CommitteeType.php) and the [`CommitteesController`](/src/Controller/CommitteesController.php).
 
 ### Rendering
 Forms can be rendered using the form-related functions in [Twig](https://twig.symfony.com/doc/2.x/). To match the design of the website, rendering is customised in the [`bulma_layout.html.twig`](/public/views/_layout/form/bulma_layout.html.twig) template, which is based on Symfony's [form div layout](https://github.com/symfony/twig-bridge/blob/6.1/Resources/views/Form/form_div_layout.html.twig) and custom types are rendered using [`custom_types.html.twig`](/public/views/_layout/form/custom_types.html.twig). We've got some extensions to go along with these customisations, more on those can be found in the Extensions.
@@ -85,16 +80,16 @@ See "Integration with DataIter". This is solved using the [`IntToBooleanTransfor
 This might happen for many different types, but often [Symfony's CallbackTransformer](https://symfony.com/doc/current/form/data_transformers.html#example-1-transforming-strings-form-data-tags-from-user-input-to-an-array) is the answer. For example, [`EventType`](/src/Form/EventType.php) uses it to convert between Facebook event ID and URL,  [`MailinglistType`](/src/Form/MailinglistType.php) uses it to make sure email addresses are always lowercase, [`StickerType`](/src/Form/StickerType.php) uses it to convert between doubles and strings, and [`RegistrationType`](/src/Form/RegistrationType.php) uses it to do some input cleaning. Keep in mind this might cause issues with constraints (see notes).
 
 ### Can I add transformers from controllers?
-Yes, this happens for example in [`CommitteesController`](/src/controllers/CommitteesController.php), [`CommitteesController`](/src/controllers/CommitteesController.php)
+Yes, this happens for example in [`CommitteesController`](/src/Controller/CommitteesController.php), [`CommitteesController`](/src/Controller/CommitteesController.php)
 
 ### Validation of one field depends on the value of another
-A good way to do this is by using a [Callback constraint](https://symfony.com/doc/current/reference/constraints/Callback.html) to validate the entire form. Examples of this can be seen in [`EventType`](/src/Form/EventType.php), and [`VacancyType`](/src/Form/VacancyType.php). Another but less preferred way to do this is by using an event listener on the `FormEvents::SUBMIT` event, this can be seen in the [`MailingListsController`](/src/controllers/MailingListsController.php).
+A good way to do this is by using a [Callback constraint](https://symfony.com/doc/current/reference/constraints/Callback.html) to validate the entire form. Examples of this can be seen in [`EventType`](/src/Form/EventType.php), and [`VacancyType`](/src/Form/VacancyType.php). Another but less preferred way to do this is by using an event listener on the `FormEvents::SUBMIT` event, this can be seen in the [`MailingListsController`](/src/Controller/MailingListsController.php).
 
 ### Validation of one field depends on data from the DB
-This can be done with a [Callback constraint](https://symfony.com/doc/current/reference/constraints/Callback.html). Examples can be found in [`EventType->validate_datetime`](/src/Form/EventType.php), [`PasswordController`](/src/controllers/PasswordController.php), [`PhotoBooksController`](/src/controllers/PhotoBooksController.php), and [`ProfileController`](/src/controllers/ProfileController.php).
+This can be done with a [Callback constraint](https://symfony.com/doc/current/reference/constraints/Callback.html). Examples can be found in [`EventType->validate_datetime`](/src/Form/EventType.php), [`PasswordController`](/src/Controller/PasswordController.php), [`PhotoBooksController`](/src/Controller/PhotoBooksController.php), and [`ProfileController`](/src/Controller/ProfileController.php).
 
 ### There might be an error on the form or a field, but I won't know until the data is being processed
-You can still add errors and invalidate the form after calling `$form->isValid()`. This is done in [`CommitteesController`](/src/controllers/CommitteesController.php) and [`SessionsController`](/src/controllers/SessionsController.php).
+You can still add errors and invalidate the form after calling `$form->isValid()`. This is done in [`CommitteesController`](/src/Controller/CommitteesController.php) and [`SessionsController`](/src/Controller/SessionsController.php).
 
 ### Some fields should (not) be rendered based on permissions or DataIter
 Have a look at [`PageType`](/src/Form/PageType.php)!
@@ -103,13 +98,16 @@ Have a look at [`PageType`](/src/Form/PageType.php)!
 Have a look at [`SignupFormType`](/src/Form/SignupFormType.php)!
 
 ### Can I add/remove fields based on view?
-Yes! Fields are added to forms in the [`CommitteesController`](/src/controllers/CommitteesController.php) and [`SignupFormsController`](/src/controllers/SignupFormsController.php). There's also a `remove` function that works the same way, but we never use it.
+Yes! Fields are added to forms in the [`CommitteesController`](/src/Controller/CommitteesController.php) and [`SignupFormsController`](/src/Controller/SignupFormsController.php). There's also a `remove` function that works the same way, but we never use it.
 
 ### Can I provide default values?
-Yes! If you have a DataIter, take a look at [`CommitteesController`](/src/controllers/CommitteesController.php), [`MailingListsController`](/src/controllers/MailingListsController.php), [`PhotoCommentsController`](/src/controllers/PhotoCommentsController.php) or [`StickersController`](/src/controllers/StickersController.php). If you don't have an iter, just pass an array with defaults instead, as is done in [`SocietiesController`](/src/controllers/SocietiesController.php) or [`MembershipController`](/src/controllers/MembershipController.php), for example.
+Yes! If you have a DataIter, take a look at [`CommitteesController`](/src/Controller/CommitteesController.php), [`MailingListsController`](/src/Controller/MailingListsController.php), [`PhotoCommentsController`](/src/Controller/PhotoCommentsController.php) or [`StickersController`](/src/Controller/StickersController.php). If you don't have an iter, just pass an array with defaults instead, as is done in [`SocietiesController`](/src/Controller/SocietiesController.php) or [`RegistrationsController`](/src/Controller/RegistrationsController.php), for example.
 
 ### I need to render a form that's processed by a different controller
-Have a look at the [sessions tab](/public/views/profile/sessions_tab.twig) of the profile page, which is processed by [`SessionsController`](/src/controllers/SessionsController.php). Or at the [photo comments form](/public/views/photo_comments/_form.twig) , which is processed by [`PhotoCommentsController`](/src/controllers/PhotoCommentsController.php).
+Have a look at the [sessions tab](/public/views/profile/sessions_tab.twig) of the profile page, which is processed by [`SessionsController`](/src/Controller/SessionsController.php). Or at the [photo comments form](/public/views/photo_comments/_form.twig) , which is processed by [`PhotoCommentsController`](/src/Controller/PhotoCommentsController.php).
 
 ### I need to perform an action based on selected iters
-Have a look at [`MailingListsController->run_unsubscribe`](/src/controllers/MailingListsController.php) and [`mailinglists/single.twig`](/public/views/mailinglists/single.twig) or at [`SignupFormsController->run_delete_entries`](/src/controllers/SignupFormsController.php) and [`sigunup/list_entries.twig`](/public/views/sigunup/list_entries.twig).
+Have a look at [`MailingListsController->run_unsubscribe`](/src/Controller/MailingListsController.php) and [`mailinglists/single.twig`](/public/views/mailinglists/single.twig) or at [`SignupFormsController->run_delete_entries`](/src/Controller/SignupFormsController.php) and [`sigunup/list_entries.twig`](/public/views/sigunup/list_entries.twig).
+
+### Can I use slightly different versions of the same form in different situations?
+Yes. Have a look at [`PasswordType`](/src/Form/PasswordType.php) and the [`PasswordController`](/src/Controller/PasswordController.php) for how to use it.

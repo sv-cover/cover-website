@@ -1,0 +1,111 @@
+{% extends '@layout/layout.html.twig' %}
+
+{# TODO SFY: include year #}
+{% set page_title = (__('Calendar') ~ ' ' ~ navigation.current.display|default(''))|trim %}
+
+{% block title page_title ~ ' – ' ~ parent() %}
+
+{% block page %}
+<article class="section">
+<div class="container calendar {% if app.request.cookies.get('cover_calendar_mode', 'grid') == 'list' %}is-list{% endif %}">
+<header class="block">
+    <nav class="level is-mobile" role="navigation" aria-label="pagination">
+        <div class="level-left">
+            {% if navigation.previous is defined %}
+                <a href="{{ path('events.list', {'year': navigation.previous.id}) }}" class="level-item button">
+                    <span class="icon"><i class="fas fa-arrow-left" aria-hidden="true"></i></span>
+                    {% if navigation.previous.display_short is defined %}
+                        <span class="is-hidden-mobile">{{ navigation.previous.display }}</span>
+                        <span class="is-hidden-tablet">{{ navigation.previous.display_short }}</span>
+                    {% else %}
+                        <span>{{ navigation.previous.display }}</span>
+                    {% endif %}
+                </a>
+            {% endif %}
+        </div>
+        <div class="level-right">
+            {% if navigation.next is defined %}
+                <a href="{{ path('events.list', {'year': navigation.next.id}) }}" class="level-item button">
+                    {% if navigation.next.display_short is defined %}
+                        <span class="is-hidden-mobile">{{ navigation.next.display }}</span>
+                        <span class="is-hidden-tablet">{{ navigation.next.display_short }}</span>
+                    {% else %}
+                        <span>{{ navigation.next.display }}</span>
+                    {% endif %}
+                    <span class="icon"><i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+                </a>
+            {% endif %}
+        </div>
+    </nav>
+    <div class="level">
+        <div class="level-left">
+            <h1 class="title">{{ page_title }}</h1>
+        </div>
+        <div class="level-right field is-grouped">
+            {% if auth.loggedIn %}
+                <div class="control">
+                    <button class="button calendar-list-view-button" title="{{ __('Grid view') }}" data-target-mode="grid" hidden>
+                        <span class="icon">
+                            <i class="fas fa-th-large" aria-hidden="true"></i>
+                            <span class="is-sr-only">{{  __('Grid view') }}</span>
+                        </span>
+                    </button>
+                    <button class="button calendar-list-view-button" title="{{ __('List view') }}" data-target-mode="list" hidden>
+                        <span class="icon">
+                            <i class="fas fa-th-list" aria-hidden="true"></i>
+                            <span class="is-sr-only">{{  __('List view') }}</span>
+                        </span>
+                    </button>
+                </div>
+                <div class="control">
+                    <div class="dropdown">
+                        <div class="dropdown-trigger">
+                            <button class="button" aria-haspopup="true" aria-controls="export-menu">
+                                <span>{{ __('Export') }}</span>
+                                <span class="icon is-small">
+                                    <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                </span>
+                            </button>
+                        </div>
+                        <div class="dropdown-menu" id="export-menu" role="menu">
+                            <div class="dropdown-content">
+                                <div class="dropdown-item">
+                                    <p>{{ __('Add the Cover Calendar to your own calendar') }}</p>
+                                </div>
+                                <hr class="dropdown-divider">
+                                {# TODO SFY get model #}
+                                {% set webcal_url = url('events.webcal', {session_id: db.getModel('DataModelSession').getForApplication(auth.identity.get('id'), 'calendar').get('session_id') }, schemeRelative = true) %}
+                                <a class="dropdown-item" href="https://calendar.google.com/calendar/render?cid={{ webcal_url }}" target="_blank" rel="noopener noreferrer">
+                                    Google Calendar
+                                </a>
+                                <a class="dropdown-item" href="http://calendar.live.com/calendar/calendar.aspx?rru=addsubscription&amp;url={{ webcal_url }}" target="_blank" rel="noopener noreferrer">
+                                    Outlook.com
+                                </a>
+                                <a class="dropdown-item" href="{{ webcal_url }}">
+                                    iCloud/other
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if policy.userCanCreate('DataModelAgenda') %}
+                <div class="control">
+                    <a href="{{ path('events.create') }}" class="button">{{ __('New event') }}</a>
+                </div>
+            {% endif%}
+        </div>
+    </div>
+    {% if not auth.loggedIn %}
+        <div class="notification">
+            {{ __('Log in to view hidden events.') }}
+        </div>
+    {% endif %}
+</header>
+
+<section class="block">
+    {{ include('events/_events.html.twig') }}
+</section>
+</div>
+</article>
+{% endblock %}

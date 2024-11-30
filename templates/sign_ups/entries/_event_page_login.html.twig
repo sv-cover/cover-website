@@ -1,0 +1,17 @@
+<hr>
+<div class="content">
+    <h2>Sign up</h2>
+    <p>
+        {{ __('Your registration will be linked to your account, so you need to login to register for this activity. ') }}
+    </p>
+    <p>
+        {{
+            __(
+                'If you’re not a member and still want to join, that might be possible. Contact the %s for more information.'
+            )|e|format(
+                '<a href="mailto:%s@svcover.nl">%s</a>'|format(event.committee.login|e('html_attr'), event.committee.naam|e)
+            )|raw
+        }}
+    </p>
+    <a href="{{ login_path() }}" class="button is-primary">{{ __('Log in') }}</a>
+</div>

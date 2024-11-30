@@ -1,0 +1,10 @@
+<h2 class="title is-5">
+    {% if result.slug is empty %}
+        <a href="{{ path('page.single', {id: result.id}) }}" data-search-main-link>{{ result.title }}</a>
+    {% else %}
+        <a href="{{ path('slug', {slug: result.slug}) }}" data-search-main-link>{{ result.title }}</a>
+    {% endif %}
+</h2>
+<div class="content">
+    {{ search_utils.excerpt(result.locale_content|strip_markup, resultset.query_parts, 50)|raw }}
+</div>

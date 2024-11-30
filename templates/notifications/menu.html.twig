@@ -1,0 +1,35 @@
+{% if notifications or always_visible %}
+    <div class="navbar-item has-dropdown is-hoverable-desktop notifications {% if notifications %}has-unread{% endif %}">
+        <a class="navbar-link is-arrowless" tabindex="0">
+            <span class="icon">
+                <i class="fas fa-bell"></i>
+                <span class="is-sr-only">
+                    {{ __('Notifications') }}
+                </span>
+            </span>
+        </a>
+        <div class="navbar-dropdown is-right">
+            <div class="navbar-item">
+                <h2 class="title is-6">{{ __('Notifications') }}</h2>
+            </div>
+
+            <hr class="navbar-divider">
+
+            {% for notification in notifications %}
+                {% if notification.url is defined %}
+                    <a href="{{ notification.url }}" class="navbar-item cover-notification {{ notification.class|default('') }}">
+                        {{ notification.message }}
+                    </a>
+                {% else %}
+                    <div class="navbar-item cover-notification {{ notification.class|default('') }}">
+                        {{ notification.message }}
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="navbar-item cover-notification has-text-grey">
+                    {{ __('There are no new notifications :)') }}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}

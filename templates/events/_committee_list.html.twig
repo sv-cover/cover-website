@@ -1,0 +1,6 @@
+{% if iters %}
+<section class="committee-events block" id="events">
+    <h2 class="title is-5">{{ __('Upcoming %s events')|format(committee.naam) }}</h2>
+    {{ include('events/_events.html.twig', {events: iters, group_by_month: false}) }}
+</section>
+{% endif %}

@@ -3,12 +3,12 @@
         {
             "name": "Chewbarka",
             "functie": "Commissioner of Cuddles",
-            "photo": "images/mascots/chewbarka.jpg"
+            "photo": "/images/mascots/chewbarka.jpg"
         },
         {
             "name": "Pumpkin",
             "functie": "Commissioner of Gezellig",
-            "photo": "images/mascots/pumpkin.webp"
+            "photo": "/images/mascots/pumpkin.webp"
         }
     ]
 }

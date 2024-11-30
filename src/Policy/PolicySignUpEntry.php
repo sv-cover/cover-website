@@ -1,0 +1,69 @@
+<?php
+
+namespace App\Policy;
+
+use App\Legacy\Database\DataIter;
+use App\Legacy\Policy\AbstractPolicy;
+
+class PolicySignUpEntry extends AbstractPolicy
+{
+    public function userCanCreate(DataIter $entry): bool
+    {
+        // Active members can sign up if it is open
+        if ($entry['form']->is_open())
+            return $this->identity->is_member()
+                || $this->identity->is_donor();
+
+        // The committee of the activity can always add people to the activity
+        if ($this->identity->member_in_committee($entry['form']['committee_id']))
+            return true;
+
+        return false;
+    }
+
+    public function userCanRead(DataIter $entry): bool
+    {
+        // Board can read & update them
+        if ($this->identity->member_in_committee(COMMISSIE_BESTUUR) || $this->identity->member_in_committee(COMMISSIE_KANDIBESTUUR))
+            return true;
+
+        // and of course the committee of the form can
+        if ($this->identity->member_in_committee($entry['form']['committee_id']))
+            return true;
+
+        // The member of the entry can read their own entries
+        if ($this->identity->get('id') === $entry['member_id'])
+            return true;
+
+        return false;
+    }
+
+    public function userCanUpdate(DataIter $entry): bool
+    {
+        // Board can read & update them
+        if ($this->identity->member_in_committee(COMMISSIE_BESTUUR) || $this->identity->member_in_committee(COMMISSIE_KANDIBESTUUR))
+            return true;
+
+        // and of course the committee of the form can
+        if ($this->identity->member_in_committee($entry['form']['committee_id']))
+            return true;
+
+        // The member of the entry can read their own entries
+        if ($this->identity->get('id') === $entry['member_id'])
+            return $entry['form']->is_open();
+
+        return false;
+    }
+
+    public function userCanDelete(DataIter $entry): bool
+    {
+        // Only the board and the committee can delete entries. You cannot "just" delete your own entry.
+        if ($this->identity->member_in_committee($entry['form']['committee_id']))
+            return true;
+
+        if ($this->identity->member_in_committee(COMMISSIE_BESTUUR) || $this->identity->member_in_committee(COMMISSIE_KANDIBESTUUR))
+            return true;
+
+        return false;
+    }
+}

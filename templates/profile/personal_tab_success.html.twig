@@ -1,0 +1,21 @@
+{% extends 'profile/base.html.twig' %}
+
+{% set active_tab = 'personal' %}
+
+{% block tab_content %}
+<article class="content">
+    <h2 class="title is-4">{{ __('Personal data') }}</h2>
+    <p>
+        {{ __('Your profile has been updated!') }}
+        {% if 'other' in updates %}
+            {{ __('Some changes need to be approved manually and may take some time to update everywhere.') }}
+        {% endif %}
+    </p>
+    {% if 'email' in updates %}
+        <p>
+            {{ __('We’ve sent a confirmation link to your new email. Please click that link to confirm.') }}
+        </p>
+    {% endif %}
+    <a href="{{ path('profile.personal', {'member_id': iter.id}) }}" class="button">{{ __('Back to Personal data') }}</a>
+</article>
+{% endblock %}

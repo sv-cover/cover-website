@@ -2,6 +2,7 @@
 namespace App\Form;
 
 use App\Form\Type\CommitteeIdType;
+use App\Service\Database;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -19,6 +20,11 @@ use App\Form\DataTransformer\StringToDateTimeTransformer;
 
 class SignUpFormType extends AbstractType
 {
+    public function __construct(
+        private Database $db,
+    ) {
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -79,7 +85,7 @@ class SignUpFormType extends AbstractType
         )
             $filter['committee_id__in'] = \get_identity()->member()->get('committees');
 
-        $events = get_model('DataModelAgenda')->find($filter);
+        $events = $this->db->getModel('DataModelAgenda')->find($filter);
 
         if (
             $iter

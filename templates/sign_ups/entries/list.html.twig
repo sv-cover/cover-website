@@ -1,0 +1,106 @@
+{% extends '@layout/layout.html.twig' %}
+
+{% block title __('Sign-ups') ~ ' – ' ~ parent() %}
+
+{% block page %}
+<section class="section signup-entries">
+<div class="container">
+
+<header class="level">
+    <div class="level-left">
+        <h1 class="title">{{ __('Sign-ups') }}</h1>
+    </div>
+    <div class="level-right buttons">
+        {% if policy.userCanCreate(form.new_entry) %}
+            <a href="{{ path('sign_up_entries.create', {form_id: form.id, context: 'modal', prefill: 'false'}) }}" class="button" data-popup="modal">{{ __('New sign-up') }}</a>
+        {% endif %}
+        {% if policy.userCanUpdate(form) %}
+            <a href="{{ path('sign_up_forms.update', {id: form.id}) }}" class="button">{{ __('Modify form') }}</a>
+        {% endif %}
+        <a href="{{ path('sign_up_entries.export', {form_id: form.id}) }}" class="button">{{ __('Download as CSV') }}</a>
+    </div>
+</header>
+
+{% if policy.userCanUpdate(form) %}
+    <article class="block">
+        <p>
+            {{ __N('There is currently %d sign-up.', 'There are currently %d sign-ups.', form.entries|length) }}
+            {% if form.participant_limit %}
+                {{ __N('There is %d spot available.', 'There are %d spots available.', form.participant_limit - form.entries|length) }}
+            {% else %}
+                {{ __('There no participant limit.') }}
+            {% endif %}
+        </p>
+    </article>
+{% endif %}
+
+<article class="block">
+    <form action="{{ path('sign_up_entries.delete', {form_id: form.id}) }}" method="post">
+        <input type="hidden" name="form[_token]" value="{{ csrf_token('form_' ~ form.id ~ '_delete_entries') }}">
+        <div class="table-container">
+            <table class="signup-entries-table table is-fullwidth is-hoverable">
+                <thead>
+                    <tr>
+                        <th class="is-sticky">
+                            <input type="checkbox" onchange="Array.from(this.form.querySelectorAll('input[type=checkbox]')).forEach(cb => cb.checked = this.checked)">
+                        </th>
+                        <th>#</th>
+                        {% for field in form.fields %}
+                            {% for column in sign_up_utils.getColumnLabels(field) %}
+                                <th class="column-field-type-{{field.type}} is-truncated" title="{{ column|capitalize }}"><span>{{ column|capitalize }}</span></th>
+                            {% endfor %}
+                        {% endfor %}
+                        <th class="is-nowrap">Sign-up date</th>
+                        <th class="is-sticky is-right is-narrow"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in form.entries %}
+                        {% if policy.userCanRead(entry) %}
+                            <tr>
+                                <td class="is-sticky">
+                                    <label class="is-sr-only" for="delete-entry-{{ entry.id }}">{{ __('Delete signup') }}</label>
+                                    <input type="checkbox" id="delete-entry-{{ entry.id }}" name="form[entries][]" value="{{ entry.id }}">
+                                </td>
+                                {% if policy.userCanUpdate(entry) %}
+                                    <td><a href="{{ path('sign_up_entries.update', {id: entry.id}) }}">{{ loop.index }}</a></td>
+                                {% else %}
+                                    <td>{{ loop.index }}</td>
+                                {% endif %}
+                                {% for column, value in sign_up_utils.exportEntry(entry) %}
+                                    <td class="is-truncated" title="{{value}}"><span>{{ value }}</span></td>
+                                {% endfor %}
+                                <td class="is-sticky is-right has-text-right is-vcentered">
+                                    {% if policy.userCanUpdate(entry) %}
+                                        <a href="{{ path('sign_up_entries.update', {id: entry.id, context: 'modal'}) }}" data-popup="modal" title="{{ __('Edit sign-up') }}">
+                                            <span class="icon is-small">
+                                                <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                                            </span>
+                                            <span class="is-sr-only">
+                                                {{ __('Edit sign-up') }}
+                                            </span>
+                                        </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% else %}
+                        <tr>
+                            <td colspan="{{ form.fields|length + 4}}" class="has-text-centered has-text-grey">
+                                {{ __('No sign-ups :(') }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="field">
+            <div class="contol buttons">
+                <button type="submit" class="button is-danger">{{ __('Remove selected sign-ups') }}</button>
+            </div>
+        </div>
+    </form>
+</article>
+</div>
+</section>
+{% endblock %}

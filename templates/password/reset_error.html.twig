@@ -1,0 +1,17 @@
+{% extends '@layout/layout.html.twig' %}
+
+{% block title __('Change password') ~ ' – ' ~ parent() %}
+
+{% block content %}
+<h1 class="title">{{ __('Change password') }}</h1>
+<div class="content">
+    <p>{{ __('Oh dear, this link is no longer valid.') }}</p>
+    <p>{{ __('It might have expired, or you already used it, or we somehow forgot about it after mailing you. Either way, you can request another link and try again.') }}</p>
+    {# TODO SFY #}
+    {# <p>{{ __('Still having trouble? Send an email to %s and we’ll help you.')|e|format(html_email(global.config.email_support))|raw }}</p> #}
+    <div class="buttons">
+        <a href="{{ path('password.request') }}" class="button">{{ __('Try again') }}</a>
+        <a href="{{ path('login') }}" class="button">{{ __('Log in') }}</a> {# Use regular path function for login url, don't want to redirect the user back here. #}
+    </div>
+</div>
+{% endblock %}

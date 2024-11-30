@@ -1,0 +1,38 @@
+{% extends 'profile/base.html.twig' %}
+
+{% from 'profile/macros.html.twig' import profile_field %}
+
+{% set active_tab = 'privacy' %}
+
+{% block tab_content %}
+<article>
+    {{ form_start(form, {action: path('profile.privacy', {'member_id': iter.id}), attr: {'data-auto-submit': true}}) }}
+        <div class="profile-field">
+            <div class="field-body">
+                <h2 class="title is-4">{{ __('Privacy settings') }}</h2>
+            </div>
+        </div>
+        <div class="profile-field">
+            <div class="field-body content">
+                <p>{{ __('Edit your privacy preferences to indicate who can see what info.') }}</p>
+                <p hidden data-auto-submit-visible>{{ __('Changes are effective immediately.') }}</p>
+                {# Global errors #}
+                {{ form_errors(form) }}
+            </div>
+        </div>
+
+        {% for child in form -%}
+            {# Cant use form_rest because of profile_field rendering #}
+            {% if not child.rendered and child.vars.name not in ['_token', 'submit'] %}
+                {{ profile_field(child) }}
+            {% endif %}
+        {%- endfor -%}
+
+        <div class="profile-field" data-auto-submit-hidden>
+            <div class="field-body">
+                {{ form_widget(form.submit, {'label': __('Save'), 'attr': {'data-auto-submit-hidden': true}}) }}
+            </div>
+        </div>
+    {{ form_end(form) }}
+</article>
+{% endblock %}

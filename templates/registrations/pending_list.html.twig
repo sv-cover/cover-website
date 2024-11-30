@@ -1,0 +1,111 @@
+{% extends "@layout/layout.html.twig" %}
+
+{% block title __('Pending registrations') ~ ' –  '~ parent() %}
+
+{% block content %}
+
+<h1 class="title">{{__('Pending registrations')}}</h1>
+
+<article class="block content notification">
+    <p>After a new student signs up for Cover through the online registration form, they have to confirm their email address. Until they clicked the link<sup>3</sup> in the confirmation email that was send when they finished filling in the form, their registration is stuck here.</p>
+    <p>Unfortunately, not everyone confirms their email address, and some don't even receive the initial confirmation mail. That is why this page exists. Here you can take one of the following steps:</p>
+    <ul>
+        <li>Re-send the confirmation email</li>
+        <li>Copy the link from the confirmation email. With that link, you can either</li>
+        <ul>
+            <li>Use the email address mentioned here to send them a personal mail with the link so they can click it</li>
+            <li>Copy &amp; paste the link yourself in your browser to confirm <em>their</em> registration.</li>
+        </ul>
+        <li>Delete a registration when a the person is already a member (e.g. they finished their registration at a different moment)</li>
+        <li>Delete duplicate registrations (note that the links in the confirmation emails for those registrations then won't work any more)</li>
+        <li>Force push the registration to Secretary. This will skip the whole email confirmation procedure.</li>
+    </ul>
+    <p><strong>Before you do any of these steps, please confirm that the student didn't already finish their registration at a different moment by checking <a href="https://secretary.svcover.nl/" target="_blank">Secretary</a>.</strong></p>
+</article>
+
+<article class="block">
+    {{ form_start(form) }}
+        {% if message %}
+            <div class="notification is-danger">
+                <p>{{ message }}</p>
+            </div>
+        {% endif %}
+        <div class="table-container">
+            <table class="table is-fullwidth is-hoverable">
+                <col>
+                <col>
+                <col>
+                <col>
+                <thead>
+                    <tr>
+                        <th class="is-sticky"></th>
+                        <th class="is-nowrap">{{ __('Name') }}</th>
+                        <th class="is-nowrap">{{ __('Email') }}</th>
+                        <th class="is-nowrap">{{ __('Registered on') }}</th>
+                        <th class="is-nowrap">{{ __('Confirmation link') }}<sup>3</sup></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in registrations %}
+                        <tr>
+                            <td class="is-sticky">
+                                <input type="checkbox" name="form[registration][]" value="{{ row.confirmation_code|e('html_attr') }}" aria-label="Select registration">
+                            </td>
+                            <td class="is-nowrap">
+                                {% set name = [row.data.first_name, row.data.family_name_preposition, row.data.family_name]|filter(v => v)|join(' ') %}
+                                {{ name }}
+                                <a
+                                    href="https://secretary.svcover.nl/administration/everyone/?full_name={{ name }}"
+                                    target="_blank"
+                                    title="Search name in Secretary"
+                                    aria-title="Search name in Secretary"
+                                ><span class="icon"><i class="fas fa-search" aria-hidden="true"></i></span></a>
+                            </td>
+                            <td class="is-nowrap">
+                                {{ row.data.email_address }}
+                                <a
+                                    href="https://secretary.svcover.nl/administration/everyone/?full_name=&amp;email_address={{ row.data.email_address }}"
+                                    target="_blank"
+                                    title="Search email in Secretary"
+                                    aria-title="Search email in Secretary"
+                                ><span class="icon"><i class="fas fa-search" aria-hidden="true"></i></span></a>
+                            </td>
+                            <td class="is-nowrap">{{ row.registered_on|date }}</td>
+                            {% if row.confirmed_on %}
+                                <td>Confirmed<sup>2</sup></td>
+                            {% else %}
+                                <td><input class="input is-small" type="text" value="{{ url('registrations.confirm_email', {token: row.confirmation_code}) }}" readonly></td>
+                            {% endif %}
+                            <td class="has-text-right">
+                                <a href="{{ path('registrations.pending.update', {token: row.confirmation_code}) }}" title="{{ __('Edit registration') }}">
+                                    <span class="icon">
+                                        <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                                        <span class="is-sr-only">{{ __('Edit registration') }}</span>
+                                    </span>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {{ form_errors(form.registration) }}
+        {% do form.registration.setRendered() %}
+        <div class="field">
+            <div class="label">Apply action to selection</div>
+            <div class="control buttons">
+                {{ form_widget(form.resend_confirmation, {label: 'Resend confirmation mail'}) }}
+                {{ form_widget(form.push_to_secretary, {label: 'Push to Secretary¹', color: 'default'}) }}
+                {{ form_widget(form.delete, {label: 'Cancel registrations', color: 'danger'}) }}
+            </div>
+        </div>
+    {{ form_end(form) }}
+</article>
+
+<article class="block content is-small">
+    <p><sup>1</sup> This will push the registrations to Secretary even when they have not been confirmed yet by clicking on the confirmation link. Normally, this happens automatically as soon as a registration is confirmed.</p>
+    <p><sup>2</sup> The registration has been confirmed and sent to administratie@svcover.nl, but could not yet be added to Secretary due to an error. You can try again by using the <em>Push to secretary</em> option, or ask the AC/DCee to fix their shit.</p>
+    <p><sup>3</sup> The registration link is the link that new members get sent via email as soon as they sign up through the website. They will first need to click this link to confirm their email address. Only then they are added to Secretary as pending new members. Following this link will confirm the registration.</p>
+</article>
+{% endblock %}

@@ -1,71 +1,99 @@
+const Encore = require('@symfony/webpack-encore');
+const webpack = require('webpack');
 const path = require('path');
-const Dotenv = require('dotenv-webpack');
-const webpack = require("webpack");
-const autoprefixer = require("autoprefixer");
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CompressionPlugin = require('compression-webpack-plugin');
 
-module.exports = {
-    context: __dirname + '/public/assets',
-    entry: {
-      'js/cover': './src/js/main/index.js',
-      'js/maps': './src/js/maps/index.js',
-      'js/images': './src/js/images/index.js',
-      'css/cover': './src/sass/light/_all.sass',
-      'css/cover-dark': './src/sass/dark/_all.sass',
-      'css/slide': './src/sass/slide/_all.sass',
-    },
-    output: {
-        path: __dirname + '/public/assets/dist',
-        publicPath: '/assets/dist/',
-        filename: '[name].js',
-    },
-    module: {
-        rules: [
-            {
-                test: /\.m?js$/,
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: [[
-                            '@babel/preset-env',
-                            {
-                                targets: {
-                                    'node': "6.10",
-                                    'esmodules': true
-                                }
-                            },
-                        ]],
-                        plugins: ['@babel/plugin-proposal-object-rest-spread']
-                    }
-                }
-            },
-            {
-                test: /\.(sa|sc|c)ss$/,
-                use: [
-                    MiniCssExtractPlugin.loader, 
-                    {
-                        loader: "css-loader",
-                        options: {
-                            url: false,
-                        },
-                    },
-                    'postcss-loader',
-                    'sass-loader'
-                ]
-            }
-        ]
-    },
-    plugins: [
-        new Dotenv(),
-        new MiniCssExtractPlugin({ filename: '[name].css', }),
-        new CompressionPlugin({ exclude: /.+\.html/ }),
-        new webpack.LoaderOptionsPlugin({
-            options: {
-                postcss: [
-                    autoprefixer()
-                ]
-            }
-        }),
-    ],
-};
+// Manually configure the runtime environment if not already configured yet by the "encore" command.
+// It's useful when you use tools that rely on webpack.config.js file.
+if (!Encore.isRuntimeEnvironmentConfigured()) {
+    Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev');
+}
+
+Encore
+    // directory where compiled assets will be stored
+    .setOutputPath('public/build/')
+    // public path used by the web server to access the output path
+    .setPublicPath('/build')
+    // only needed for CDN's or subdirectory deploy
+    //.setManifestKeyPrefix('build/')
+
+    /*
+     * ENTRY CONFIG
+     *
+     * Each entry will result in one JavaScript file (e.g. app.js)
+     * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
+     */
+    .addEntry('app', './assets/js/main/index.js')
+    .addEntry('images', './assets/js/images/index.js')
+    .addEntry('maps', './assets/js/maps/index.js')
+    .addEntry('theme_light', './assets/sass/light/theme.js')
+    .addEntry('theme_dark', './assets/sass/dark/theme.js')
+    .addEntry('theme_slide', './assets/sass/slide/theme.js')
+
+    // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
+    .splitEntryChunks()
+
+    // will require an extra script tag for runtime.js
+    // but, you probably want this, unless you're building a single-page app
+    .enableSingleRuntimeChunk()
+
+    /*
+     * FEATURE CONFIG
+     *
+     * Enable & configure other features below. For a full
+     * list of features, see:
+     * https://symfony.com/doc/current/frontend.html#adding-more-features
+     */
+    .cleanupOutputBeforeBuild()
+    .enableBuildNotifications()
+    .enableSourceMaps(!Encore.isProduction())
+    // enables hashed filenames (e.g. app.abc123.css)
+    .enableVersioning(Encore.isProduction())
+
+    // configure Babel
+    // .configureBabel((config) => {
+    //     config.plugins.push('@babel/a-babel-plugin');
+    // })
+
+    // enables and configure @babel/preset-env polyfills
+    .configureBabelPresetEnv((config) => {
+        config.useBuiltIns = 'usage';
+        config.corejs = '3.38';
+    })
+
+    // enables Sass/SCSS support
+    .enableSassLoader((options) => {
+        // Temporarily disable some warnings. TODO: fix instead of quiet
+        options.sassOptions.quietDeps = true; // Added to silence Bulma warnings
+        options.sassOptions.silenceDeprecations = ['import'];
+    })
+
+    // uncomment if you use TypeScript
+    //.enableTypeScriptLoader()
+
+    // uncomment if you use React
+    //.enableReactPreset()
+
+    // uncomment to get integrity="..." attributes on your script & link tags
+    // requires WebpackEncoreBundle 1.4 or higher
+    //.enableIntegrityHashes(Encore.isProduction())
+
+    // uncomment if you're having problems with a jQuery plugin
+    //.autoProvidejQuery()
+;
+
+
+let webpackConfig = Encore.getWebpackConfig();
+
+let appConfig;
+
+try {
+    appConfig = require(path.resolve(__dirname, `config.${Encore.isProduction() ? 'prod' : 'dev'}.js`))
+} catch (error) {
+    appConfig = require(path.resolve(__dirname, `config.js`))
+}
+
+webpackConfig.plugins.push(new webpack.DefinePlugin({
+    APP_CONFIG: JSON.stringify(appConfig),
+}));
+
+module.exports = webpackConfig;

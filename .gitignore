@@ -1,24 +1,19 @@
-/documenten/
-*~
-/incasso
-/phpmyadmin
-/phppgadmin
-/webmail
-/config/config.inc
-/config/DBIds.php
-/vendor
-/logs
-/test
-/tmp
-node_modules
-public/assets/dist
-.env
-/.history
-*/.history
-/.vscode
-*/.vscode
+
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+###> symfony/webpack-encore-bundle ###
+/node_modules/
+/public/build/
 npm-debug.log
-.idea
-.idea/*
-.DS_Store
-adminer.php
+yarn-error.log
+###< symfony/webpack-encore-bundle ###
+
+/config.*.js

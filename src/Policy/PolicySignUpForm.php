@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Policy;
+
+use App\Legacy\Database\DataIter;
+use App\Legacy\Policy\AbstractPolicy;
+
+class PolicySignUpForm extends AbstractPolicy
+{
+
+    public function userCanCreate(DataIter $form): bool
+    {
+        if ($form['committee_id'] !== null)
+            return $this->identity->member_in_committee($form['committee_id']);
+        else
+            return $this->identity->member_in_committee();
+    }
+
+    public function userCanCreateForEvent(\DataIterAgenda $event): bool
+    {
+        return $this->identity->member_in_committee($event['committee_id']);
+    }
+
+    public function userCanRead(DataIter $form): bool
+    {
+        return $this->identity->is_member() || $this->identity->is_donor();
+    }
+
+    public function userCanUpdate(DataIter $form): bool
+    {
+        return $this->identity->member_in_committee($form['committee_id']);
+    }
+
+    public function userCanDelete(DataIter $form): bool
+    {
+        return $this->identity->member_in_committee($form['committee_id']);
+    }
+}

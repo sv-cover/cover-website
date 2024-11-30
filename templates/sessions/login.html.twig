@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=9">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>{{ __('Log in') }} – Cover</title>
+        {% if app.request.cookies.get('cover_color_mode', 'light') == 'dark' %}
+            {{ encore_entry_link_tags('theme_dark') }}
+        {% else %}
+            {{ encore_entry_link_tags('theme_light') }}
+        {% endif %}
+    </head>
+    <body class="has-navbar-fixed-top">
+        <nav class="navbar is-fixed-top is-cover" role="navigation" aria-label="main navigation">
+            <div class="container">
+                <div class="navbar-brand">
+                    <a class="navbar-item" href="/">
+                        <img class="cover-logo" src="{{ asset('images/cover_logo.png') }}" alt="Cover">
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <section class="section">
+            <div class="container columns is-centered">
+                <div class="column is-two-thirds-tablet is-half-widescreen is-one-third-fullhd">
+                    <article class="box">
+                        <h1 class="title">{{ __('Log in') }}</h1>
+                        {% if external_domain %}
+                            <p class="subtitle is-6">{{ __('to continue to %s.')|format(external_domain) }}</p>
+                        {% endif %}
+
+                        {{ form_start(form, {action: login_path(referrer|default(null))}) }}
+                            {# Global errors #}
+                            {{ form_errors(form, {attr: {class: 'error-section'}}) }}
+                            {# Fields #}
+                            {{ form_row(form.email) }}
+                            {{ form_row(form.password) }}
+                            {{ form_row(form.remember) }}
+                            {{ form_row(form.submit, {attr: {class: 'button is-primary is-fullwidth'}}) }}
+                            <div class="field">
+                                <a href="{{ path('password.request') }}">{{ __('Forgot your password?') }}</a>
+                            </div>
+                        {{ form_end(form) }}
+                        <div class="divider is-fullwidth">{{ __('or') }}</div>
+                        <a class="button is-fullwidth" href="{{ path('registrations.join') }}">Become a member</a>
+                    </article>
+                </div>
+            </div>
+        </section>
+    </body>
+</html>

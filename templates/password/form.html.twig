@@ -1,0 +1,17 @@
+{% extends '@layout/layout.html.twig' %}
+
+{% block title __('Change Password') ~ ' – ' ~ parent() %}
+
+{% block content %}
+<h1 class="title">{{ __('Change Password') }}</h1>
+
+{{ form_start(form) }}
+    {# Global errors #}
+    {{ form_errors(form) }}
+    {# Fields #}
+    {{ form_row(form.current, {attr: {autocomplete: 'current-password'}}) }}
+    {{ form_row(form.password.first, {attr: {autocomplete: 'new-password'}}) }}
+    {{ form_row(form.password.second, {attr: {autocomplete: 'new-password'}}) }}
+    {{ form_row(form.submit, {'label': __('Change Password')}) }}
+{{ form_end(form) }}
+{% endblock %}

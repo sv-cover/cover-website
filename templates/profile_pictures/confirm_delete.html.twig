@@ -1,0 +1,27 @@
+{% extends '@layout/layout.html.twig' %}
+
+{% block title __('Delete profile picture') ~ ' – ' ~ parent() %}
+
+{% block content %}
+<div class="modal is-static">
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">{{ __('Delete profile picture') }}</p>
+        </header>
+        <section class="modal-card-body">
+            {{ form_start(form, {id: 'delete-profile-picture-form', action: path('profile_pictures.delete', {id: iter.id}) }) }}
+                {% if iter.member_id == auth.identity.member.id %}
+                    <p>{{ __('Are you sure you want to delete your profile picture?') }}</p>
+                {% else %}
+                    <p>{{ __('Are you sure you want to delete the profile picture <em>%s</em>?')|format(iter.member|full_name_ignore_privacy|e('html'))|raw }}</p>
+                {% endif %}
+                {% set submit_button = form_widget(form.submit, {label: __('Delete profile picture'), color: 'danger', attr: {form: 'delete-profile-picture-form'}}) %}
+            {{ form_end(form) }}
+        </section>
+        <footer class="modal-card-foot">
+            <a href="{{ path('profile.profile', {member_id: iter.member_id}) }}" class="button" data-dismiss="modal">{{ __('Cancel') }}</a>
+            {{ submit_button|raw }}
+        </footer>
+    </div>
+</div>
+{% endblock %}

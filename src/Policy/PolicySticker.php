@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Policy;
+
+use App\Legacy\Database\DataIter;
+use App\Legacy\Policy\AbstractPolicy;
+
+class PolicySticker extends AbstractPolicy
+{
+    public function userCanCreate(DataIter $sticker): bool
+    {
+        // Members are allowed to add new stickers (also contributors etc.)
+        return $this->auth->loggedIn;
+    }
+
+    public function userCanRead(DataIter $sticker): bool
+    {
+        return true;
+    }
+
+    public function userCanUpdate(DataIter $sticker): bool
+    {
+        // Board can admin the stickers
+        if ($this->identity->member_in_committee(COMMISSIE_BESTUUR))
+            return true;
+
+        // Only the owner can update their stickers
+        if ($sticker->get('toegevoegd_door') != null)
+            return $sticker->get('toegevoegd_door') == $this->identity->get('id');
+
+        return false;
+    }
+
+    public function userCanDelete(DataIter $sticker): bool
+    {
+        return $this->userCanUpdate($sticker);
+    }
+}

@@ -1,0 +1,18 @@
+{% import "polls/macros.html.twig" as poll %}
+
+<article class="card" >
+    <header class="card-header">
+        <h2 class="card-header-title">
+            {{ __('Poll') }}
+        </h2>
+    </header>
+    <div class="card-content">
+        <div id="poll-widget-homepage" class="poll">
+            {% if poll %}
+                {{ poll.render_poll_widget(poll, true, true, path('homepage', {_fragment: 'poll-widget-homepage'})) }}
+            {% else %}
+                <p>{{ __('There is no poll at the moment') }}</p>
+            {% endif %}
+        </div>
+    </div>
+</article>

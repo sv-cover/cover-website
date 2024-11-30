@@ -1,0 +1,161 @@
+{% extends 'profile/base.html.twig' %}
+
+{% macro profile_field(iter, field, label, href = null, external = false, value = null) %}
+    {% set visibility = db.getModel('DataModelMember').get_privacy_for_field(iter, field) %}
+    {% if
+        visibility == constant('\DataModelMember::VISIBLE_TO_EVERYONE')
+        or (visibility == constant('\DataModelMember::VISIBLE_TO_MEMBERS') and auth.identity.is_member)
+        or auth.identity.member_in_committee(constant('COMMISSIE_BESTUUR'))
+    %}
+        <div class="profile-field">
+            <div class="field-label">
+                {{ label }}
+            </div>
+            <div class="field-body">
+                {% if href is not empty %}
+                    <a href="{{ href|e('html_attr') }}" {% if external %}rel="noopener noreferrer nofollow" target="_blank" {%endif%}>
+                        {{ value ?? iter[field]|e }}
+                    </a>
+                {% else %}
+                    {{ value ?? iter[field]|e }}
+                {% endif %}
+                {% if visibility == constant('DataModelMember::VISIBLE_TO_MEMBERS') %}
+                    <span class="icon is-small">
+                        <i
+                            class="fas fa-lock"
+                            title="{{ __('Only visible for logged-in members')|e('html_attr') }}"
+                            aria-hidden="true"
+                        ></i>
+                        <span class="is-sr-only">{{ __('Only visible for logged-in members') }}</span>
+                    </span>
+                {% elseif visibility == constant('DataModelMember::VISIBLE_TO_NONE') %}
+                    <span class="icon is-small">
+                        <i
+                            class="fas fa-eye-slash"
+                            title="{{ __('Private')|e('html_attr') }}"
+                            aria-hidden="true"
+                        ></i>
+                        <span class="is-sr-only">{{ __('Private') }}</span>
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+
+{% set active_tab = 'public' %}
+
+{% block tab_content %}
+<article class="block">
+    <div class="is-hidden-desktop block">
+        {{ include('profile/_profile_widget.html.twig') }}
+    </div>
+    <div class="profile-field">
+        <div class="field-body">
+            <h2 class="title is-4">{{ __('About') }}</h2>
+        </div>
+    </div>
+
+    {% if auth.identity.get('id') == iter.id %}
+        <div class="profile-field">
+            <div class="field-body">
+                <p class="content is-small">
+                    {{ __('Change who can see these personal details on the <a href="%s">privacy tab</a>.')|format(path('profile.privacy', {member_id: iter.id}))|raw }}
+                </p>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="profile-information">
+        {{ _self.profile_field(iter, 'full_name', __('Name')) }}
+        {{ _self.profile_field(iter, 'geboortedatum', __('Birthdate')) }}
+        {# TODO SFY #}
+        {{ _self.profile_field(iter, 'beginjaar', __('Starting year')) }}{# , path('almanak', {'search_year': iter.beginjaar})) }} #}
+        {{ _self.profile_field(iter, 'adres', __('Address'), 'https://www.google.com/maps/search/%s %s/'|format(iter.adres|e('html_attr'), iter.woonplaats|e('html_attr')), true) }}
+        {{ _self.profile_field(iter, 'postcode', __('Postal code')) }}
+        {{ _self.profile_field(iter, 'woonplaats', __('Town')) }}
+        {{ _self.profile_field(iter, 'telefoonnummer', __('Phone'), 'tel:%s'|format(iter.telefoonnummer|safe_phone_number_format('E164')), false, iter.telefoonnummer|safe_phone_number_format('INTERNATIONAL')) }}
+        {{ _self.profile_field(iter, 'email', __('Email'), 'mailto:%s'|format(iter.email|e('html_attr'))) }}
+        <div class="profile-field">
+            <div class="field-label">{{ __('Status') }}</div>
+            <div class="field-body data-public">{{ iter.status }}</div>
+        </div>
+    </div>
+</article>
+
+{% set working_groups = committees|filter(c => c.type == constant('\DataModelCommissie::TYPE_WORKING_GROUP')) %}
+{% set others = committees|filter(c => c.type == constant('\DataModelCommissie::TYPE_OTHER')) %}
+{% set committees = committees|filter(c => c.type == constant('\DataModelCommissie::TYPE_COMMITTEE')) %}
+<article class="block">
+    <div class="profile-field">
+        <div class="field-body">
+            <h2 class="title is-4">{{ __('Committees') }}</h2>
+        </div>
+    </div>
+    <div class="profile-field">
+        <div class="field-body">
+            {% if committees|length > 0 %}
+                <p>{{ __('%s is a member of the following committees:')|format(iter|first_name) }}</p>
+            {% else %}
+                <p>{{ __('%s is not a member of any committees.')|format(iter|first_name) }}</p>
+            {% endif %}
+        </div>
+    </div>
+    <ul class="profile-committees">
+        {% for committee in committees %}
+            <li>
+                <a class="committee-name"
+                   href="{{ path('committees.single', {slug: committee.login}) }}">{{ committee.naam }}</a>
+                <div class="committee-position">{{ __translate_parts(committee.functie, ',\/&') }}</div>
+            </li>
+        {% endfor %}
+    </ul>
+</article>
+{% if working_groups|length > 0 %}
+    <article class="block">
+        <div class="profile-field">
+            <div class="field-body">
+                <h2 class="title is-4">{{ __('Working Groups') }}</h2>
+            </div>
+        </div>
+        <div class="profile-field">
+            <div class="field-body">
+                <p>{{ __('%s is a member of the following working groups:')|format(iter|first_name) }}</p>
+            </div>
+        </div>
+        <ul class="profile-committees">
+            {% for working_group in working_groups %}
+                <li>
+                    <a class="committee-name"
+                       href="{{ path('committees.single', {slug: working_group.login}) }}">{{ working_group.naam }}</a>
+                    <div class="committee-position">{{ __translate_parts(working_group.functie, ',\/&') }}</div>
+                </li>
+            {% endfor %}
+        </ul>
+    </article>
+{% endif %}
+{% if others|length > 0 %}
+    <article class="block">
+        <div class="profile-field">
+            <div class="field-body">
+                <h2 class="title is-4">{{ __('Groups') }}</h2>
+            </div>
+        </div>
+        <div class="profile-field">
+            <div class="field-body">
+                <p>{{ __('%s is a member of the following groups:')|format(iter|first_name) }}</p>
+            </div>
+        </div>
+        <ul class="profile-committees">
+            {% for other in others %}
+                <li>
+                    <a class="committee-name"
+                       href="{{ path('committees.single', {slug: other.login}) }}">{{ other.naam }}</a>
+                    <div class="committee-position">{{ __translate_parts(other.functie, ',\/&') }}</div>
+                </li>
+            {% endfor %}
+        </ul>
+    </article>
+{% endif %}
+{% endblock %}
