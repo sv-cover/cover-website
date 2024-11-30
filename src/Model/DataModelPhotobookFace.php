@@ -4,6 +4,7 @@ require_once 'src/Model/DataModelPhotobook.php';
 
 use App\Legacy\Database\DataIter;
 use App\Legacy\Database\DataModel;
+use App\Utils\HumanizeUtils;
 
 class DataIterPhotobookFace extends DataIter
 {
@@ -226,10 +227,10 @@ class DataModelPhotobookFace extends DataModel
         return new DataIterFacesPhotobook(
                 get_model('DataModelPhotobook'), -1, array(
                 'titel' => sprintf(__('Photos of %s'),
-                    implode_human(array_map(function($member) { return member_first_name($member); }, $members))),
+                    HumanizeUtils::join(array_map(fn($member) => member_first_name($member), $members))),
                 'datum' => null,
                 'parent_id' => 0,
-                'member_ids' => array_map(function($member) { return $member->get_id(); }, $members)));
+                'member_ids' => array_map(fn($member) => $member->get_id(), $members)));
     }
 
     /**

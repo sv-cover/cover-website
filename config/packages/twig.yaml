@@ -5,6 +5,7 @@ twig:
     globals:
         auth: '@App\Service\Authentication'
         db: '@App\Service\Database'
+        humanize: '@App\Utils\HumanizeUtils'
         menu: '@App\Service\Menu'
         policy: '@App\Service\Policy'
         photo_utils: '@App\Utils\PhotoUtils'

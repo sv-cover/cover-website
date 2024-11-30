@@ -8,7 +8,7 @@
     {% if book.num_photos > 0 %}
         {% set parts = parts|merge([__N('%d photo', '%d photos', book.num_photos)]) %}
     {% endif %}
-    {{ __('Photo album with %s made on %s.')|format(parts|human_join, book.date) }}
+    {{ __('Photo album with %s made on %s.')|format(humanize.join(parts), book.date) }}
 {%- endmacro %}
 
 <h2 class="title is-5">

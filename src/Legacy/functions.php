@@ -141,65 +141,6 @@ function parse_email_object($file, array $variables = array())
     return new SimpleEmail($subject, ltrim($body), implode("\r\n", $headers));
 }
 
-/** @group Functions
- * Implode a list while separating it with , (except for the last item
- * for which "and" is used instead of a comma
- * @list the list to implode
- *
- * @result a string in the format item1, item2 and item3
- */
-function implode_human($list)
-{
-    $len = count($list);
-
-    if ($len === 0)
-        return '';
-    elseif ($len === 1)
-        return reset($list);
-    else
-        return implode(', ', array_slice($list, 0, $len - 1)) . ' ' . __('and') . ' ' . end($list);
-}
-
-function human_file_size($bytes, $decimals = 2)
-{
-    $size = array('B','kB','MB','GB','TB','PB','EB','ZB','YB');
-    $factor = (int) floor((strlen($bytes) - 1) / 3);
-    return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . $size[$factor];
-}
-
-function format_date_relative($time)
-{
-    if (!is_int($time) && !ctype_digit($time))
-        $time = strtotime($time);
-
-    $diff = time() - $time;
-
-    if ($diff == 0)
-        return __('now');
-
-    else if ($diff > 0)
-    {
-        $day_diff = floor($diff / 86400);
-
-        if ($day_diff == 0)
-        {
-            if ($diff < 60) return __('less than a minute ago');
-            if ($diff < 120) return __('1 minute ago');
-            if ($diff < 3600) return sprintf(__('%d minutes ago'), floor($diff / 60));
-            if ($diff < 7200) return __('1 hour ago');
-            if ($diff < 86400) return sprintf(__('%d hours ago'), floor($diff / 3600));
-        }
-        if ($day_diff == 1) return __('Yesterday');
-        if ($day_diff < 7) return sprintf(__('%d days ago'), $day_diff);
-        // if ($day_diff < 31) return sprintf(__('%d weken geleden'), floor($day_diff / 7));
-        // if ($day_diff < 60) return __('afgelopen maand');
-        if ($day_diff < 180) return date('F j', $time);
-        return date('F j, Y', $time);
-    }
-    else
-        return date('F j, Y', $time);
-}
-
 function set_domain_cookie($name, $value, $cookie_time = 0)
 {
     // Determine the host name for the cookie (try to be as broad as possible so sd.svcover.nl can profit from it)

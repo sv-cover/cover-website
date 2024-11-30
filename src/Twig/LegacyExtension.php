@@ -29,9 +29,6 @@ class LegacyExtension extends AbstractExtension
                 return $member ? member_full_name($member, IGNORE_PRIVACY) : null;
             }),
             new TwigFilter('first_name', 'member_first_name'),
-            new TwigFilter('date_relative', 'format_date_relative'),
-            new TwigFilter('human_join', 'implode_human'),
-            new TwigFilter('human_file_size', 'human_file_size'),
             // new TwigFilter('vformat', 'vsprintf'),
             // new TwigFilter('flip', 'array_flip'),
             // new TwigFilter('values', 'array_values'),
@@ -100,24 +97,6 @@ class LegacyExtension extends AbstractExtension
             // new TwigTest('instance_of', function($var, $classname) {
             //     return $var instanceof $classname;
             // }),
-            new TwigTest('past', function($date) {
-                if (!$date)
-                    return false;
-
-                if (!($date instanceof DateTime))
-                    $date = new DateTime($date);
-
-                return $date < new DateTime();
-            }),
-            new TwigTest('future', function($date) {
-                if (!$date)
-                    return false;
-
-                if (!($date instanceof DateTime))
-                    $date = new DateTime($date);
-
-                return $date > new DateTime();
-            })
         ];
     }
 

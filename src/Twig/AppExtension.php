@@ -2,6 +2,7 @@
 
 namespace App\Twig;
 
+use App\Utils\HumanizeUtils;
 use libphonenumber\PhoneNumberUtil;
 use libphonenumber\PhoneNumberFormat;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -18,6 +19,7 @@ class AppExtension extends AbstractExtension
     public function __construct(
         private UrlGeneratorInterface $router,
         private ContainerBagInterface $params,
+        private HumanizeUtils $humanize,
     ) {
     }
 
@@ -28,6 +30,7 @@ class AppExtension extends AbstractExtension
             new TwigFilter('hostname', fn($url) => \parse_url($url, \PHP_URL_HOST)), // Used in profile widget
             new TwigFilter('safe_phone_number_format', [$this, 'safePhoneNumberFormat']),
             new TwigFilter('academic_year', [$this, 'academicYear']), // Used by events macros
+            new TwigFilter('date_relative', [$this->humanize, 'dateRelative']),
         ];
     }
 
@@ -43,28 +46,27 @@ class AppExtension extends AbstractExtension
     public function getTests(): array
     {
         return [
-            // new TwigTest('numeric', 'is_numeric'),
             new TwigTest('instanceof', function($var, $classname) {
                 return $var instanceof $classname;
             }),
-            // new TwigTest('past', function($date) {
-            //     if (!$date)
-            //         return false;
+            new TwigTest('past', function($date) {
+                if (!$date)
+                    return false;
 
-            //     if (!($date instanceof DateTime))
-            //         $date = new DateTime($date);
+                if (!($date instanceof DateTime))
+                    $date = new \DateTime($date);
 
-            //     return $date < new DateTime();
-            // }),
-            // new TwigTest('future', function($date) {
-            //     if (!$date)
-            //         return false;
+                return $date < new \DateTime();
+            }),
+            new TwigTest('future', function($date) {
+                if (!$date)
+                    return false;
 
-            //     if (!($date instanceof DateTime))
-            //         $date = new DateTime($date);
+                if (!($date instanceof DateTime))
+                    $date = new \DateTime($date);
 
-            //     return $date > new DateTime();
-            // })
+                return $date > new \DateTime();
+            }),
         ];
     }
 
