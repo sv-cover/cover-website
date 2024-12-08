@@ -22,6 +22,14 @@ class Authentication
         return $this->authenticator;
     }
 
+    /**
+     * Set authenticator, for use in tests.
+     */
+    public function setAuth(?SessionProviderInterface $authenticator): void
+    {
+        $this->authenticator = $authenticator;
+    }
+
     public function getIdentity()
     {
         $authenticator = $this->getAuth();
