@@ -9,12 +9,12 @@ use Twig\TwigFunction;
 
 class I18nExtension extends AbstractExtension
 {
-    public function getName()
+    public function getName(): string
     {
         return 'i18n';
     }
 
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             new TwigFilter('trans', '__'),
@@ -23,7 +23,7 @@ class I18nExtension extends AbstractExtension
         ];
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('__', '__'),

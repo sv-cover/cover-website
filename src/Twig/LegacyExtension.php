@@ -16,7 +16,7 @@ class LegacyExtension extends AbstractExtension
     ) {
     }
 
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             new TwigFilter('full_name', function($member) {
@@ -82,7 +82,7 @@ class LegacyExtension extends AbstractExtension
         ];
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('login_path', [$this, 'get_login_path']),
@@ -90,7 +90,7 @@ class LegacyExtension extends AbstractExtension
         ];
     }
 
-    public function getTests()
+    public function getTests(): array
     {
         return [
             // new TwigTest('numeric', 'is_numeric'),

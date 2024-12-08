@@ -15,7 +15,7 @@ class MemberValidator extends ConstraintValidator
     ) {
     }
 
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         // Keep Symfony happy
         if (!$constraint instanceof Member)
