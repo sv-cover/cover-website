@@ -1,6 +1,9 @@
 .member-block
     background-color: $background
 
+    &:not(:last-child)
+        margin-bottom: $content-block-margin-bottom
+
     @media(min-width: $widescreen)
         display: flex
         &:nth-of-type(even)

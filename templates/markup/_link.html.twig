@@ -1,0 +1,14 @@
+<a
+    href="{{ url|e('html_attr') }}"
+    {% if is_external %}
+        rel="noopener noreferrer nofollow"
+        target="_blank"
+    {% else %}
+        rel="nofollow"
+    {% endif %}
+    {% if class %}
+        class="{{ class|e('html_attr') }}"
+    {% endif %}
+>
+    {{- content|raw -}}
+</a>{# Comment for whitespace control #}

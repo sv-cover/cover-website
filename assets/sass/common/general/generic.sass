@@ -60,8 +60,18 @@ body
 .sortable-handle
     cursor: grab
 
+figure.video,
 figure.youtube
     margin: 0
+
+.markup-block,
+.content :has(.markup-block:last-child),
+.content > .table-container
+    &:not(:last-child)
+        margin-bottom: $content-block-margin-bottom
+
+.content a:has(.markup-block, div, p, table, blockquote, ul, ol)
+    display: block
 
 // TODO: implement in cover style system
 .table

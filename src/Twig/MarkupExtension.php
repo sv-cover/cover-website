@@ -2,7 +2,7 @@
 
 namespace App\Twig;
 
-use App\Service\Markup;
+use App\Markup\Markup;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
@@ -14,7 +14,7 @@ class MarkupExtension extends AbstractExtension
     ) {
     }
 
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             new TwigFilter('parse_markup', [$this->markup, 'parse'], ['is_safe' => ['html']]),

@@ -1,0 +1,6 @@
+{% if author is not empty %}
+    <p>{{ author }}:</p>
+{% endif %}
+<blockquote>
+    {{ content|trim|raw }}
+</blockquote>

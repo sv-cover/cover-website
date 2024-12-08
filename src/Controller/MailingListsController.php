@@ -415,6 +415,11 @@ class MailingListsController extends AbstractController
         else
             $list = $this->model->get_iter($id);
 
+        if (empty($list))
+            return $this->render('mailing_lists/_markup_not_found.html.twig', [
+                'id' => $id,
+            ]);
+
         $member = $auth->identity->member();
         $subscriptionModel = $this->db->getModel('DataModelMailinglistSubscription');
 

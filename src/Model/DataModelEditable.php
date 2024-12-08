@@ -91,8 +91,10 @@ class DataIterEditable extends DataIter implements SearchResultInterface
         $content = $this->get_locale_content($language);
 
         if (preg_match('/\[samenvatting\](.+?)\[\/samenvatting\]/msi', $content ?? '', $matches))
+            // TODO SFY: markup_strip
             return markup_strip($matches[1]);
 
+        // TODO SFY: markup_strip
         return $summary = summarize(markup_strip($content), 128);
     }
 

@@ -58,6 +58,26 @@ function optional($value)
     return !empty($value) ? ' ' . $value : '';
 }
 
+
+// Used in email templates
+function markup_format_text($text)
+{
+    $text = htmlspecialchars($text ?? '', ENT_COMPAT, WEBSITE_ENCODING);
+    return $text;
+}
+
+// Used in email templates
+function markup_format_attribute($text)
+{
+    return htmlspecialchars($text, ENT_QUOTES, WEBSITE_ENCODING);
+}
+
+// only used in DataModelEditable::get_summary
+function markup_strip($markup)
+{
+    return preg_replace('/\[[^\[\]\s]*\]/', '', $markup ?? '');
+}
+
 /**
  * Parse an email message and substitute variables and constants. The
  * function will first look for email in public/email and will

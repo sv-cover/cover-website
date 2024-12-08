@@ -6,7 +6,7 @@ use App\Exception\UnauthorizedException;
 use App\Form\PageType;
 use App\Service\Authentication;
 use App\Service\Database;
-use App\Service\Markup;
+use App\Markup\Markup;
 use App\Service\Policy;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -86,7 +86,7 @@ class PageController extends AbstractController
     {
         $committee = $this->db->getModel('DataModelCommissie')->get_from_page($iter['id']);
         if (isset($committee))
-            return $this->redirectToRoute('committees', ['commissie' => $committee->get('login')], Response::HTTP_MOVED_PERMANENTLY);
+            return $this->redirectToRoute('committees.single', ['slug' => $committee->get('login')], Response::HTTP_MOVED_PERMANENTLY);
 
         $board = $this->db->getModel('DataModelBesturen')->get_from_page($iter['id']);
         if (isset($board))
