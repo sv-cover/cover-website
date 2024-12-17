@@ -2,8 +2,6 @@
 
 namespace App\Controller;
 
-require_once 'src/Legacy/mailing_list.php';
-
 use App\DataModel\DataModelAgenda;
 use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelMailinglist;
@@ -18,8 +16,7 @@ use App\Legacy\Authentication\DeviceIdentityProvider;
 use App\Service\Authentication;
 use App\Service\Policy;
 use App\Service\Secretary;
-use function App\Legacy\Email\MailingList\get_error_message;
-use function App\Legacy\Email\MailingList\send_mailinglist_mail;
+use App\Utils\MailingListUtils;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Response;
@@ -51,6 +48,7 @@ class ApiController extends AbstractController
         private DataModelSession $sessionModel,
         private Authentication $auth,
         private Policy $policy,
+        private MailingListUtils $mailingListUtils,
         private UriSigner $uriSigner,
     ) {
     }
@@ -358,14 +356,14 @@ class ApiController extends AbstractController
 
         // send_mailinglist_mail is not quiet. Let it shoud into the void.
         \ob_start();
-        $returnValue = send_mailinglist_mail($bufferStream);
+        $returnValue = $this->mailingListUtils->sendMailingListMail($bufferStream);
         \ob_end_clean();
 
         if ($returnValue !== 0)
             return $this->json([
                 'success' => false,
                 'code' => $returnValue,
-                'message' => get_error_message($returnValue),
+                'message' => MailingListUtils::getErrorMessage($returnValue),
             ]);
 
         return $this->json(['success' => true]);

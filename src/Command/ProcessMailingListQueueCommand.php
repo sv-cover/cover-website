@@ -2,20 +2,12 @@
 
 namespace App\Command;
 
-require_once 'src/Legacy/mailing_list.php';
-
+use App\DataIter\DataIterCommissie;
+use App\DataIter\DataIterMailinglist;
 use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelMailinglistQueue;
 use App\Legacy\Email\MessagePart;
-use function App\Legacy\Email\personalize;
-use function App\Legacy\Email\MailingList\send_mailinglist_mail;
-use function App\Legacy\Email\MailingList\validate_message_to_all_committees;
-use function App\Legacy\Email\MailingList\validate_message_to_committee;
-use function App\Legacy\Email\MailingList\validate_message_to_mailinglist;
-use function App\Legacy\Email\MailingList\parse_email_address;
-use function App\Legacy\Email\MailingList\send_welcome_mail;
-use function App\Legacy\Email\MailingList\send_message;
-use function App\Legacy\Email\MailingList\get_error_message;
+use App\Utils\MailingListUtils;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -34,6 +26,7 @@ class ProcessMailingListQueueCommand extends Command
     public function __construct(
         private DataModelCommissie $committeeModel,
         private DataModelMailinglistQueue $queueModel,
+        private MailingListUtils $mailingListUtils,
         private UrlGeneratorInterface $urlGenerator,
     ){
         parent::__construct();
@@ -46,7 +39,7 @@ class ProcessMailingListQueueCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $queue = $queueModel->find(['status' => 'waiting']);
+        $queue = $this->queueModel->find(['status' => 'waiting']);
 
         // Array_shift returns NULL if no results
         while ($queuedMessage = \array_shift($queue)) {
@@ -55,7 +48,7 @@ class ProcessMailingListQueueCommand extends Command
             $queuedMessage->update();
 
             $message = MessagePart::parse_text($queuedMessage->get('message'));
-            $from = parse_email_address($message->header('From'));
+            $from = $this->mailingListUtils->parseEmailAddress($message->header('From'));
 
             if ($queuedMessage->get('destination_type') === 'all_committees') {
                 $result = $this->sendToAllCommittees($message, $queuedMessage->get('destination'), $from);
@@ -69,44 +62,44 @@ class ProcessMailingListQueueCommand extends Command
             }
 
             if ($result === 0) {
-               $queueModel->delete($queuedMessage);
+               $this->queueModel->delete($queuedMessage);
             } else {
-                $message = $this->getErrorMessage($result);
+                $message = MailingListUtils::getErrorMessage($result);
                 $queuedMessage->set('status', sprintf('error_%s', $message));
                 $queuedMessage->update();
             }
 
             // Query every iteration to prevent race conditions
-            $queue = $queueModel->find(['status' => 'waiting']);
+            $queue = $this->queueModel->find(['status' => 'waiting']);
         }
 
         return Command::SUCCESS;
     }
 
-    private function getErrorMessage(int $return_value): string
+    private function getErrorMessage(int $code): string
     {
-        switch ($return_value) {
+        switch ($code) {
             case self::RETURN_UNKNOWN_LIST_TYPE:
                 return "Error: Unknown list type.";
 
             default:
-                return get_error_message($return_value);
+                return MailingListUtils::getErrorMessage($code);
         }
     }
 
     private function sendToAllCommittees(MessagePart $message, string $to, string $from): int
     {
         $destinations = null;
-        $loop_id = null;
+        $loopId = null;
 
-        $result = validate_message_to_all_committees($message, $to, $from, $destinations, $loop_id);
+        $result = $this->mailingListUtils->validateMessageToAllCommittees($message, $to, $from, $destinations, $loopId);
 
         if ($result !== 0)
             return $result;
 
-        $message->addHeader('X-Loop', $loop_id);
+        $message->addHeader('X-Loop', $loopId);
 
-        $committees = $committeeModel->get($destinations[$to]); // Get all committees of that type, not including hidden committees (such as board)
+        $committees = $this->committeeModel->get($destinations[$to]); // Get all committees of that type, not including hidden committees (such as board)
 
         foreach ($committees as $committee) {
             $email = $committee['login'] . '@svcover.nl';
@@ -119,11 +112,12 @@ class ProcessMailingListQueueCommand extends Command
                 '[COMMITTEE]' => $committee['naam']
             );
 
-            $personalized_message = personalize($message, function($text) use ($variables) {
-                return \str_ireplace(\array_keys($variables), \array_values($variables), $text);
-            });
+            $personalized_message = $this->mailingListUtils->personalize(
+                $message,
+                fn($text, $contentType) => \str_ireplace(\array_keys($variables), \array_values($variables), $text)
+            );
 
-            $status = send_message($personalized_message, $email);
+            $status = $this->mailingListUtils->sendMessage($personalized_message, $email);
 
             $this->io->writeln($status);
 
@@ -133,18 +127,18 @@ class ProcessMailingListQueueCommand extends Command
         return 0;
     }
 
-    private function sendToCommittee(MessagePart $message, string $to, \DataIterCommissie &$committee=null): int
+    private function sendToCommittee(MessagePart $message, string $to, DataIterCommissie &$committee=null): int
     {
         $committee = null;
-        $loop_id = null;
+        $loopId = null;
 
         // Sets committee if committee is null
-        $result = validate_message_to_committee($message, $to, $committee, $loop_id);
+        $result = $this->mailingListUtils->validateMessageToCommittee($message, $to, $committee, $loopId);
 
         if ($result !== 0)
             return $result;
 
-        $message->addHeader('X-Loop', $loop_id);
+        $message->addHeader('X-Loop', $loopId);
 
         $members = $committee->get_members();
 
@@ -158,11 +152,12 @@ class ProcessMailingListQueueCommand extends Command
                 '[COMMITTEE]' => $committee['naam']
             );
 
-            $personalized_message = personalize($message, function($text) use ($variables) {
-                return \str_ireplace(\array_keys($variables), \array_values($variables), $text);
-            });
+            $personalized_message = $this->mailingListUtils->personalize(
+                $message,
+                fn($text, $contentType) => \str_ireplace(\array_keys($variables), \array_values($variables), $text),
+            );
 
-            $status = send_message($personalized_message, $member['email']);
+            $status = $this->mailingListUtils->sendMessage($personalized_message, $member['email']);
 
             $this->io->writeln($status);
 
@@ -172,18 +167,18 @@ class ProcessMailingListQueueCommand extends Command
         return 0;
     }
 
-    private function sendToMailinglist(MessagePart $message, string $to, string $from, \DataIterMailinglist &$list=null): int
+    private function sendToMailinglist(MessagePart $message, string $to, string $from, DataIterMailinglist &$list = null): int
     {
         $list = null;
         $subscriptions = null;
-        $loop_id = null;
+        $loopId = null;
 
-        $result = validate_message_to_mailinglist($message, $to, $from, $list, $subscriptions, $loop_id);
+        $result = $this->mailingListUtils->validateMessageToMailinglist($message, $to, $from, $list, $subscriptions, $loopId);
 
         if ($result !== 0)
             return $result;
 
-        $message->addHeader('X-Loop', $loop_id);
+        $message->addHeader('X-Loop', $loopId);
 
         // Append '[Cover]' or whatever tag is defined for this list to the subject
         // but do so only if it is set.
@@ -196,7 +191,7 @@ class ProcessMailingListQueueCommand extends Command
             ));
 
         if ($list->sends_email_on_first_email() && !$list['archive']->contains_email_from($from))
-            send_welcome_mail($list, $from);
+            $this->mailingListUtils->sendWelcomeMail($list, $from);
 
         foreach ($subscriptions as $subscription) {
             // Skip subscriptions without an e-mail address silently
@@ -217,19 +212,20 @@ class ProcessMailingListQueueCommand extends Command
             );
 
             // Personize the message for the receiver
-            $personalizedMessage = personalize($message, function($text, $content_type) use ($subscription, $list, $unsubscribeUrl, $archiveUrl) {
-                return $this->messageTransformer($text, $content_type, [
+            $personalizedMessage = $this->mailingListUtils->personalize(
+                $message,
+                fn($text, $contentType) => $this->messageTransformer($text, $contentType, [
                     'subscription' => $subscription,
                     'list' => $list,
                     'unsubscribe_url' => $unsubscribeUrl,
                     'archive_url' => $archiveUrl,
-                ]);
-            });
+                ]),
+            );
 
             $personalizedMessage->setHeader('List-Unsubscribe', sprintf('<%s>', $unsubscribeUrl));
             $personalizedMessage->setHeader('List-Archive', sprintf('<%s>', $archiveUrl));
 
-            $status = send_message($personalizedMessage, $subscription['email']);
+            $status = $this->mailingListUtils->sendMessage($personalizedMessage, $subscription['email']);
 
             $this->io->writeln($status);
 
@@ -239,11 +235,11 @@ class ProcessMailingListQueueCommand extends Command
         return 0;
     }
 
-    private function messageTransformer(string $text, ?string $content_type, array $context): string
+    private function messageTransformer(string $text, ?string $contentType, array $context): string
     {
         $use_html = (
-            $content_type !== null
-            && \preg_match('/^text\/html/', $content_type)
+            $contentType !== null
+            && \preg_match('/^text\/html/', $contentType)
         );
 
         // Escape function depends on content type (text/html is treated differently)
@@ -279,7 +275,7 @@ class ProcessMailingListQueueCommand extends Command
         // Add an unsubscribe link to the footer when there isn't already a link in there, and
         // if users can unsubscribe from the list (i.e. public lists)
         if (
-            $content_type !== null
+            $contentType !== null
             && $context['list']['publiek']
             && \strpos($text, '[UNSUBSCRIBE]') === false
             && \strpos($text, '[UNSUBSCRIBE_URL]') === false

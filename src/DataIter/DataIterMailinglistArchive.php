@@ -3,7 +3,7 @@
 namespace App\DataIter;
 
 use App\Legacy\Database\DataIter;
-use App\Legacy\Email\MailingList;
+use App\Utils\MailingListUtils;
 
 class DataIterMailinglistArchive extends DataIter
 {
@@ -54,7 +54,7 @@ class DataIterMailinglistArchive extends DataIter
     {
         if ($this['return_code'] == 0)
             return __('Success');
-        return MailingList\get_error_message($this['return_code']);
+        return MailingListUtils::getErrorMessage($this['return_code']);
     }
 
     protected function _convert_header_encoding($data)

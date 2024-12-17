@@ -2,10 +2,7 @@
 
 namespace App\Command;
 
-require_once 'src/Legacy/mailing_list.php';
-
-use function App\Legacy\Email\MailingList\get_error_message;
-use function App\Legacy\Email\MailingList\send_mailinglist_mail;
+use App\Utils\MailingListUtils;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,6 +14,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class SendMailingListMailCommand extends Command
 {
     private SymfonyStyle $io;
+
+    public function __construct(
+        private MailingListUtils $mailingListUtils,
+    ){
+        parent::__construct();
+    }
 
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
@@ -35,13 +38,13 @@ class SendMailingListMailCommand extends Command
         $bufferStream = \fopen('php://temp', 'r+');
         \stream_copy_to_stream($inputStream, $bufferStream);
 
-        $returnValue = send_mailinglist_mail($bufferStream);
+        $returnValue = $this->mailingListUtils->sendMailingListMail($bufferStream);
 
         // Close the buffered message at last
         \fclose($bufferStream);
 
         if ($returnValue !== 0) {
-            $io->getErrorStyle()->error(get_error_message($returnValue));
+            $io->getErrorStyle()->error(MailingListUtils::getErrorMessage($returnValue));
             return Command::FAILURE;
         }
 

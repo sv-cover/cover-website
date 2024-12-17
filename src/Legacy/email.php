@@ -766,35 +766,6 @@ function reply(MessagePart $message, string $reply_text): MessagePart
     return $reply;
 }
 
-/**
- * Transforms the message's text body (plain and html) using a transformer
- * function. A shallow copy of the message is returned, with only the headers
- * and the body parts that have been touched by the transformer copied. The
- * transformer is also applied to the subject header of the mail.
- *
- * If any changes are actually made, this function also drops the DKIM-Signature
- * from the email.
- */
-function personalize(MessagePart $message, callable $transformer): MessagePart
-{
-    $changed = false;
-
-    $change_checker = function($text, $content_type) use ($transformer, &$changed) {
-        $output = $transformer($text, $content_type);
-        $changed = $changed || $output != $text;
-        return $output;
-    };
-
-    $derived = $message->derive($change_checker);
-
-    $derived->setHeader('Subject', $change_checker($message->header('Subject'), null));
-
-    if ($changed)
-        $derived->removeHeader('DKIM-Signature');
-
-    return $derived;
-}
-
 function send(MessagePart $message): bool
 {
     $to = $message->header('To');
