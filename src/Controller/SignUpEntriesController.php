@@ -12,6 +12,7 @@ use App\Service\Authentication;
 use App\Service\Policy;
 use App\SignUp\SignUpFormManager;
 use App\Utils\UrlUtils;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -20,6 +21,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 class SignUpEntriesController extends AbstractController
@@ -109,6 +111,7 @@ class SignUpEntriesController extends AbstractController
     #[Route('/sign_up/{form_id<\d+>}/entries/create', name: 'sign_up_entries.create', methods: ['GET', 'POST'])]
     public function create(
         Authentication $auth,
+        MailerInterface $mailer,
         Request $request,
         UrlUtils $urlUtils,
         int $form_id,
@@ -142,13 +145,20 @@ class SignUpEntriesController extends AbstractController
 
             try {
                 if (!empty($entry['member_id']) && $iter['agenda_item']) {
-                    $email = \parse_email_object("signup_confirmation.txt", [
-                        'entry' => $entry,
-                        'entry_table' => $this->manager->renderEntryTable($entry),
-                    ]);
-                    $email->send($entry['member']['email']);
+                    $email = (new TemplatedEmail())
+                        ->to($entry['member']['email'])
+                        ->replyTo($entry['form']['agenda_item']['committee']['email'])
+                        ->subject("[Cover] You've signed up for " . $entry['form']['agenda_item']['kop'])
+                        ->htmlTemplate('emails/sign_up_confirmation.html.twig')
+                        ->textTemplate('emails/sign_up_confirmation.txt.twig')
+                        ->context([
+                            'entry' => $entry,
+                        ])
+                    ;
+                    $mailer->send($email);
                 }
             } catch (\Exception $exception) {
+                throw $exception;
                 // Catch it, but it is not important for the rest of the process.
                 \Sentry\captureException($exception);
             }

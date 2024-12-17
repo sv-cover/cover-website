@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Exception\UnauthorizedException;
 use App\Service\Authentication;
 use Misd\PhoneNumberBundle\Validator\Constraints\PhoneNumber as AssertPhoneNumber;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -13,6 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -25,7 +27,7 @@ class SocietiesController extends AbstractController
     }
 
     #[Route('/societies/create', name: 'societies.create', methods: ['GET', 'POST'])]
-    public function create(Authentication $auth, Request $request): Response|RedirectResponse
+    public function create(Authentication $auth, MailerInterface $mailer, Request $request): Response|RedirectResponse
     {
         if (!$auth->loggedIn)
             throw new UnauthorizedException();
@@ -81,11 +83,17 @@ class SocietiesController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $mail = \parse_email_object("society_request.txt", [
-                'data' => $form->getData(),
-                'member' => $member
-            ]);
-            $mail->send($this->getParameter('app.email_board'));
+            $email = (new TemplatedEmail())
+                ->to($this->getParameter('app.email_board'))
+                ->replyTo($form->get('email')->getData())
+                ->subject("Society founding request")
+                ->htmlTemplate('emails/society_request.html.twig')
+                ->context([
+                    'data' => $form->getData(),
+                    'member' => $member,
+                ])
+            ;
+            $mailer->send($email);
             $this->addFlash('notice', __('Society foundation requested! You should hear from the Board soon!'));
             return $this->redirectToRoute('societies.list');
         }

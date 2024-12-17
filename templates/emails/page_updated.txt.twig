@@ -1,0 +1,13 @@
+Page “{{ page.titel }}” was updated by {{ member_name }} on behalf of the {{ committee_name }}. The changes are listed below.
+
+You can see the new page here: {{ page.slug ? url('slug', {slug: page.slug}) : url('page.single', {id: page.id}) }}
+
+
+Kind Regards,
+
+The Website
+
+
+---
+
+{{ differences|join('\n\n---\n\n') }}

@@ -10,6 +10,7 @@ use App\Form\RegistrationType;
 use App\Legacy\Database\DatabasePDO;
 use App\Service\Authentication;
 use App\Service\Secretary;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -19,6 +20,9 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\String\ByteString;
@@ -28,6 +32,7 @@ class RegistrationsController extends AbstractController
     public function __construct(
         private DatabasePDO $db,
         private DataModelMember $model,
+        private MailerInterface $mailer,
     ) {
     }
 
@@ -64,8 +69,15 @@ class RegistrationsController extends AbstractController
             'link' => $this->generateUrl('registrations.confirm_email', ['token' => $token], UrlGeneratorInterface::ABSOLUTE_URL),
         ]);
 
-        $email = \parse_email_object('join_confirm_membership.txt', $data);
-        $email->send($data['email_address']);
+        $email = (new TemplatedEmail())
+            ->to($data['email_address'])
+            ->replyTo(new Address('secretary@svcover.nl', 'Cover Secretary'))
+            ->subject("[Cover] Confirm your membership application")
+            ->htmlTemplate('emails/join_confirm_email.html.twig')
+            ->textTemplate('emails/join_confirm_email.txt.twig')
+            ->context($data)
+        ;
+        $this->mailer->send($email);
     }
 
     private function pushToMailbox(string $token): void
@@ -84,10 +96,17 @@ class RegistrationsController extends AbstractController
         $data = \json_decode($result, true);
 
         $data['confirmation_code'] = $token;
-        $data['name'] = $data['first_name'] . (!empty($data['family_name_preposition']) ? ' ' . $data['family_name_preposition'] : '') . ' ' . $data['family_name'];
+        $name = $data['first_name'] . (!empty($data['family_name_preposition']) ? ' ' . $data['family_name_preposition'] : '') . ' ' . $data['family_name'];
 
-        $email = \parse_email_object('join_administratie.txt', $data);
-        $email->send('administratie@svcover.nl');
+
+        $email = (new TemplatedEmail())
+            ->to('administratie@svcover.nl')
+            ->replyTo(new Address('secretary@svcover.nl', 'Cover Secretary'))
+            ->subject("Membership application $name")
+            ->textTemplate('emails/join_administratie.txt.twig')
+            ->context($data)
+        ;
+        $this->mailer->send($email);
     }
 
     private function pushToSecretary(Secretary $secretary, string $token): void
@@ -196,21 +215,29 @@ class RegistrationsController extends AbstractController
 
                 \Sentry\captureException($e);
 
-                \mail('webcie@svcover.nl',
-                    'Error during membership application',
-                    "Something went wrong while trying to add a new member to Secretary.\n" .
-                    "In case it helps, the confirmation code was: " . $token . "\n" .
-                    "Maybe the website error log for " . \date('Y-m-d H:i:s') . " will provide more insight. Or this:\n\n"
-                    . $e->getMessage() . "\n"
-                    . $e->getTraceAsString(),
-                    \implode("\r\n", ['Content-Type: text/plain; charset=UTF-8']));
+                $email = (new Email())
+                    ->to('webcie@svcover.nl')
+                    ->subject('Error during membership application')
+                    ->text(
+                        "Something went wrong while trying to add a new member to Secretary.\n" .
+                        "In case it helps, the confirmation code was: " . $token . "\n" .
+                        "Maybe the website error log for " . \date('Y-m-d H:i:s') . " will provide more insight. Or this:\n\n"
+                        . $e->getMessage() . "\n"
+                        . $e->getTraceAsString()
+                    )
+                ;
+                $this->mailer->send($email);
 
-                \mail('secretaris@svcover.nl',
-                    'Error during membership application (member not added to Secretary)',
-                    "Something went wrong while trying to add a new member to Secretary. The AC/DCee has been informed about this.\n" .
-                    "You can find the application in the administratie@svcover.nl mailbox.\n" .
-                    "In case it helps, the confirmation code was: " . $token,
-                    \implode("\r\n", ['Content-Type: text/plain; charset=UTF-8']));
+                $email = (new Email())
+                    ->to('secretary@svcover.nl')
+                    ->subject('Error during membership application (member not added to Secretary)')
+                    ->text(
+                        "Something went wrong while trying to add a new member to Secretary. The AC/DCee has been informed about this.\n" .
+                        "You can find the application in the administratie@svcover.nl mailbox.\n" .
+                        "In case it helps, the confirmation code was: " . $token
+                    )
+                ;
+                $this->mailer->send($email);
             }
             // Redirect to prevent accidental repeated submissions
             return $this->redirectToRoute('registrations.confirm_email_success');
@@ -279,10 +306,18 @@ class RegistrationsController extends AbstractController
                     count($form->get('registration')->getData())
                 );
             } elseif ($form->get('resend_confirmation')->isClicked()) {
-                foreach ($form->get('registration')->getData() as $registration)
-                    $this->sendConfirmationMail($registration->confirmation_code);
+                $success = 0;
+                foreach ($form->get('registration')->getData() as $registration) {
+                    try {
+                        $this->sendConfirmationMail($registration->confirmation_code);
+                        $success++;
+                    } catch (\Exception $exception) {
+                        // Probably already confirmed
+                    }
+                }
                 $message = sprintf(
-                    'Resent %d confirmation emails',
+                    'Resent %d out of %d confirmation emails',
+                    $success,
                     count($form->get('registration')->getData())
                 );
             } elseif ($form->get('delete')->isClicked() && count($form->get('registration')->getData()) > 0) {

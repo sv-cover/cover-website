@@ -89,8 +89,8 @@ function markup_strip($markup)
  */
 function parse_email($email, $data)
 {
-    if (file_exists('templates/email/' . $email))
-        $contents = file_get_contents('templates/email/' . $email);
+    if (file_exists('templates/emails/' . $email))
+        $contents = file_get_contents('templates/emails/' . $email);
     else
         throw new RuntimeException("Could not find email template '$email'");
 
@@ -122,7 +122,7 @@ class SimpleEmail
 
 function parse_email_object($file, array $variables = array())
 {
-    $path = 'templates/email/' . $file;
+    $path = 'templates/emails/' . $file;
 
     if (!file_exists($path))
         throw new InvalidArgumentException("Cannot find file '{$file}' in any theme data");

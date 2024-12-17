@@ -1,8 +1,0 @@
-$member_naam has rejected the document $titel on behalf of the Board for the following reason:
-
-$reden
-
-Kind Regards (we're just the messenger),
-
-
-The WebCie

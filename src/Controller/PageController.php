@@ -11,10 +11,12 @@ use App\Form\PageType;
 use App\Service\Authentication;
 use App\Markup\Markup;
 use App\Service\Policy;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 class PageController extends AbstractController
@@ -120,39 +122,47 @@ class PageController extends AbstractController
         return $this->_render_single($iter);
     }
 
-    private function _prepare_mail(Authentication $auth, DataIterPage $iter, string $difference): array
+    private function getEmailContext(Authentication $auth, DataIterPage $iter, array $differences): array
     {
         $identity = $auth->getIdentity();
 
-        $data = $iter->data;
-        $data['member_naam'] = \member_full_name($identity->member(), IGNORE_PRIVACY);
-        $data['page'] = $difference;
+        $context = [
+            'page' => $iter->data,
+            'member_name' => \member_full_name($identity->member(), IGNORE_PRIVACY),
+            'differences' => $differences,
+        ];
 
         $isInBoard = $identity->member_in_committee(COMMISSIE_BESTUUR);
         $isInCommittee = $identity->member_in_committee($iter['committee_id']);
 
+        $to = [];
         if (!$isInCommittee && $isInBoard) {
             /* Bestuur changed something, notify commissie */
-            $data['commissie_naam'] = $this->committeeModel->get_naam(COMMISSIE_BESTUUR);
-            $data['email'] = [$this->committeeModel->get_email($iter['committee_id'])];
+            $context['committee_name'] = $this->committeeModel->get_naam(COMMISSIE_BESTUUR);
+            $to = [$this->committeeModel->get_email($iter['committee_id'])];
         } elseif (!$isInBoard && $isInCommittee) {
             /* Commissie changed something, notify bestuur */
-            $data['commissie_naam'] = $this->committeeModel->get_naam($iter['committee_id']);
-            $data['email'] = [$this->committeeModel->get_email(COMMISSIE_BESTUUR)];
+            $context['committee_name'] = $this->committeeModel->get_naam($iter['committee_id']);
+            $to = [$this->committeeModel->get_email(COMMISSIE_BESTUUR)];
         } else {
             /* AC/DCee changed something, notify bestuur and commissie */
-            $data['commissie_naam'] = $this->committeeModel->get_naam(COMMISSIE_EASY);
-            $data['email'] = [
+            $context['committee_name'] = $this->committeeModel->get_naam(COMMISSIE_EASY);
+            $to = [
                 $this->committeeModel->get_email($iter['committee_id']),
                 $this->committeeModel->get_email(COMMISSIE_BESTUUR)
             ];
         }
 
-        return $data;
+        return [$to, $context];
     }
 
     #[Route('/page/{id<\d+>}/update', name: 'page.update', methods: ['GET', 'POST'])]
-    public function update(int $id, Request $request, Authentication $auth): Response|RedirectResponse
+    public function update(
+        Authentication $auth,
+        MailerInterface $mailer,
+        Request $request,
+        int $id,
+    ): Response|RedirectResponse
     {
         $iter = $this->model->get_iter($id);
 
@@ -195,19 +205,20 @@ class PageController extends AbstractController
                 }
 
                 // Collect all
-                $mail_data = $this->_prepare_mail($auth, $iter, implode("\n\n---\n\n", $updates));
+                [$to, $context] = $this->getEmailContext($auth, $iter, $updates);
 
-                if (!empty($mail_data['email'])) {
-                    $body = \parse_email('editable_edit.txt', $mail_data);
-
-                    $subject = sprintf(
-                        '[Cover website] %s updated: %s',
-                        count($subjects) == 1 ? $subjects[0] : 'Page',
-                        $mail_data['titel']
-                    );
-
-                    foreach ($mail_data['email'] as $email)
-                        @mail($email, $subject, $body, "From: acdcee@svcover.nl\r\n");
+                if (!empty($to)) {
+                    $email = (new TemplatedEmail())
+                        ->to(...$to)
+                        ->subject(sprintf(
+                            '[Cover] %s updated: %s',
+                            count($subjects) == 1 ? $subjects[0] : 'Page',
+                            $iter['titel']
+                        ))
+                        ->textTemplate('emails/page_updated.txt.twig')
+                        ->context($context)
+                    ;
+                    $mailer->send($email);
                 }
             }
 

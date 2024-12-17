@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<body>
+<p>Dear {{ name }},</p>
+
+<p>It looks like you’ve changed your email address on the Cover website to <code>{{ email.to[0].address }}</code>.</p>
+
+<p>Is this correct? It probably is, but we just want to make sure! Please do confirm it by clicking this link:<br>
+<a href="{{ link|e('html_attr') }}">Confirm your email address</a></p>
+
+<p>If it’s not correct, just don’t click the link. We’ll keep your previous email.</p>
+
+<p>Kind regards,</p>
+
+<p>The AC/DCee</p>
+
+<div itemscope itemtype="http://schema.org/EmailMessage">
+  <div itemprop="potentialAction" itemscope itemtype="http://schema.org/ConfirmAction">
+    <meta itemprop="name" content="Approve Email">
+    <div itemprop="handler" itemscope itemtype="http://schema.org/HttpActionHandler">
+      <link itemprop="url" href="{{ link|e('html_attr') }}">
+    </div>
+  </div>
+  <meta itemprop="description" content="Approve your email address">
+</div>
+
+</body>
+</html>

@@ -8,13 +8,15 @@ use App\Form\CommitteeType;
 use App\Form\DataTransformer\IntToBooleanTransformer;
 use App\Service\Authentication;
 use App\Service\Policy;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 class CommitteesController extends AbstractController
@@ -186,7 +188,7 @@ class CommitteesController extends AbstractController
     }
 
     #[Route('/committees/{slug}/interest', name: 'committees.interest', methods: ['POST'])]
-    public function interest(string $slug, Authentication $auth, Request $request): RedirectResponse
+    public function interest(Authentication $auth, MailerInterface $mailer, Request $request, string $slug): RedirectResponse
     {
         if (!$auth->getIdentity()->is_member())
             throw new UnauthorizedException('Only members can apply for a committee.');
@@ -213,13 +215,19 @@ class CommitteesController extends AbstractController
                     $iter['naam']
                 ), 3, $this->getParameter('app.committee_interest_log'));
 
-            $mail = parse_email_object('interst_in_committee.txt', [
-                'committee' => $iter,
-                'member' => $member
-            ]);
-            $mail->send('intern@svcover.nl');
+            $email = (new TemplatedEmail())
+                ->to('intern@svcover.nl')
+                ->cc($member['email'])
+                ->replyTo($member['email'])
+                ->subject("{$member['voornaam']} is interested in {$iter['naam']}")
+                ->htmlTemplate('emails/committee_interest.html.twig')
+                ->context([
+                    'committee' => $iter,
+                    'member' => $member,
+                ])
+            ;
+            $mailer->send($email);
 
-            // Special flash to report back to the member.
             $this->addFlash('committee_interest', __('Cool! We’ve notified the Commissioner of Internal Affairs for you!'));
         }
 

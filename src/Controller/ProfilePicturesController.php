@@ -11,6 +11,7 @@ use App\Form\ProfilePictureType;
 use App\Service\Authentication;
 use App\Service\Policy;
 use App\Utils\UrlUtils;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Cache\Adapter\FilesystemTagAwareAdapter;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -20,6 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
@@ -437,7 +439,13 @@ class ProfilePicturesController extends AbstractController
      * was performed by an admin.Also clears cache for this member's pictures.
      */
     #[Route('/profile_pictures/{id<\d+>}/delete', name: 'profile_pictures.delete', methods: ['GET', 'POST'])]
-    public function delete(Authentication $auth, Request $request, UrlUtils $urlUtils, int $id): Response|RedirectResponse
+    public function delete(
+        Authentication $auth,
+        MailerInterface $mailer,
+        Request $request,
+        UrlUtils $urlUtils,
+        int $id
+    ): Response|RedirectResponse
     {
         $iter = $this->model->get_iter($id);
 
@@ -471,10 +479,17 @@ class ProfilePicturesController extends AbstractController
 
             if ($iter['member_id'] != $auth->getIdentity()->get('id')) {
                 $member = $iter->get_member();
-                $mail = \parse_email_object('profile_picture_delete.txt', [
-                    'reason' => $form->get('reason')->getData(),
-                ]);
-                $mail->send($iter->get_member()['email']);
+
+                $email = (new TemplatedEmail())
+                    ->to($member['email'])
+                    ->subject("[Cover] Profile picture deleted")
+                    ->htmlTemplate('emails/profile_picture_deleted.html.twig')
+                    ->textTemplate('emails/profile_picture_deleted.txt.twig')
+                    ->context([
+                        'reason' => $form->get('reason')->getData(),
+                    ])
+                ;
+                $mailer->send($email);
                 $this->addFlash('notice',  sprintf(
                     __('%s has been notified their profile picture was deleted.'),
                     $member->get_full_Name()

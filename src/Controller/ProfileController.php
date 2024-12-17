@@ -18,6 +18,7 @@ use App\Service\Policy;
 use App\Service\Secretary;
 use JeroenDesloovere\VCard\VCard;
 use Misd\PhoneNumberBundle\Validator\Constraints\PhoneNumber as AssertPhoneNumber;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -38,6 +39,8 @@ use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -46,6 +49,7 @@ class ProfileController extends AbstractController
     public function __construct(
         private Authentication $auth,
         private DataModelMember $model,
+        private MailerInterface $mailer,
         private Policy $policy,
     ) {
     }
@@ -196,14 +200,28 @@ class ProfileController extends AbstractController
         foreach ($iter->secretary_changed_values() as $field => $value)
             $body .= sprintf("%s:\t%s\n", $field, $value ?? "<deleted>");
 
-        mail('administratie@svcover.nl', $subject, $body, "From: Study Association Cover <noreply@svcover.nl>\r\nContent-Type: text/plain; charset=UTF-8");
-        mail('secretaris@svcover.nl', $subject, sprintf("%s updated their member details:\n\nYou can see the changes in sectary or in the administratie@svcover.nl mailbox", member_full_name($iter, IGNORE_PRIVACY)), "From: Study Association Cover <noreply@svcover.nl>\r\nContent-Type: text/plain; charset=UTF-8");
+        $email = (new Email())
+            ->to('administratie@svcover.nl')
+            ->subject($subject)
+            ->text($body)
+        ;
+        $this->mailer->send($email);
+
+        $email = (new Email())
+            ->to('secretary@svcover.nl')
+            ->subject($subject)
+            ->text(sprintf(
+                "%s updated their member details:\n\nYou can see the changes in sectary or in the administratie@svcover.nl mailbox.",
+                member_full_name($iter, IGNORE_PRIVACY)
+            ))
+        ;
+        $this->mailer->send($email);
 
         try {
             $secretary->updatePersonFromIterChanges($iter);
-        } catch (\RuntimeException $e) {
+        } catch (\Exception|\Error $exception) {
             // Todo: replace this with a serious more general logging call
-            error_log($e, 1, 'webcie@rug.nl', "From: webcie-cover-php@svcover.nl");
+            error_log($exception, 1, 'webcie@rug.nl', "From: webcie-cover-php@svcover.nl");
         }
     }
 
@@ -269,11 +287,17 @@ class ProfileController extends AbstractController
                 $signed_url = $uriSigner->sign($url, new \DateInterval('PT24H')); // Valid for 24 hours
 
                 // Send the confirmation to the new email address
-                \parse_email_object("profile_confirm_email.txt", [
-                    'naam' => \member_first_name($iter, \IGNORE_PRIVACY),
-                    'email' => $token['email'],
-                    'link' => $signed_url,
-                ])->send($token['email']);
+                $email = (new TemplatedEmail())
+                    ->to($token['email'])
+                    ->subject("[Cover] Confirm your email address")
+                    ->htmlTemplate('emails/profile_confirm_email.html.twig')
+                    ->textTemplate('emails/profile_confirm_email.txt.twig')
+                    ->context([
+                        'name' => \member_first_name($iter, \IGNORE_PRIVACY),
+                        'link' => $signed_url,
+                    ])
+                ;
+                $this->mailer->send($email);
             }
 
             return $this->render('profile/personal_tab_success.html.twig', [

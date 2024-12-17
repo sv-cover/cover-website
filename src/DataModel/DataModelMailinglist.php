@@ -10,7 +10,11 @@ use App\DataModel\DataModelMailinglistArchiveAdapter;
 use App\DataModel\DataModelMailinglistSubscription;
 use App\DataModel\DataModelMember;
 use App\Legacy\Database\DataModel;
+use App\Markup\Markup;
 use Symfony\Component\DependencyInjection\Attribute\Lazy;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 
 class DataModelMailinglist extends DataModel
 {
@@ -30,6 +34,8 @@ class DataModelMailinglist extends DataModel
         private DataModelCommissie $committeeModel,
         private DataModelMailinglistArchive $archiveModel,
         #[Lazy] private DataModelMailinglistSubscription $subscriptionModel,  // Lazy to prevent circular dependencies
+        private MailerInterface $mailer,
+        private Markup $markup,
     ) {
     }
 
@@ -89,49 +95,47 @@ class DataModelMailinglist extends DataModel
         return $this->find_one(['adres' => $address]);
     }
 
-    public function send_subscription_mail(DataIterMailinglist $lijst, $naam, $email)
+    public function send_subscription_mail(DataIterMailinglist $list, $name, $email)
     {
-        if (!$lijst->sends_email_on_subscribing())
+        if (!$list->sends_email_on_subscribing())
             return;
 
-        $text = $lijst->get('on_subscription_message');
+        $text = $list->get('on_subscription_message');
 
-        $variables = array(
-            '[NAAM]' => htmlspecialchars($naam, ENT_COMPAT, 'utf-8'),
-            '[NAME]' => htmlspecialchars($naam, ENT_COMPAT, 'utf-8'),
-            '[MAILINGLIST]' => htmlspecialchars($lijst->get('naam'), ENT_COMPAT, 'utf-8')
-        );
+        $variables = [
+            '[NAAM]' => $name,
+            '[NAME]' => $name,
+            '[MAILINGLIST]' => $list->get('naam'),
+        ];
 
         // If you are allowed to unsubscribe, parse the placeholder correctly (different for opt-in and opt-out lists)
         /*
-        if ($lijst->get('publiek'))
+        if ($list->get('publiek'))
         {
-            $url = $lijst->get('type')== DataModelMailinglijst::TYPE_OPT_IN
+            $url = $list->get('type')== DataModelMailinglijst::TYPE_OPT_IN
                 ? ROOT_DIR_URI . sprintf('mailinglijsten.php?abonnement_id=%s', $aanmelding->get('abonnement_id'))
-                : ROOT_DIR_URI . sprintf('mailinglijsten.php?lijst_id=%d', $lijst->get('id'));
+                : ROOT_DIR_URI . sprintf('mailinglijsten.php?lijst_id=%d', $list->get('id'));
 
             $variables['[UNSUBSCRIBE_URL]'] = htmlspecialchars($url, ENT_QUOTES, WEBSITE_ENCODING);
 
             $variables['[UNSUBSCRIBE]'] = sprintf('<a href="%s">Click here to unsubscribe from the %s mailinglist.</a>',
                 htmlspecialchars($url, ENT_QUOTES, WEBSITE_ENCODING),
-                htmlspecialchars($lijst->get('naam'), ENT_COMPAT, WEBSITE_ENCODING));
+                htmlspecialchars($list->get('naam'), ENT_COMPAT, WEBSITE_ENCODING));
         }
         */
 
-        $subject = $lijst->get('on_first_email_subject');
+        $subject = $list->get('on_first_email_subject');
 
-        $personalized_message = str_replace(array_keys($variables), array_values($variables), $text);
+        $personalized_message = strtr($text, $variables);
 
-        $message = new \Cover\email\MessagePart();
-
-        $message->setHeader('From', 'Cover Mail Monkey <monkies@svcover.nl>');
-        $message->setHeader('Reply-To', 'Cover WebCie <webcie@rug.nl>');
-        $message->addBody('text/plain', strip_tags($personalized_message));
-        $message->addBody('text/html', $personalized_message);
-
-        list($message_headers, $message_body) = preg_split("/\r?\n\r?\n/", $message->toString(), 2);
-
-        return mail(sprintf('%s <%s>', $naam, $email), $subject, $message_body, $message_headers);
+        $email = (new Email())
+            ->to(new Address($email, $name))
+            ->replyTo(new Address('webcie@rug.nl', 'AC/DCee Cover'))
+            ->subject($list->get('on_first_email_subject'))
+            ->text($this->markup->strip($personalized_message))
+            ->html($this->markup->parse($personalized_message))
+        ;
+        $this->mailer->send($email);
     }
 
     public function is_subscribed(DataIterMailinglist $list, DataIterMember $member)

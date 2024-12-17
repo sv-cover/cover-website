@@ -13,6 +13,7 @@ use App\Markup\Markup;
 use App\Service\Authentication;
 use App\Service\Policy;
 use App\Utils\WebCal;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -21,6 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -117,7 +119,12 @@ class EventsController extends AbstractController
     }
 
     #[Route('/events/create', name: 'events.create', methods: ['GET', 'POST'])]
-    public function create(Authentication $auth, DataModelCommissie $committeeModel, Request $request): Response|RedirectResponse
+    public function create(
+        Authentication $auth,
+        DataModelCommissie $committeeModel,
+        MailerInterface $mailer,
+        Request $request
+    ): Response|RedirectResponse
     {
         $iter = $this->model->new_iter();
 
@@ -132,22 +139,21 @@ class EventsController extends AbstractController
             if (empty($iter['tot']))
                 $iter['tot'] = $iter['van'];
 
-            $id = $this->model->propose_insert($iter);
+            $this->model->propose_insert($iter);
 
             $this->addFlash('notice', __('The new event is now waiting for approval. Once the board has accepted the event, it will be published on the website.'));
 
-            $placeholders = [
-                'id' => $id,
-                'commissie_naam' => $committeeModel->get_naam($iter['committee_id']),
-                'member_naam' => \member_full_name($auth->getIdentity()->member(), \IGNORE_PRIVACY),
-            ];
-
-            \mail(
-                $this->getParameter('app.email_board'),
-                'New event ' . $iter['kop'],
-                \parse_email('agenda_add.txt', \array_merge($iter->data, $placeholders)),
-                "From: Study Association Cover <noreply@svcover.nl>\r\n"
-            );
+            $email = (new TemplatedEmail())
+                ->to($this->getParameter('app.email_board'))
+                ->subject('New event ' . $iter['kop'])
+                ->textTemplate('emails/event_created.txt.twig')
+                ->context([
+                    'member_name' => \member_full_name($auth->getIdentity()->member(), \IGNORE_PRIVACY),
+                    'committee_name' => $committeeModel->get_naam($iter['committee_id']),
+                    'event' => $iter,
+                ])
+            ;
+            $mailer->send($email);
 
             return $this->redirectToRoute('events.single', ['id' => $iter->get_id()]);
         }
@@ -171,7 +177,13 @@ class EventsController extends AbstractController
     }
 
     #[Route('/events/{id<\d+>}/update', name: 'events.update', methods: ['GET', 'POST'])]
-    public function update(Authentication $auth, DataModelCommissie $committeeModel, Request $request, int $id): Response|RedirectResponse
+    public function update(
+        Authentication $auth,
+        DataModelCommissie $committeeModel,
+        MailerInterface $mailer,
+        Request $request,
+        int $id
+    ): Response|RedirectResponse
     {
         $iter = $this->model->get_iter($id);
 
@@ -200,23 +212,22 @@ class EventsController extends AbstractController
                 $this->model->update($iter);
                 $this->addFlash('notice', __("The changes you've made to this event have been published."));
             } else {
-                $override_id = $this->model->propose_update($iter);
+                $proposalId = $this->model->propose_update($iter);
 
                 $this->addFlash('notice', __('The changes to the event are waiting for approval. Once the board has accepted the changes, they will be published on the website.'));
 
-                $placeholders = [
-                    'id' => $override_id,
-                    'commissie_naam' => $committeeModel->get_naam($iter['committee_id']),
-                    'member_naam' => \member_full_name($auth->getIdentity()->member(), \IGNORE_PRIVACY),
-                    'category' => implode(', ', array_map('ucfirst', explode(',', $iter['category']))),
-                ];
-
-                mail(
-                    $this->getParameter('app.email_board'),
-                    'Updated event ' . $iter['kop'] . ($iter->get('kop') != $orig->get('kop') ? ' was ' . $orig->get('kop') : ''),
-                    \parse_email('agenda_mod.txt', array_merge($iter->data, $placeholders)),
-                    "From: Study Association Cover <noreply@svcover.nl>\r\n"
-                );
+                $email = (new TemplatedEmail())
+                    ->to($this->getParameter('app.email_board'))
+                    ->subject('Updated event: ' . $iter['kop'] . ($iter->get('kop') != $orig->get('kop') ? ' was ' . $orig->get('kop') : ''))
+                    ->textTemplate('emails/event_updated.txt.twig')
+                    ->context([
+                        'proposal_id' => $proposalId,
+                        'member_name' => \member_full_name($auth->getIdentity()->member(), \IGNORE_PRIVACY),
+                        'committee_name' => $committeeModel->get_naam($iter['committee_id']),
+                        'event' => $iter,
+                    ])
+                ;
+                $mailer->send($email);
             }
 
             return $this->redirectToRoute('events.single', ['id' => $iter->get_id()]);
@@ -297,7 +308,13 @@ class EventsController extends AbstractController
     }
 
     #[Route('/events/{id<\d+>}/reject', name: 'events.reject', methods: ['GET', 'POST'])]
-    public function reject(Request $request, DataModelCommissie $committeeModel, int $id): Response|RedirectResponse
+    public function reject(
+        Authentication $auth,
+        Request $request,
+        DataModelCommissie $committeeModel,
+        MailerInterface $mailer,
+        int $id
+    ): Response|RedirectResponse
     {
         $iter = $this->model->get_iter($id);
 
@@ -314,21 +331,22 @@ class EventsController extends AbstractController
             ->getForm();
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid())
-        {
+        if ($form->isSubmitted() && $form->isValid()) {
             /* Delete event proposal and inform the event owner */
             $this->model->reject_proposal($iter);
 
-            $data = $iter->data;
-            $data['member_name'] = \member_full_name(null, \IGNORE_PRIVACY);
-            $data['reason'] = $form->get('reason')->getData();
-
-            $subject = 'Rejected event: ' . $iter['kop'];
-            $body = \parse_email('agenda_cancel.txt', $data);
-
-            $email = $committeeModel->get_email($iter['committee_id']);
-
-            mail($email, $subject, $body, "From: Study Association Cover <noreply@svcover.nl>\r\n");
+            $email = (new TemplatedEmail())
+                ->to($committeeModel->get_email($iter['committee_id']))
+                ->replyTo($this->getParameter('app.email_board'))
+                ->subject('Rejected event: ' . $iter['kop'])
+                ->textTemplate('emails/event_rejected.txt.twig')
+                ->context([
+                    'member_name' => \member_full_name($auth->getIdentity()->member(), \IGNORE_PRIVACY),
+                    'event' => $iter,
+                    'reason' => $form->get('reason')->getData(),
+                ])
+            ;
+            $mailer->send($email);
 
             $this->addFlash('notice', sprintf(
                 __('The %s has been notified that their event has been rejected.'),

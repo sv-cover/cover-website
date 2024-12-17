@@ -17,12 +17,15 @@ use App\Service\Authentication;
 use App\Service\Policy;
 use App\Service\Secretary;
 use App\Utils\MailingListUtils;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -47,6 +50,7 @@ class ApiController extends AbstractController
         private DataModelPasswordResetToken $passwordResetModel,
         private DataModelSession $sessionModel,
         private Authentication $auth,
+        private MailerInterface $mailer,
         private Policy $policy,
         private MailingListUtils $mailingListUtils,
         private UriSigner $uriSigner,
@@ -494,12 +498,22 @@ class ApiController extends AbstractController
         $data['password_link'] = $signed_url;
 
         // Send email
-        $email = \parse_email_object('join_welcome_email.txt', $data);
-        $email->send($data['email']);
+        $email = (new TemplatedEmail())
+            ->to($member['email'])
+            ->replyTo(new Address('secretary@svcover.nl', 'Cover Secretary'))
+            ->subject("[Cover] Welcome to Cover!")
+            ->htmlTemplate('emails/join_welcome.html.twig')
+            ->textTemplate('emails/join_welcome.txt.twig')
+            ->context([
+                'member' => $member,
+                'password_link' => $signed_url,
+            ])
+        ;
+        $this->mailer->send($email);
 
-        // Send copy to adminstratie@svcover.nl
-        $email->subject = 'Welcome to Cover! (' . \member_full_name($member, \IGNORE_PRIVACY) . ')';
-        $email->send('administratie@svcover.nl');
+        $email->subject('Welcome to Cover! (' . \member_full_name($member, \IGNORE_PRIVACY) . ')');
+        $email->to('administratie@svcover.nl');
+        $this->mailer->send($email);
 
         return $this->json(['success' => true]);
     }

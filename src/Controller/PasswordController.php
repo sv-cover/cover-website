@@ -10,6 +10,7 @@ use App\Form\PasswordType;
 use App\Service\Authentication;
 use App\Service\Policy;
 use App\Utils\UrlUtils;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -20,6 +21,7 @@ use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -34,7 +36,7 @@ class PasswordController extends AbstractController
     }
 
     #[Route('/password', name: 'password.request', methods: ['GET', 'POST'])]
-    public function request(Request $request, UriSigner $uriSigner): Response
+    public function request(Request $request, MailerInterface $mailer, UriSigner $uriSigner): Response
     {
         $form = $this->createFormBuilder()
             ->add('email', EmailType::class, [
@@ -56,11 +58,17 @@ class PasswordController extends AbstractController
                 $url = $this->generateUrl('password.reset', ['token' => $token['key']], UrlGeneratorInterface::ABSOLUTE_URL);
                 $signed_url = $uriSigner->sign($url, new \DateInterval('PT24H')); // Valid for 24 hours
 
-                $email = \parse_email_object("password_reset_en.txt", [
-                    'naam' => $member['voornaam'],
-                    'link' => $signed_url,
-                ]);
-                $email->send($member['email']);
+                $email = (new TemplatedEmail())
+                    ->to($member['email'])
+                    ->subject("[Cover] Password Reset")
+                    ->htmlTemplate('emails/password_reset.html.twig')
+                    ->textTemplate('emails/password_reset.txt.twig')
+                    ->context([
+                        'member' => $member,
+                        'link' => $signed_url,
+                    ])
+                ;
+                $mailer->send($email);
             } catch (NotFoundException $e) {
                 // Do nothing, we don't want to give membership status based on email
             }
