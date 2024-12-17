@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\DataIter\DataIterMember;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 
@@ -39,7 +40,7 @@ class Incassomatic
         return $response->toArray();
     }
 
-    public function createContract(\DataIterMember $member) :array
+    public function createContract(DataIterMember $member) :array
     {
         $data = [
             'cover_id' => $member->get_id(),
@@ -49,19 +50,19 @@ class Incassomatic
         return $this->request('POST', 'contracten/', [], $data);
     }
 
-    public function getContracts(\DataIterMember $member): array
+    public function getContracts(DataIterMember $member): array
     {
         return $this->request('GET', 'contracten/', ['cover_id' => $member['id']]);
     }
 
-    public function getCurrentContract(\DataIterMember $member): array|bool
+    public function getCurrentContract(DataIterMember $member): array|bool
     {
         $contracts = $this->getContracts($member);
         // Only show valid contracts
         return \current(\array_filter($contracts, fn($c) => $c['is_geldig']));
     }
 
-    public function getDebits(\DataIterMember $member, ?int $limit = null) : array
+    public function getDebits(DataIterMember $member, ?int $limit = null) : array
     {
         $params = [
             'cover_id' => $member->get_id(),

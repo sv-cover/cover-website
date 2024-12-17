@@ -95,7 +95,7 @@ class DataModelProfilePicture extends DataModel
         " ORDER BY created_on DESC";
     }
 
-    public function get_member_for_iter(DataIterMailinglistSubscription $iter)
+    public function get_member_for_iter(DataIterProfilePicture $iter)
     {
         return $this->memberModel->get_iter($iter['member_id']);
     }

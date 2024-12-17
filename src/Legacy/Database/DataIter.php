@@ -136,7 +136,7 @@ abstract class DataIter implements \JsonSerializable, \ArrayAccess
         {
             foreach ($this->_getter_stack as $frame)
                 if ($frame['field'] == $field)
-                    throw new Exception('Infinite loop while trying to calculate ' . get_class($this) . '::' . $field);
+                    throw new \Exception('Infinite loop while trying to calculate ' . get_class($this) . '::' . $field);
 
             array_push($this->_getter_stack, ['field' => $field, 'dependencies' => []]);
 
@@ -145,7 +145,7 @@ abstract class DataIter implements \JsonSerializable, \ArrayAccess
             $frame = array_pop($this->_getter_stack);
 
             if ($frame['field'] != $field)
-                    throw new Exception('Cache retrieval error for ' . get_class($this) . '::' . $field);
+                    throw new \Exception('Cache retrieval error for ' . get_class($this) . '::' . $field);
             
             $this->_getter_cache[$field] = [$value, array_unique($frame['dependencies'])];
         }

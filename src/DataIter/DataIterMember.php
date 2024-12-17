@@ -171,7 +171,7 @@ class DataIterMember extends DataIter implements SearchResultInterface
             try {
                 $result = current($this->model->secretary->findPerson($this->get_id()));
                 $this->_secretary_data = (array) $result;
-            } catch (\Exception|Error $exception) {
+            } catch (\Exception|\Error $exception) {
                 \Sentry\captureException($exception);
                 $this->_secretary_data = [];
             }

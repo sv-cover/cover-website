@@ -25,7 +25,7 @@ class DataModelEmailConfirmationToken extends DataModel
             'key' => ByteString::fromRandom(40)->toString(),
             'member_id' => $member['id'],
             'email' => $email,
-            'created_on' => new DateTime()
+            'created_on' => new \DateTime()
         ]);
 
         $this->insert($token);

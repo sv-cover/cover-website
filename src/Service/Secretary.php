@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\DataIter\DataIterMember;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -114,7 +115,7 @@ class Secretary
         return $response->toArray();
     }
 
-    public function updatePersonFromIterChanges(\DataIterMember $iter): array
+    public function updatePersonFromIterChanges(DataIterMember $iter): array
     {
         if (!$iter->has_id())
             throw new \InvalidArgumentException('You can only submit updates for iters that have an id');

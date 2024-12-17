@@ -162,14 +162,14 @@ class DataModelPage extends DataModel implements SearchProviderInterface
 
     public function insert(DataIter $iter)
     {
-        $iter['last_modified'] = new DateTime();
+        $iter['last_modified'] = new \DateTime();
 
         return parent::insert($iter);
     }
 
     public function update(DataIter $iter)
     {
-        $iter['last_modified'] = new DateTime();
+        $iter['last_modified'] = new \DateTime();
 
         return parent::update($iter);
     }

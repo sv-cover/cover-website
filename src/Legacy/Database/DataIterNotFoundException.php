@@ -10,7 +10,7 @@ class DataIterNotFoundException extends NotFoundException
     {
         parent::__construct(sprintf('%s with id %s was not found',
             $source
-                ? substr(get_class($source), strlen('DataModel'))
+                ? substr((new \ReflectionClass($source))->getShortName(), strlen('DataModel'))
                 : 'DataIter',
             $id));
     }

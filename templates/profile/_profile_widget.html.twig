@@ -26,8 +26,8 @@
 <div class="profile-widget">
     {% if iter.profile_picture and not iter.is_private('foto') %}
         <figure class="profile-photo">
-            <a class="image is-128x128" href="{{ path('profile_pictures.member', {member_id: iter.id, format: 'original'}) }}" data-popup="image" title="{{ __('Click to enlarge the photo')|e('html_attr') }}">
-                <img class="is-rounded" src="{{ path('profile_pictures.member', {member_id: iter.id, format: 'square', width: 256}) }}" width="128">
+            <a class="image is-128x128" href="{{ path('profile_pictures.member', {member_id: iter.id, format: 'original', timestamp: iter.profile_picture.mtime}) }}" data-popup="image" title="{{ __('Click to enlarge the photo')|e('html_attr') }}">
+                <img class="is-rounded" src="{{ path('profile_pictures.member', {member_id: iter.id, format: 'square', width: 256, timestamp: iter.profile_picture.mtime}) }}" width="128">
             </a>
         </figure>
     {% else %}

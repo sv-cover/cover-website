@@ -10,7 +10,7 @@ use App\Legacy\Authentication\SessionProviderInterface;
 
 class MemberIdentityProvider implements IdentityProviderInterface
 {
-    protected ?DataIterMember $member;
+    protected ?DataIterMember $member = null;
 
     public function __construct(
         protected SessionProviderInterface $session_provider,
