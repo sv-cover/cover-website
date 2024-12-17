@@ -1,8 +1,8 @@
 <?php
 namespace App\Form\ChoiceList;
 
+use App\DataModel\DataModelCommissie;
 use App\Service\Authentication;
-use App\Service\Database;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
@@ -11,7 +11,7 @@ class CommitteeChoiceLoader implements ChoiceLoaderInterface
 {
     public function __construct(
         private Authentication $auth,
-        private Database $db,
+        private DataModelCommissie $committeeModel,
         private bool $showAll = false,
         private bool $showOwn = true,
     ) {
@@ -19,7 +19,7 @@ class CommitteeChoiceLoader implements ChoiceLoaderInterface
 
     public function loadChoiceList(callable $value = null): ChoiceListInterface
     {
-        $choices = $this->db->getModel('DataModelCommissie')->get_committee_choices($this->showOwn);
+        $choices = $this->committeeModel->get_committee_choices($this->showOwn);
 
         $factory = new DefaultChoiceListFactory();
         return $factory->createListFromChoices($choices, $value, [$this, 'filterCommittees']);

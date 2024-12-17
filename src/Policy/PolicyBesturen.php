@@ -2,6 +2,7 @@
 
 namespace App\Policy;
 
+use App\DataModel\DataModelBesturen;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Policy\PolicyInterface;
@@ -13,7 +14,7 @@ class PolicyBesturen implements PolicyInterface
 
     public static function getSupportedModel(): string
     {
-        return \DataModelBesturen::class;
+        return DataModelBesturen::class;
     }
 
     public function __construct(

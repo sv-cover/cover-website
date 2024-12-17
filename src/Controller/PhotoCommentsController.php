@@ -2,10 +2,13 @@
 
 namespace App\Controller;
 
+use App\DataIter\DataIterPhoto;
+use App\DataIter\DataIterPhotobook;
+use App\DataModel\DataModelPhotobook;
+use App\DataModel\DataModelPhotobookReactie;
 use App\Exception\UnauthorizedException;
 use App\Form\PhotoCommentType;
 use App\Service\Authentication;
-use App\Service\Database;
 use App\Service\Policy;
 use App\Utils\PhotoUtils;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,22 +21,21 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/photos/{book_id}/photo/{photo_id<\d+>}/comments', requirements: ['book_id' => '\d+|liked|member(_\d+)+'])]
 class PhotoCommentsController extends AbstractController
 {
-    private \DataIterPhotobook $book;
-    private \DataModelPhotobookReactie $model;
-    private \DataIterPhoto $photo;
+    private DataIterPhotobook $book;
+    private DataIterPhoto $photo;
 
     public function __construct(
-        private Database $db,
+        private DataModelPhotobook $bookModel,
+        private DataModelPhotobookReactie $model,
         private Policy $policy,
         private PhotoUtils $photoUtils,
-    ){
-        $this->model = $db->getModel('DataModelPhotobookReactie');
+    ) {
     }
 
     private function validateRoute(Request $request): ?RedirectResponse
     {
         $photo_id = $request->attributes->get('_route_params')['photo_id'];
-        $this->photo = $this->db->getModel('DataModelPhotobook')->get_iter($photo_id);
+        $this->photo = $this->bookModel->get_iter($photo_id);
 
         $book_id = $request->attributes->get('_route_params')['book_id'];
         $this->book = $this->photoUtils->getBook($book_id);
@@ -57,7 +59,7 @@ class PhotoCommentsController extends AbstractController
     /**
      * Render the "_photo" fragment
      */
-    public function photo(Authentication $auth, \DataIterPhoto $photo, \DataIterPhotobook $book)
+    public function photo(Authentication $auth, DataIterPhoto $photo, DataIterPhotobook $book)
     {
         $iter = $this->model->new_iter([
             'foto' => $photo->get_id(),

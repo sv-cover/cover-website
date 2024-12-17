@@ -2,11 +2,12 @@
 
 namespace App\Controller;
 
+use App\DataModel\DataModelMember;
+use App\DataModel\DataModelPasswordResetToken;
 use App\Exception\NotFoundException;
 use App\Exception\UnauthorizedException;
 use App\Form\PasswordType;
 use App\Service\Authentication;
-use App\Service\Database;
 use App\Service\Policy;
 use App\Utils\UrlUtils;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,15 +25,12 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class PasswordController extends AbstractController
 {
-    private \DataModelPasswordResetToken $tokenModel;
-    private \DataModelMember $memberModel;
 
     public function __construct(
-        private Database $db,
+        private DataModelMember $memberModel,
+        private DataModelPasswordResetToken $tokenModel,
         private Policy $policy,
-    ){
-        $this->tokenModel = $db->getModel('DataModelPasswordResetToken');
-        $this->memberModel = $db->getModel('DataModelMember');
+    ) {
     }
 
     #[Route('/password', name: 'password.request', methods: ['GET', 'POST'])]

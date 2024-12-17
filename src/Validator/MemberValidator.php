@@ -1,7 +1,7 @@
 <?php
 namespace App\Validator;
 
-use App\Service\Database;
+use App\DataModel\DataModelMember;
 use App\Exception\NotFoundException;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 class MemberValidator extends ConstraintValidator
 {
     public function __construct(
-        private Database $db,
+        private DataModelMember $memberModel,
     ) {
     }
 
@@ -28,7 +28,7 @@ class MemberValidator extends ConstraintValidator
             throw new UnexpectedValueException($value, 'int');
 
         try {
-            $member = $this->db->getModel('DataModelMember')->get_iter($value);
+            $member = $this->memberModel->get_iter($value);
         } catch (NotFoundException $e) {
             $this->context->buildViolation(__($constraint->member_not_found_message))
                 ->addViolation();

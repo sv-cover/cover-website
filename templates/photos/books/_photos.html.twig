@@ -1,12 +1,12 @@
 {% from 'photos/macros.html.twig' import gallery %}
 
 {# Prepare context: make sure the hard things are done only once #}
-{% set likes = db.getModel('DataModelPhotobookLike').count_for_photos(photos) %}
-{% set my_likes = auth.loggedIn ? db.getModel('DataModelPhotobookLike').get_for_lid(auth.identity.member) : [] %}
+{% set likes = model('PhotobookLike').count_for_photos(photos) %}
+{% set my_likes = auth.loggedIn ? model('PhotobookLike').get_for_lid(auth.identity.member) : [] %}
 
 {% set visibility = [] %}
-{% if book is instanceof('DataIterFacesPhotobook') %}
-    {% set visibility = db.getModel('DataModelPhotobookPrivacy').get_visibility_for_photos(photos, auth.identity.member) %}
+{% if book is instanceof('App\\DataIter\\DataIterFacesPhotobook') %}
+    {% set visibility = model('PhotobookPrivacy').get_visibility_for_photos(photos, auth.identity.member) %}
 {% endif %}
 
 {% set unread_photos = photos|filter(p => p.read_status == 'unread') %}

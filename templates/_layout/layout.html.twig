@@ -61,7 +61,8 @@
         {% endfor %}
     {% endfor %}
 
-    {# {% if global.db.history|length > 0 %}
+    {# TODO SFY
+    {% if global.db.history|length > 0 %}
         <script>
             console.info('Total number of queries run: %d (%0.1fms)', {{ global.db.history|length }}, {{ global.db.history|select('duration')|sum * 1000 }});
             console.groupCollapsed("Queries");

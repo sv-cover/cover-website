@@ -2,7 +2,9 @@
 
 namespace App\Twig;
 
+use App\Legacy\Database\DataModel;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
@@ -11,9 +13,17 @@ use Twig\TwigTest;
 
 class LegacyExtension extends AbstractExtension
 {
+    private array $models = [];
+
     public function __construct(
         private UrlGeneratorInterface $router,
+        #[AutowireIterator('app.data-model')]
+        iterable $models,
     ) {
+        foreach ($models as $model) {
+            $name = (new \ReflectionClass($model))->getShortName();
+            $this->models[$name] = $model;
+        }
     }
 
     public function getFilters(): array
@@ -85,8 +95,9 @@ class LegacyExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('login_path', [$this, 'get_login_path']),
-            new TwigFunction('logout_path', [$this, 'get_logout_path']),
+            new TwigFunction('login_path', [$this, 'getLoginPath']),
+            new TwigFunction('logout_path', [$this, 'getLogoutPath']),
+            new TwigFunction('model', [$this, 'getModel']),
         ];
     }
 
@@ -100,7 +111,7 @@ class LegacyExtension extends AbstractExtension
         ];
     }
 
-    public function get_login_path($referrer = null, $name = 'login')
+    public function getLoginPath($referrer = null, $name = 'login')
     {
         if (!isset($referrer))
             $referrer = $_SERVER['REQUEST_URI'];
@@ -108,11 +119,22 @@ class LegacyExtension extends AbstractExtension
         return $this->router->generate($name, compact('referrer'));
     }
 
-    public function get_logout_path($referrer = null, $name = 'logout')
+    public function getLogoutPath($referrer = null, $name = 'logout')
     {
         if (!isset($referrer))
             $referrer = $_SERVER['REQUEST_URI'];
 
         return $this->router->generate($name, compact('referrer'));
+    }
+
+    public function getModel($name): DataModel
+    {
+        if (!str_starts_with($name, 'DataModel'))
+            $name = 'DataModel' . $name;
+
+        if (!isset($this->models[$name]))
+            throw new \InvalidArgumentException(sprintf(__("Could not find the model %s"), $name));
+
+        return $this->models[$name];
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Legacy\Authentication;
 
+use App\DataIter\DataIterMember;
+use App\DataModel\DataModelMember;
 use App\Legacy\Authentication\MemberIdentityProvider;
 
 class ImpersonatingIdentityProvider extends MemberIdentityProvider
@@ -21,7 +23,7 @@ class ImpersonatingIdentityProvider extends MemberIdentityProvider
             $member = parent::member();
 
         if ($this->get_override_committees() !== null)
-            $member = new \DataIterMember($member->model(), $member->get_id(),
+            $member = new DataIterMember($member->get_model(), $member->get_id(),
                 array_merge($member->data, ['committees' => $this->get_override_committees()]));
 
         return $member;
@@ -45,7 +47,7 @@ class ImpersonatingIdentityProvider extends MemberIdentityProvider
             return null;
 
         if (!$this->override_member)
-            $this->override_member = \get_model('DataModelMember')->get_iter($session['override_member_id']);
+            $this->override_member = $this->member_model->get_iter($session['override_member_id']);
         
         return $this->override_member;
     }

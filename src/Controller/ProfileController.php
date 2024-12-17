@@ -2,11 +2,16 @@
 
 namespace App\Controller;
 
+use App\DataIter\DataIterMember;
+use App\DataModel\DataModelCommissie;
+use App\DataModel\DataModelEmailConfirmationToken;
+use App\DataModel\DataModelMailinglist;
+use App\DataModel\DataModelMember;
+use App\DataModel\DataModelSession;
 use App\Exception\UnauthorizedException;
 use App\Form\PasswordType;
 use App\Form\ProfilePictureType;
 use App\Service\Authentication;
-use App\Service\Database;
 use App\Service\Incassomatic;
 use App\Service\Kast;
 use App\Service\Policy;
@@ -38,17 +43,14 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class ProfileController extends AbstractController
 {
-    private \DataModelMember $model;
-
     public function __construct(
         private Authentication $auth,
-        private Database $db,
+        private DataModelMember $model,
         private Policy $policy,
-    ){
-        $this->model = $db->getModel('DataModelMember');
+    ) {
     }
 
-    private function getPersonalForm(\DataIterMember $iter)
+    private function getPersonalForm(DataIterMember $iter)
     {
         $form = $this->createFormBuilder($iter)
             ->add('adres', TextType::class, [
@@ -87,7 +89,7 @@ class ProfileController extends AbstractController
                     new Assert\Email(),
                     new Assert\Length(['max' => 255]),
                 ],
-                'setter' => function (\DataIterMember &$member, string $value, FormInterface $form) {
+                'setter' => function (DataIterMember &$member, string $value, FormInterface $form) {
                     // Prevent normal flow by doing nothing. Email requires special treatment.
                 },
             ])
@@ -111,7 +113,7 @@ class ProfileController extends AbstractController
         return $form;
     }
 
-    private function getProfileForm(\DataIterMember $iter, FormFactoryInterface $formFactory)
+    private function getProfileForm(DataIterMember $iter, FormFactoryInterface $formFactory)
     {
         $form = $formFactory->createNamedBuilder('profile', FormType::class, $iter)
             ->add('nick', TextType::class, [
@@ -150,7 +152,7 @@ class ProfileController extends AbstractController
         return $form;
     }
 
-    private function getPrivacyForm(\DataIterMember $iter)
+    private function getPrivacyForm(DataIterMember $iter)
     {
         // TODO: These should really be stored in the database
         $labels = [
@@ -172,9 +174,9 @@ class ProfileController extends AbstractController
             $builder->add($field, ChoiceType::class, [
                 'label' => $labels[$field] ?? $field,
                 'choices'  => [
-                    __('Everyone') => \DataModelMember::VISIBLE_TO_EVERYONE,
-                    __('Members') => \DataModelMember::VISIBLE_TO_MEMBERS,
-                    __('Nobody') => \DataModelMember::VISIBLE_TO_NONE,
+                    __('Everyone') => DataModelMember::VISIBLE_TO_EVERYONE,
+                    __('Members') => DataModelMember::VISIBLE_TO_MEMBERS,
+                    __('Nobody') => DataModelMember::VISIBLE_TO_NONE,
                 ],
                 'expanded' => true,
                 'chips' => true,
@@ -185,7 +187,7 @@ class ProfileController extends AbstractController
         return $builder->getForm();
     }
 
-    private function updateMember(Secretary $secretary, \DataIterMember $iter)
+    private function updateMember(Secretary $secretary, DataIterMember $iter)
     {
         // Inform the board that member info has been changed.
         $subject = "Member details updated";
@@ -208,7 +210,7 @@ class ProfileController extends AbstractController
     #[Route('/profile', name: 'profile', methods: ['GET'])]
     #[Route('/profile/{member_id<\d+>}', name: 'profile.member', methods: ['GET'])]
     #[Route('/profile/{member_id<\d+>}/public', name: 'profile.public', methods: ['GET'])]
-    public function publicTab(?int $member_id = null): Response
+    public function publicTab(DataModelCommissie $committeeModel, ?int $member_id = null): Response
     {
         if (isset($member_id))
             $iter = $this->model->get_iter($member_id);
@@ -221,7 +223,7 @@ class ProfileController extends AbstractController
         if (!$this->policy->userCanRead($iter))
             throw new UnauthorizedException('This person is no longer a Cover member and therefore has no public profile.');
 
-        $committees = $this->db->getModel('DataModelCommissie')->get_for_member($iter);
+        $committees = $committeeModel->get_for_member($iter);
 
         return $this->render('profile/public_tab.html.twig', [
             'iter' => $iter,
@@ -231,7 +233,13 @@ class ProfileController extends AbstractController
 
     #[Route('/profile/personal', methods: ['GET'])]
     #[Route('/profile/{member_id<\d+>}/personal', name: 'profile.personal', methods: ['GET', 'POST'])]
-    public function personalTab(Request $request, Secretary $secretary, UriSigner $uriSigner, ?int $member_id = null): Response
+    public function personalTab(
+        DataModelEmailConfirmationToken $tokenModel,
+        Request $request,
+        Secretary $secretary,
+        UriSigner $uriSigner,
+        ?int $member_id = null
+    ): Response
     {
         if (isset($member_id))
             $iter = $this->model->get_iter($member_id);
@@ -255,7 +263,7 @@ class ProfileController extends AbstractController
             // If the email address has changed, add a confirmation.
             if ($form['email']->getData() != $iter['email']) {
                 $updates[] = 'email';
-                $token = $this->db->getModel('DataModelEmailConfirmationToken')->create_token($iter, $form['email']->getData());
+                $token = $tokenModel->create_token($iter, $form['email']->getData());
 
                 $url = $this->generateUrl('profile.confirm_email', ['token' => $token['key']], UrlGeneratorInterface::ABSOLUTE_URL);
                 $signed_url = $uriSigner->sign($url, new \DateInterval('PT24H')); // Valid for 24 hours
@@ -356,7 +364,7 @@ class ProfileController extends AbstractController
 
     #[Route('/profile/mailing_lists', methods: ['GET'])]
     #[Route('/profile/{member_id<\d+>}/mailing_lists', name: 'profile.mailing_lists', methods: ['GET'])]
-    public function mailingListsTab(?int $member_id = null): Response
+    public function mailingListsTab(DataModelMailinglist $mailinglistModel, ?int $member_id = null): Response
     {
         if (isset($member_id))
             $iter = $this->model->get_iter($member_id);
@@ -366,7 +374,7 @@ class ProfileController extends AbstractController
         if (!$this->policy->userCanUpdate($iter))
             throw new UnauthorizedException();
 
-        $lists = $this->db->getModel('DataModelMailinglist')->get_for_member($iter);
+        $lists = $mailinglistModel->get_for_member($iter);
 
         // TODO: should we show all list a person is subscribed to?
         $lists = array_filter($lists, [$this->policy, 'userCanSubscribe']);
@@ -379,7 +387,7 @@ class ProfileController extends AbstractController
 
     #[Route('/profile/sessions', methods: ['GET'])]
     #[Route('/profile/{member_id<\d+>}/sessions', name: 'profile.sessions', methods: ['GET'])]
-    public function sessionsTab(?int $member_id = null): Response
+    public function sessionsTab(DataModelSession $model, ?int $member_id = null): Response
     {
         if (isset($member_id))
             $iter = $this->model->get_iter($member_id);
@@ -388,8 +396,6 @@ class ProfileController extends AbstractController
 
         if (!$this->policy->userCanUpdate($iter))
             throw new UnauthorizedException();
-
-        $model = $this->db->getModel('DataModelSession');
 
         return $this->render('profile/sessions_tab.html.twig', [
             'iter' => $iter,
@@ -515,6 +521,7 @@ class ProfileController extends AbstractController
 
     #[Route('/profile/confirm_email', name: 'profile.confirm_email', methods: ['GET'])]
     public function confirmEmail(
+        DataModelEmailConfirmationToken $model,
         #[MapQueryParameter] string $token,
         Request $request,
         Secretary $secretary,
@@ -523,8 +530,6 @@ class ProfileController extends AbstractController
     {
         if (!$uriSigner->checkRequest($request))
             return $this->render('profile/confirm_email.html.twig', ['success' => false]);
-
-        $model = $this->db->getModel('DataModelEmailConfirmationToken');
 
         try {
             $token = $model->get_iter($token);
@@ -561,7 +566,7 @@ class ProfileController extends AbstractController
         // Macro for checking whether a field is not private.
         $is_visible = function($field) use ($iter) {
             return in_array($this->model->get_privacy_for_field($iter, $field),
-                [\DataModelMember::VISIBLE_TO_EVERYONE, \DataModelMember::VISIBLE_TO_MEMBERS]);
+                [DataModelMember::VISIBLE_TO_EVERYONE, DataModelMember::VISIBLE_TO_MEMBERS]);
         };
 
         $card = new VCard();

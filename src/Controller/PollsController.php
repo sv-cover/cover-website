@@ -2,11 +2,12 @@
 
 namespace App\Controller;
 
+use App\DataModel\DataModelPoll;
+use App\DataModel\DataModelPollLike;
 use App\Exception\UnauthorizedException;
 use App\Form\DataTransformer\StringToDateTimeTransformer;
 use App\Form\PollType;
 use App\Service\Authentication;
-use App\Service\Database;
 use App\Service\Policy;
 use App\Utils\UrlUtils;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,13 +27,10 @@ class PollsController extends AbstractController
 {
     CONST PAGE_SIZE = 10;
 
-    private \DataModelPoll $model;
-
     public function __construct(
-        private Database $db,
+        private DataModelPoll $model,
         private Policy $policy,
-    ){
-        $this->model = $db->getModel('DataModelPoll');
+    ) {
     }
 
     public function homepage(): Response
@@ -242,7 +240,13 @@ class PollsController extends AbstractController
     }
 
     #[Route('/polls/{id<\d+>}/likes', name: 'polls.likes', methods: ['GET', 'POST'])]
-    public function likes(Authentication $auth, Request $request, UrlUtils $urlUtils, int $id): Response|RedirectResponse
+    public function likes(
+        Authentication $auth,
+        DataModelPollLike $likeModel,
+        Request $request,
+        UrlUtils $urlUtils,
+        int $id
+    ): Response|RedirectResponse
     {
         $iter = $this->model->get_iter($id);
 
@@ -268,8 +272,6 @@ class PollsController extends AbstractController
         } elseif ($form->isSubmitted() && $form->isValid()) {
             $action = $form->get('like')->isClicked() ? 'like' : 'unlike';
         }
-
-        $likeModel = $this->db->getModel('DataModelPollLike');
 
         if ($auth->loggedIn && isset($action)) {
             try {

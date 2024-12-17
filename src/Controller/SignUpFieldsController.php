@@ -2,9 +2,10 @@
 
 namespace App\Controller;
 
+use App\DataModel\DataModelSignUpField;
+use App\DataModel\DataModelSignUpForm;
 use App\Exception\UnauthorizedException;
 use App\Form\SignUpFieldType;
-use App\Service\Database;
 use App\Service\Policy;
 use App\SignUp\SignUpFormManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,15 +19,11 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/sign_up/{form_id<\d+>}/fields')]
 class SignUpFieldsController extends AbstractController
 {
-    private \DataModelSignUpField $fieldModel;
-    private \DataModelSignUpForm $formModel;
-
     public function __construct(
-        private Database $db,
+        private DataModelSignUpField $fieldModel,
+        private DataModelSignUpForm $formModel,
         private Policy $policy,
-    ){
-        $this->fieldModel = $db->getModel('DataModelSignUpField');
-        $this->formModel = $db->getModel('DataModelSignUpForm');
+    ) {
     }
 
     #[Route('/create', name: 'sign_up_fields.create', methods: ['GET', 'POST'])]

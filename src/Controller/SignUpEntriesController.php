@@ -2,10 +2,13 @@
 
 namespace App\Controller;
 
+use App\DataModel\DataModelSignUpEntry;
+use App\DataModel\DataModelSignUpForm;
+use App\DataIter\DataIterAgenda;
+use App\DataIter\DataIterSignupForm;
 use App\Exception\UnauthorizedException;
 use App\Form\SignUpFieldType;
 use App\Service\Authentication;
-use App\Service\Database;
 use App\Service\Policy;
 use App\SignUp\SignUpFormManager;
 use App\Utils\UrlUtils;
@@ -21,19 +24,15 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class SignUpEntriesController extends AbstractController
 {
-    private $entryModel;
-    private $formModel;
-
     public function __construct(
-        private Database $db,
+        private DataModelSignUpEntry $entryModel,
+        private DataModelSignUpForm $formModel,
         private SignUpFormManager $manager,
         private Policy $policy,
-    ){
-        $this->entryModel = $db->getModel('DataModelSignUpEntry');
-        $this->formModel = $db->getModel('DataModelSignUpForm');
+    ) {
     }
 
-    public function eventPage(Authentication $auth, \DataIterAgenda $event): Response
+    public function eventPage(Authentication $auth, DataIterAgenda $event): Response
     {
         if (!$auth->loggedIn)
             return $this->render('sign_ups/entries/_event_page_login.html.twig', [
@@ -61,7 +60,7 @@ class SignUpEntriesController extends AbstractController
         ]);
     }
 
-    private function streamCsv(\DataIterSignupForm $form): void
+    private function streamCsv(DataIterSignupForm $form): void
     {
         // Add Unicode byte order marker for Excel
         echo chr(239) . chr(187) . chr(191);

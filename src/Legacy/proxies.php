@@ -29,24 +29,6 @@ function get_model(string $name) {
     return $kernel->getContainer()->get('App\Service\Database')->getModel($name);
 }
 
-function get_secretary() {
-    global $kernel;
-
-    if (!isset($kernel))
-        return null;
-
-    return $kernel->getContainer()->get('App\Service\Secretary');
-}
-
-function get_policy($name) {
-    global $kernel;
-
-    if (!isset($kernel))
-        return null;
-
-    return $kernel->getContainer()->get('App\Service\Policy')->get($name);
-}
-
 function get_config_value(string $name, mixed $default = null) {
     global $kernel;
 

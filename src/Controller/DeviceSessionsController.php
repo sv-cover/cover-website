@@ -2,11 +2,11 @@
 
 namespace App\Controller;
 
+use App\DataModel\DataModelSession;
 use App\Exception\UnauthorizedException;
 use App\Form\DeviceSessionType;
 use App\Legacy\Authentication\DeviceIdentityProvider;
 use App\Service\Authentication;
-use App\Service\Database;
 use App\Service\Policy;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -17,13 +17,10 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class DeviceSessionsController extends AbstractController
 {
-    private \DataModelSession $model;
-
     public function __construct(
-        private Database $db,
+        private DataModelSession $model,
         private Policy $policy,
-    ){
-        $this->model = $db->getModel('DataModelSession');
+    ) {
     }
 
     #[Route('/sessions/device', name: 'device_sessions.list', methods: ['GET'])]

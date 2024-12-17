@@ -2,11 +2,13 @@
 
 namespace App\Controller;
 
+use App\DataIter\DataIterSignupForm;
+use App\DataModel\DataModelSignUpField;
+use App\DataModel\DataModelSignUpForm;
 use App\Exception\UnauthorizedException;
 use App\Form\SignUpFormType;
 use App\Form\SignUpFieldType;
 use App\Service\Authentication;
-use App\Service\Database;
 use App\Service\Policy;
 use App\SignUp\SignUpFormManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,14 +22,12 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class SignUpFormsController extends AbstractController
 {
-    private \DataModelSignUpForm $model;
-
     public function __construct(
-        private Database $db,
+        private DataModelSignUpForm $model,
+        private DataModelSignUpField $fieldModel,
         private Policy $policy,
         private SignUpFormManager $manager,
-    ){
-        $this->model = $db->getModel('DataModelSignUpForm');
+    ) {
     }
 
     #[Route('/sign_up', name: 'sign_up_forms.list', methods: ['GET'])]
@@ -154,10 +154,10 @@ class SignUpFormsController extends AbstractController
         ]);
     }
 
-    private function populateFormFromTemplate(\DataIterSignupForm $form, string $template): void
+    private function populateFormFromTemplate(DataIterSignupForm $form, string $template): void
     {
         if ($template == 'paid_activity') {
-            $model = $this->db->getModel('DataModelSignUpField');
+            $model = $this->fieldModel;
 
             $model->db->beginTransaction();
 

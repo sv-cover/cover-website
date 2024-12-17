@@ -18,20 +18,20 @@
     {# Make sure the context is how we expect it to be, in case this macro is called from somewhere else #}
     {# TODO SFY don't call models directly from templates #}
     {% if context.likes is not defined %}
-        {% set context = context|merge({'likes': db.getModel('DataModelPhotobookLike').count_for_photos(photos)}) %}
+        {% set context = context|merge({'likes': model('PhotobookLike').count_for_photos(photos)}) %}
     {% endif  %}
 
     {% if context.my_likes is not defined %}
         {% if auth.loggedIn %}
-            {% set context = context|merge({'my_likes': db.getModel('DataModelPhotobookLike').get_for_lid(auth.identity.member)}) %}
+            {% set context = context|merge({'my_likes': model('PhotobookLike').get_for_lid(auth.identity.member)}) %}
         {% else %}
             {% set context = context|merge({'my_likes': []}) %}
         {% endif %}
     {% endif %}
 
     {% if context.visibility is not defined %}
-        {% if context.book is instanceof('DataIterFacesPhotobook') %}
-            {% set context = context|merge({'visibility': db.getModel('DataModelPhotobookPrivacy').get_visibility_for_photos(photos, auth.identity.member)}) %}
+        {% if context.book is instanceof('App\\DataIter\\DataIterFacesPhotobook') %}
+            {% set context = context|merge({'visibility': model('PhotobookPrivacy').get_visibility_for_photos(photos, auth.identity.member)}) %}
         {% else %}
             {% set context = context|merge({'visibility': []}) %}
         {% endif %}

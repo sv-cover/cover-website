@@ -4,12 +4,18 @@ namespace App\Controller;
 
 require_once 'src/Legacy/mailing_list.php';
 
+use App\DataModel\DataModelAgenda;
+use App\DataModel\DataModelCommissie;
+use App\DataModel\DataModelMailinglist;
+use App\DataModel\DataModelMailinglistSubscription;
+use App\DataModel\DataModelMember;
+use App\DataModel\DataModelPasswordResetToken;
+use App\DataModel\DataModelSession;
 use App\Exception\NotFoundException;
 use App\Exception\UnauthorizedException;
 use App\Legacy\Authentication\ConstantSessionProvider;
 use App\Legacy\Authentication\DeviceIdentityProvider;
 use App\Service\Authentication;
-use App\Service\Database;
 use App\Service\Policy;
 use App\Service\Secretary;
 use function App\Legacy\Email\MailingList\get_error_message;
@@ -36,8 +42,14 @@ class ApiController extends AbstractController
     private Request $request;
 
     public function __construct(
+        private DataModelAgenda $eventModel,
+        private DataModelCommissie $committeeModel,
+        private DataModelMailinglist $mailingListModel,
+        private DataModelMailinglistSubscription $mailingListSubscriptionModel,
+        private DataModelMember $memberModel,
+        private DataModelPasswordResetToken $passwordResetModel,
+        private DataModelSession $sessionModel,
         private Authentication $auth,
-        private Database $db,
         private Policy $policy,
         private UriSigner $uriSigner,
     ) {
@@ -144,13 +156,11 @@ class ApiController extends AbstractController
                 $committees = [$committees];
         }
 
-        $agenda = $this->db->getModel('DataModelAgenda');
-
         $activities = [];
 
         // TODO logged_in() incidentally works because the session is read from $_GET[session_id] by
         // the session provider. But the current session should be set more explicit.
-        foreach ($agenda->get_agendapunten() as $activity){
+        foreach ($this->eventModel->get_agendapunten() as $activity){
             if (!empty($committees) && !in_array($activity['committee']['login'], $committees))
                 continue;
             if ($this->policy->userCanRead($activity))
@@ -174,15 +184,14 @@ class ApiController extends AbstractController
         if ($id === 0)
             throw new \InvalidArgumentException('Missing id parameter');
 
-        $agenda = $this->db->getModel('DataModelAgenda');
-        $agendapunt = $agenda->get_iter($id);
+        $event = $this->eventModel->get_iter($id);
 
         // TODO this incidentally works because the session is read from $_GET[session_id] by
         // the session provider. But the current session should be set more explicit.
-        if (!$this->policy->userCanRead($agendapunt))
+        if (!$this->policy->userCanRead($event))
             throw new UnauthorizedException('You are not authorized to read this event');
 
-        $data = $agendapunt->data;
+        $data = $event->data;
 
         // Backwards compatibility for consumers of the API
         $data['commissie'] = $data['committee_id'];
@@ -197,15 +206,14 @@ class ApiController extends AbstractController
     private function getMember(): Response
     {
         $memberId = $this->request->query->get('member_id');
-        $model = $this->db->getModel('DataModelMember');
-        $member = $model->get_iter($memberId);
+        $member = $this->memberModel->get_iter($memberId);
 
         $data = $member->data;
         // Hide all private fields for this user. is_private() uses
         // logged_in() which uses the session_id get variable. So sessions
         // are taken into account ;)
         foreach ($data as $field => $value)
-            if ($model->is_private($member, $field, true))
+            if ($this->memberModel->is_private($member, $field, true))
                 $data[$field] = null;
 
         // This one is passed as parameter anyway, it is already known.
@@ -220,15 +228,13 @@ class ApiController extends AbstractController
     private function getCommittees(): Response
     {
         $memberId = $this->request->query->get('member_id');
-        $memberModel = $this->db->getModel('DataModelMember');
-        $memberCommittees = $memberModel->get_commissies($memberId);
+        $memberCommittees = $this->memberModel->get_commissies($memberId);
 
-        $committeeModel = $this->db->getModel('DataModelCommissie');
         $committees = [];
 
         foreach ($memberCommittees as $committeeId)
         {
-            $committee = $committeeModel->get_iter($committeeId);
+            $committee = $this->committeeModel->get_iter($committeeId);
             $committees[$committee['login']] = $committee['naam'];
         }
 
@@ -246,12 +252,10 @@ class ApiController extends AbstractController
         $password = $this->request->getPayload()->get('password');
         $application = $this->request->getPayload()->get('application', 'api');
 
-        $userModel = $this->db->getModel('DataModelMember');
-        if (!($member = $userModel->login($email, $password)))
+        if (!($member = $this->memberModel->login($email, $password)))
             throw new \InvalidArgumentException('Invalid username or password');
 
-        $sessionModel = $this->db->getModel('DataModelSession');
-        $session = $sessionModel->create($member->get_id(), $application);
+        $session = $this->sessionModel->create($member->get_id(), $application);
 
         return $this->json(['result' => [
             'session_id' => $session->get('session_id'),
@@ -264,10 +268,8 @@ class ApiController extends AbstractController
     {
         $sessionId = $this->request->getPayload()->get('session_id');
 
-        $sessionModel = $this->db->getModel('DataModelSession');
-
-        $session = $sessionModel->resume($sessionId);
-        $sessionModel->delete($session);
+        $session = $this->sessionModel->resume($sessionId);
+        $this->sessionModel->delete($session);
 
         return $this->json([]);
     }
@@ -277,9 +279,7 @@ class ApiController extends AbstractController
         // TODO SFY: POST data was supported for legacy
         $sessionId = $this->request->query->get('session_id');
 
-        $sessionModel = $this->db->getModel('DataModelSession');
-
-        $session = $sessionModel->resume($sessionId);
+        $session = $this->sessionModel->resume($sessionId);
 
         if (!$session)
             throw new \InvalidArgumentException('Invalid session id');
@@ -301,11 +301,10 @@ class ApiController extends AbstractController
             $data[$field] = $member[$field];
 
         // Prepare committee data
-        $committeeModel = $this->db->getModel('DataModelCommissie');
         $committeeData = [];
 
         // $committee_ids = $ident->get_override_committees() ?? $member['committees'];
-        $committees = $committeeModel->find(['id__in' => $member['committees'] ]);
+        $committees = $this->committeeModel->find(['id__in' => $member['committees'] ]);
 
         // For now just return login and committee name
         foreach ($committees as $committee)
@@ -329,17 +328,13 @@ class ApiController extends AbstractController
                 $committees = [$committees];
         }
 
-        $sessionModel = $this->db->getModel('DataModelSession');
-        $session = $sessionModel->get_iter($sessionId);
+        $session = $this->sessionModel->get_iter($sessionId);
         $auth = new ConstantSessionProvider($session);
         $ident = $this->auth->getIdentityProvider($auth);
 
-        $committeeModel = $this->db->getModel('DataModelCommissie');
-
-        foreach ($committees as $committee_name)
-        {
+        foreach ($committees as $committee_name) {
             // Find the committee id
-            $committee = $committeeModel->get_from_name($committee_name);
+            $committee = $this->committeeModel->get_from_name($committee_name);
 
             // And finally, test whether the searched for committee and the member is committees intersect
             if ($ident->member_in_committee($committee->get_id()))
@@ -382,8 +377,6 @@ class ApiController extends AbstractController
 
     private function secretaryCreateMember(): Response
     {
-        $model = $this->db->getModel('DataModelMember');
-
         $payload = $this->request->getPayload();
 
         $id = $payload->get('id');
@@ -396,7 +389,7 @@ class ApiController extends AbstractController
         ];
 
         try {
-            $existing = $model->get_iter($data['id']);
+            $existing = $this->memberModel->get_iter($data['id']);
             if ($existing)
                 throw new \InvalidArgumentException(sprintf('Member with ID %s already exists', $data['id']));
         } catch (NotFoundException $e) {
@@ -407,7 +400,7 @@ class ApiController extends AbstractController
             if ($payload->has($field))
                 $data[$prop] = $payload->get($field);
 
-        $member = new \DataIterMember($model, $data['id'], $data);
+        $member = new \DataIterMember($this->memberModel, $data['id'], $data);
         $member['privacy'] = \DataModelMember::PRIVACY_DEFAULT;
 
         // Create profile for this member
@@ -416,7 +409,7 @@ class ApiController extends AbstractController
             $nick = '';
         $member['nick'] = $nick;
 
-        $model->insert($member);
+        $this->memberModel->insert($member);
 
         if (strtolower($this->request->query->get('send_email', 'true')) === 'true')
             // Optionally send welcome mail to new members. This can be disabled by clients,
@@ -432,8 +425,7 @@ class ApiController extends AbstractController
     private function secretaryReadMember(): Response
     {
         $memberId = $this->request->getPayload()->get('member_id');
-        $model = $this->db->getModel('DataModelMember');
-        $member = $model->get_iter($memberId);
+        $member = $this->memberModel->get_iter($memberId);
 
         $data = [];
         foreach (Secretary::FIELDS_MAP as $prop => $field)
@@ -450,8 +442,7 @@ class ApiController extends AbstractController
         if ($memberId != $payload->get('id'))
             throw new \InvalidArgumentException('Person ids in GET and POST do not match up');
 
-        $model = $this->db->getModel('DataModelMember');
-        $member = $model->get_iter($memberId);
+        $member = $this->memberModel->get_iter($memberId);
 
         $fields_map = \array_flip(Secretary::FIELDS_MAP);
 
@@ -462,7 +453,7 @@ class ApiController extends AbstractController
             $member[$fields_map[$key]] = $value;
         }
 
-        $model->update($member);
+        $this->memberModel->update($member);
 
         return $this->json([
             'success' => true,
@@ -478,10 +469,9 @@ class ApiController extends AbstractController
         if ($memberId != $payload->get('id'))
             throw new \InvalidArgumentException('Person ids in GET and POST do not match up');
 
-        $model = $this->db->getModel('DataModelMember');
-        $member = $model->get_iter($memberId);
+        $member = $this->memberModel->get_iter($memberId);
 
-        return $this->json(['success' => $model->delete($member)]);
+        return $this->json(['success' => $this->memberModel->delete($member)]);
     }
 
     private function secretarySendWelcomeMail(?\DataIterMember $member = null): Response
@@ -492,11 +482,11 @@ class ApiController extends AbstractController
 
         if (empty($member)) {
             $memberId = $this->request->query->get('member_id');
-            $member = $this->db->getModel('DataModelMember')->get_iter($memberId);
+            $member = $this->memberModel->get_iter($memberId);
         }
 
         // Create a password
-        $token = $this->db->getModel('DataModelPasswordResetToken')->create_token_for_member($member);
+        $token = $this->passwordResetModel->create_token_for_member($member);
 
         // Setup e-mail
         $data = $member->data;
@@ -519,13 +509,12 @@ class ApiController extends AbstractController
     private function secretarySubscribeMemberToMailingList(): Response
     {
         $memberId = $this->request->getPayload()->get('member_id');
-        $member = $this->db->getModel('DataModelMember')->get_iter($memberId);
+        $member = $this->memberModel->get_iter($memberId);
 
         $mailinglistId = $this->request->getPayload()->get('mailinglist');
-        $mailinglist = $this->db->getModel('DataModelMailinglist')->get_iter_by_address($mailinglistId);
+        $mailinglist = $this->mailingListModel->get_iter_by_address($mailinglistId);
 
-        $subscriptionModel = $this->db->getModel('DataModelMailinglistSubscription');
-        $subscriptionModel->subscribe_member($mailinglist, $member);
+        $this->mailingListSubscriptionModel->subscribe_member($mailinglist, $member);
 
         return $this->json(['success' => true]);
     }

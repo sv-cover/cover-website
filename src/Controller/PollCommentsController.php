@@ -2,10 +2,12 @@
 
 namespace App\Controller;
 
+use App\DataModel\DataModelPoll;
+use App\DataModel\DataModelPollComment;
+use App\DataModel\DataModelPollCommentLike;
 use App\Exception\UnauthorizedException;
 use App\Form\PollCommentType;
 use App\Service\Authentication;
-use App\Service\Database;
 use App\Service\Policy;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -17,15 +19,11 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/polls/{poll_id<\d+>}/comments')]
 class PollCommentsController extends AbstractController
 {
-    private \DataModelPollComment $commentModel;
-    private \DataModelPoll $pollModel;
-
     public function __construct(
-        private Database $db,
+        private DataModelPollComment $commentModel,
+        private DataModelPoll $pollModel,
         private Policy $policy,
-    ){
-        $this->commentModel = $db->getModel('DataModelPollComment');
-        $this->pollModel = $db->getModel('DataModelPoll');
+    ) {
     }
 
     #[Route('/create', name: 'poll_comments.create', methods: ['GET', 'POST'])]
@@ -120,7 +118,13 @@ class PollCommentsController extends AbstractController
     }
 
     #[Route('/{id<\d+>}/likes', name: 'poll_comments.likes', methods: ['GET', 'POST'])]
-    public function likes(Authentication $auth, Request $request, int $poll_id, int $id): Response|RedirectResponse
+    public function likes(
+        Authentication $auth,
+        DataModelPollCommentLike $likeModel,
+        Request $request,
+        int $poll_id,
+        int $id,
+    ): Response|RedirectResponse
     {
         $iter = $this->commentModel->get_iter($id);
         $poll = $this->pollModel->get_iter($poll_id);
@@ -154,8 +158,6 @@ class PollCommentsController extends AbstractController
         } elseif ($form->isSubmitted() && $form->isValid()) {
             $action = $form->get('like')->isClicked() ? 'like' : 'unlike';
         }
-
-        $likeModel = $this->db->getModel('DataModelPollCommentLike');
 
         if ($auth->loggedIn && isset($action)) {
             try {

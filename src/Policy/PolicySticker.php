@@ -2,6 +2,7 @@
 
 namespace App\Policy;
 
+use App\DataModel\DataModelSticker;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Policy\PolicyInterface;
@@ -13,7 +14,7 @@ class PolicySticker implements PolicyInterface
 
     public static function getSupportedModel(): string
     {
-        return \DataModelSticker::class;
+        return DataModelSticker::class;
     }
 
     public function __construct(

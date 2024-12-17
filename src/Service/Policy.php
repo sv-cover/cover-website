@@ -8,40 +8,44 @@ use App\Legacy\Database\DataIter;
 use App\Legacy\Database\DataModel;
 use App\Policy as Policies;
 use App\Service\Authentication;
-use App\Service\Database;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 class Policy
 {
-    const string MODEL_PREFIX = 'DataModel';
+    const asdf = 10;
+    const string MODEL_NAMESPACE = 'App\DataModel\\';
+    const string MODEL_PREFIX = 'App\DataModel\DataModel';
 
     private array $policies = [];
+    private array $models = [];
 
     public function __construct(
         private Authentication $auth,
-        private Database $db,
         #[AutowireIterator('app.policy', defaultIndexMethod: 'getSupportedModel')]
         iterable $policies,
+        #[AutowireIterator('app.data-model')]
+        iterable $models,
     ) {
         $this->policies = $policies instanceof \Traversable ? \iterator_to_array($policies) : $policies;
+
+        foreach ($models as $model) {
+            $name = (new \ReflectionClass($model))->getShortName();
+            $this->models[$name] = $model;
+        }
     }
 
     public function get(string|DataIter|DataModel $model, ?string $original_model_name = null): PolicyInterface
     {
-        if (is_string($model)) {// Providing a name, e.g. DataIterFotoboek
-            if (substr($model, 0, strlen('DataModel')) == 'DataModel')
-                $modelName = substr($model, strlen('DataModel'));
-            elseif (substr($model, 0, strlen('DataIter')) == 'DataIter')
-                $modelName = substr($model, strlen('DataIter'));
-            else
-                throw new \InvalidArgumentException('Cannot determine the policy for any class of which the name does not start with DataModel or DataIter.');
-        }
+        if (is_string($model) && (str_contains($model, 'DataModel') || str_contains($model, 'DataIter')))
+            $modelName = preg_replace('{^.*(DataIter|DataModel)}', '', $model);
+        elseif (is_string($model))
+            $modelName = $model;
         elseif (is_subclass_of($model, DataModel::class))
-            $modelName = substr(get_class($model), strlen('DataModel'));
+            $modelName = substr((new \ReflectionClass($model))->getShortName(), strlen('DataModel'));
         elseif (is_subclass_of($model, DataIter::class))
-            $modelName = substr(get_class($model), strlen('DataIter'));
+            $modelName = substr((new \ReflectionClass($model))->getShortName(), strlen('DataIter'));
         elseif ($model instanceof DataIter)
-            return $this->get($model->model());
+            return $this->get($model->get_model());
 
         if (isset($this->policies[self::MODEL_PREFIX . $modelName]))
             return $this->policies[self::MODEL_PREFIX . $modelName];
@@ -58,12 +62,13 @@ class Policy
     private function checkPolicy(string $check, DataIter|string $iter): bool
     {
         if (is_string($iter)) {
-            try {
-                $model = $this->db->getModel($iter);
-            } catch (\Exception $e) {
-                throw new \InvalidArgumentException('Can only check policy for an DataIter or a Model name string.');
-            }
-            return call_user_func([$this->get($iter), $check], $model->new_iter());
+            if (!str_starts_with($iter, 'DataModel'))
+                $iter = 'DataModel' . $iter;
+
+            if (!isset($this->models[$iter]))
+                throw new \InvalidArgumentException(sprintf(__("Could not find the model %s"), $iter));
+
+            return call_user_func([$this->get($iter), $check], $this->models[$iter]->new_iter());
         }
         return call_user_func([$this->get($iter), $check], $iter);
     }

@@ -14,7 +14,7 @@ class DatabasePDO
     private $last_insert_table = null;
 
     public $history = [];
-    public $track_history = false;
+    // public $track_history = false;
 
     private $transaction_counter = 0;
 
@@ -23,26 +23,32 @@ class DatabasePDO
      * @dbid a hash with database information (host, port, user, password,
      * dbname)
      */
-    public function __construct(array $dbid)
-    {
-        $params = array();
+    public function __construct(
+        ?string $host,
+        ?string $user,
+        ?string $password,
+        ?string $database,
+        ?int $port = null,
+        public ?bool $track_history = false,
+    ) {
+        $params = [];
 
         /* Add host */
-        $params[] = 'host=' . ($dbid['host'] ? $dbid['host'] : 'localhost');
+        $params[] = 'host=' . ($host ?: 'localhost');
         
         /* Add port if needed */
-        if (isset($dbid['port']))
-            $params[] = 'port=' . $dbid['port'];
+        if (isset($port))
+            $params[] = 'port=' . $port;
         
         /* Add user */
-        $params[] = 'user=' . $dbid['user'];
+        $params[] = 'user=' . $user;
         
         /* Add password */
-        if (!empty($dbid['password']))
-            $params[] = 'password=' . $dbid['password'];
+        if (!empty($password))
+            $params[] = 'password=' . $password;
         
         /* Add database */
-        $params[] = 'dbname=' . $dbid['database'];
+        $params[] = 'dbname=' . $database;
 
         /* Add client encoding */
         $params[] = "options='--client_encoding=UTF8'";

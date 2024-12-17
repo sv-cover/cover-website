@@ -2,6 +2,8 @@
 
 namespace App\Policy;
 
+use App\DataIter\DataIterAgenda;
+use App\DataModel\DataModelSignUpForm;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Policy\PolicyInterface;
@@ -13,7 +15,7 @@ class PolicySignUpForm implements PolicyInterface
 
     public static function getSupportedModel(): string
     {
-        return \DataModelSignUpForm::class;
+        return DataModelSignUpForm::class;
     }
 
     public function __construct(
@@ -30,7 +32,7 @@ class PolicySignUpForm implements PolicyInterface
             return $this->identity->member_in_committee();
     }
 
-    public function userCanCreateForEvent(\DataIterAgenda $event): bool
+    public function userCanCreateForEvent(DataIterAgenda $event): bool
     {
         return $this->identity->member_in_committee($event['committee_id']);
     }

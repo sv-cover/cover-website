@@ -41,7 +41,7 @@
                                     <span class="icon">
                                         <i class="fas fa-users-cog" aria-hidden="true"></i>
                                     </span>
-                                    <span>{{ __('Edit %s')|format(constant('DataModelCommissie::TYPE_OPTIONS')[iter.type]) }}</span>
+                                    <span>{{ __('Edit %s')|format(constant('App\\DataModel\\DataModelCommissie::TYPE_OPTIONS')[iter.type]) }}</span>
                                 </a>
                             {% endif %}
 
@@ -50,7 +50,7 @@
                                     <span class="icon">
                                         <i class="fas fa-trash" aria-hidden="true"></i>
                                     </span>
-                                    <span>{{ __('Deactivate %s')|format(constant('DataModelCommissie::TYPE_OPTIONS')[iter.type]) }}</span>
+                                    <span>{{ __('Deactivate %s')|format(constant('App\\DataModel\\DataModelCommissie::TYPE_OPTIONS')[iter.type]) }}</span>
                                 </a>
                                 <hr class="dropdown-divider">
                             {% endif %}
@@ -61,7 +61,7 @@
                                     <span class="icon">
                                         <i class="fas fa-pencil-alt" aria-hidden="true"></i>
                                     </span>
-                                    <span>{{ __('Edit %s page')|format(constant('DataModelCommissie::TYPE_OPTIONS')[iter.type]) }}</span>
+                                    <span>{{ __('Edit %s page')|format(constant('App\\DataModel\\DataModelCommissie::TYPE_OPTIONS')[iter.type]) }}</span>
                                 </a>
                             {% endif %}
 

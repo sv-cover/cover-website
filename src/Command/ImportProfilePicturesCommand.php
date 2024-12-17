@@ -2,8 +2,10 @@
 
 namespace App\Command;
 
+use App\DataModel\DataModelMember;
+use App\DataModel\DataModelProfilePicture;
 use App\Exception\NotFoundException;
-use App\Service\Database;
+use App\Legacy\Database\DatabasePDO;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -19,7 +21,9 @@ class ImportProfilePicturesCommand extends Command
     private SymfonyStyle $io;
 
     public function __construct(
-        private Database $db,
+        private DatabasePDO $db,
+        private DataModelMember $memberModel,
+        private DataModelProfilePicture $profilePictureModel,
         private TagAwareCacheInterface $profilePicturesCache,
     ){
         parent::__construct();
@@ -70,7 +74,7 @@ class ImportProfilePicturesCommand extends Command
             return;
 
         try {
-            $member = $this->db->getModel('DataModelMember')->get_iter($memberId);
+            $member = $this->memberModel->get_iter($memberId);
         } catch (NotFoundException $e) {
             $this->io->error("Unable to find find member with ID $memberId.");
             return;
@@ -88,7 +92,7 @@ class ImportProfilePicturesCommand extends Command
         $this->profilePicturesCache->invalidateTags([
             sprintf('member_%d_picture', $member->get_id()),
         ]);
-        $this->db->getModel('DataModelProfilePicture')->set_for_member($member, $fh);
+        $this->profilePictureModel->set_for_member($member, $fh);
 
         unlink($file);
     }

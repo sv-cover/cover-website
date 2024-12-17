@@ -39,26 +39,27 @@ class Secretary
         string $user,
         string $password,
     ) {
-        $callback = function (ItemInterface $item) use ($client, $user, $password): string {
-            return $this->getToken($client, $user, $password);
-        };
+        // TODO SFY: reenable
+        // $callback = function (ItemInterface $item) use ($client, $user, $password): string {
+        //     return $this->getToken($client, $user, $password);
+        // };
 
-        $token = $cache->get('secretary_token', $callback);
+        // $token = $cache->get('secretary_token', $callback);
 
-        if (!$this->isValidToken($client, $token)) {
-            $cache->delete('secretary_token');
-            $token = $cache->get('secretary_token', $callback);
-        }
+        // if (!$this->isValidToken($client, $token)) {
+        //     $cache->delete('secretary_token');
+        //     $token = $cache->get('secretary_token', $callback);
+        // }
 
-        list($usr, $tkn) = explode(':', $token, 2);
+        // list($usr, $tkn) = explode(':', $token, 2);
 
-        $this->client = ScopingHttpClient::forBaseUri($client, $this->url, [
-            // 'auth_basic' => explode(':', $token, 2),
-            'query' => [
-                'user' => $usr,
-                'token' => $tkn,
-            ],
-        ]);
+        // $this->client = ScopingHttpClient::forBaseUri($client, $this->url, [
+        //     // 'auth_basic' => explode(':', $token, 2),
+        //     'query' => [
+        //         'user' => $usr,
+        //         'token' => $tkn,
+        //     ],
+        // ]);
     }
 
     private function getToken(HttpClientInterface $client, string $user, string $password): string

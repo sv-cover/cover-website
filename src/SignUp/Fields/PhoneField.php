@@ -2,6 +2,7 @@
 
 namespace App\SignUp\Fields;
 
+use App\DataIter\DataIterMember;
 use App\SignUp\SignUpFieldInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -65,7 +66,7 @@ class PhoneField implements SignUpFieldInterface
         return $value;
     }
 
-    public function prefill(\DataIterMember $member): ?string
+    public function prefill(DataIterMember $member): ?string
     {
         if (!$this->autofill)
             return null;

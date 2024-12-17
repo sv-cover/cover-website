@@ -2,23 +2,20 @@
 
 namespace App\Legacy\Authentication;
 
+use App\DataIter\DataIterMember;
+use App\DataModel\DataModelMember;
 use App\Exception\NotFoundException;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Authentication\SessionProviderInterface;
 
 class MemberIdentityProvider implements IdentityProviderInterface
 {
-    protected $session_provider;
+    protected ?DataIterMember $member;
 
-    protected $member_model;
-    
-    protected $member;
-
-    public function __construct(SessionProviderInterface $session_provider)
-    {
-        $this->session_provider = $session_provider;
-
-        $this->member_model = \get_model('DataModelMember');
+    public function __construct(
+        protected SessionProviderInterface $session_provider,
+        protected DataModelMember $member_model,
+    ) {
     }
 
     public function is_member()

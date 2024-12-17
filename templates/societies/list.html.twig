@@ -3,7 +3,7 @@
 {% block title __('Societies') ~ ' – ' ~ parent() %}
 
 {% block content %}
-{% set header = db.getModel('DataModelEditable').get_iter_from_title('Societies') %}
+{% set header = model('Page').get_iter_from_title('Societies') %}
 <div class="level">
     <div class="level-left">
         <h1 class="title">{{ header.get_title }}</h1>

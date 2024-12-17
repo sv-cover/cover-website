@@ -2,6 +2,7 @@
 
 namespace App\SignUp\Fields;
 
+use App\DataIter\DataIterMember;
 use App\SignUp\SignUpFieldInterface;
 use App\Form\Type\MarkupType;
 use App\Form\Type\PresentationType;
@@ -53,7 +54,7 @@ class EditableField implements SignUpFieldInterface
         return null;
     }
 
-    public function prefill(\DataIterMember $member): ?string
+    public function prefill(DataIterMember $member): ?string
     {
         return null;
     }

@@ -2,29 +2,21 @@
 
 namespace App\Legacy\Authentication;
 
+use App\DataIter\DataIterSession;
+use App\DataModel\DataModelMember;
+use App\DataModel\DataModelSession;
 use App\Legacy\Authentication\SessionProviderInterface;
 
 class CookieSessionProvider implements SessionProviderInterface
 {
-    /**
-     * @var DataModelSession
-     */
-    protected $session_model;
+    private ?DataIterSession $session;
 
-    /**
-     * @var DataIterSession
-     */
-    private $session;
+    private bool $is_restored = false;
 
-    /**
-     * @var bool
-     */
-
-    private $is_restored = false;
-
-    public function __construct()
-    {
-        $this->session_model = \get_model('DataModelSession');
+    public function __construct(
+        protected DataModelSession $session_model,
+        protected DataModelMember $member_model,
+    ) {
     }
 
     protected function get_session_id()
@@ -46,7 +38,7 @@ class CookieSessionProvider implements SessionProviderInterface
 
     public function login($email, $password, $remember, $application)
     {
-        $member = \get_model('DataModelMember')->login($email, $password);
+        $member = $this->member_model->login($email, $password);
 
         if (!$member)
             return false;

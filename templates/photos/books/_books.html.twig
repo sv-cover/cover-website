@@ -9,28 +9,28 @@
             <div class="overlay">
                 <h2 class="title">{{ book.titel }}</h2>
                 {% if policy.userCanUpdate(book) and book.visibility is not same as(null) %}
-                    {% if book.visibility == constant('\DataModelPhotobook::VISIBILITY_PUBLIC') %}
+                    {% if book.visibility == constant('App\\DataModel\\DataModelPhotobook::VISIBILITY_PUBLIC') %}
                         <span class="visibility" title="{{ __('Public') }}">
                             <span class="icon">
                                 <i class="fas fa-globe fa-fw" aria-hidden="true"></i>
                                 <span class="is-sr-only">{{ __('Public') }}</span>
                             </span>
                         </span>
-                    {% elseif book.visibility == constant('\DataModelPhotobook::VISIBILITY_MEMBERS') %}
+                    {% elseif book.visibility == constant('App\\DataModel\\DataModelPhotobook::VISIBILITY_MEMBERS') %}
                         <span class="visibility" title="{{ __('Only logged in members') }}">
                             <span class="icon">
                                 <i class="fas fa-user fa-fw" aria-hidden="true"></i>
                                 <span class="is-sr-only">{{ __('Only logged in members') }}</span>
                             </span>
                         </span>
-                    {% elseif book.visibility == constant('\DataModelPhotobook::VISIBILITY_ACTIVE_MEMBERS') %}
+                    {% elseif book.visibility == constant('App\\DataModel\\DataModelPhotobook::VISIBILITY_ACTIVE_MEMBERS') %}
                         <span class="visibility" title="{{ __('Only logged in active members') }}">
                             <span class="icon">
                                 <i class="fas fa-user-check fa-fw" aria-hidden="true"></i>
                                 <span class="is-sr-only">{{ __('Only logged in active members') }}</span>
                             </span>
                         </span>
-                    {% elseif book.visibility == constant('\DataModelPhotobook::VISIBILITY_PHOTOCEE') %}
+                    {% elseif book.visibility == constant('App\\DataModel\\DataModelPhotobook::VISIBILITY_PHOTOCEE') %}
                         <span class="visibility" title="{{ __('Only logged in members of the PhotoCee') }}">
                             <span class="icon">
                                 <i class="fas fa-lock fa-fw" aria-hidden="true"></i>

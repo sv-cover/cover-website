@@ -1,9 +1,9 @@
 <?php
 namespace App\Form;
 
+use App\DataModel\DataModelAgenda;
 use App\Form\Type\CommitteeIdType;
 use App\Service\Authentication;
-use App\Service\Database;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -23,7 +23,7 @@ class SignUpFormType extends AbstractType
 {
     public function __construct(
         private Authentication $auth,
-        private Database $db,
+        private DataModelAgenda $eventModel,
     ) {
     }
 
@@ -87,7 +87,7 @@ class SignUpFormType extends AbstractType
         )
             $filter['committee_id__in'] = $this->auth->identity->member()->get('committees');
 
-        $events = $this->db->getModel('DataModelAgenda')->find($filter);
+        $events = $this->eventModel->find($filter);
 
         if (
             $iter

@@ -1,6 +1,7 @@
 <?php
 namespace App\Form;
 
+use App\DataModel\DataModelMailinglist;
 use App\Form\Type\CommitteeIdType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
@@ -30,19 +31,19 @@ class MailingListType extends AbstractType
             ->add('type', ChoiceType::class, [
                 'label' => __('Type'),
                 'choices'  => [
-                    __('Opt-in') => \DataModelMailinglist::TYPE_OPT_IN,
-                    __('Opt-out') => \DataModelMailinglist::TYPE_OPT_OUT,
+                    __('Opt-in') => DataModelMailinglist::TYPE_OPT_IN,
+                    __('Opt-out') => DataModelMailinglist::TYPE_OPT_OUT,
                 ],
                 'help' => __('What type of list is this?'),
             ])
             ->add('toegang', ChoiceType::class, [
                 'label' => __('Access'),
                 'choices'  => [
-                    __('Everyone') => \DataModelMailinglist::TOEGANG_IEDEREEN,
-                    __('Only people subscribed to this list (and the list owner)') => \DataModelMailinglist::TOEGANG_DEELNEMERS,
-                    __('Only *@svcover.nl addresses') => \DataModelMailinglist::TOEGANG_COVER,
-                    __('Only the committee that owns this list') => \DataModelMailinglist::TOEGANG_EIGENAAR,
-                    __('People subscribed to this list and *@svcover.nl addresses') => \DataModelMailinglist::TOEGANG_COVER_DEELNEMERS,
+                    __('Everyone') => DataModelMailinglist::TOEGANG_IEDEREEN,
+                    __('Only people subscribed to this list (and the list owner)') => DataModelMailinglist::TOEGANG_DEELNEMERS,
+                    __('Only *@svcover.nl addresses') => DataModelMailinglist::TOEGANG_COVER,
+                    __('Only the committee that owns this list') => DataModelMailinglist::TOEGANG_EIGENAAR,
+                    __('People subscribed to this list and *@svcover.nl addresses') => DataModelMailinglist::TOEGANG_COVER_DEELNEMERS,
                 ],
                 'help' => __('Who can send emails to this list?'),
             ])

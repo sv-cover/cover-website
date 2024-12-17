@@ -2,11 +2,13 @@
 
 namespace App\Controller;
 
+use App\DataModel\DataModelPhotobook;
+use App\DataModel\DataModelPhotobookLike;
+use App\DataModel\DataModelPhotobookPrivacy;
 use App\Exception\NotFoundException;
 use App\Exception\UnauthorizedException;
 use App\Form\PhotoType;
 use App\Service\Authentication;
-use App\Service\Database;
 use App\Service\Policy;
 use App\Utils\PhotoUtils;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,19 +27,21 @@ class PhotosController extends AbstractController
 {
     const MAX_SIZE = 2400;
 
-    private \DataModelPhotobook $model;
-
     public function __construct(
-        private Database $db,
+        private DataModelPhotobook $model,
         private Policy $policy,
         private PhotoUtils $photoUtils,
-    ){
-        $this->model = $db->getModel('DataModelPhotobook');
+    ) {
     }
 
     #[Route('/photo/{photo_id<\d+>}', methods: ['GET'])] // Courtesy route, rarely (if ever) used.
     #[Route('/{book_id}/photo/{photo_id<\d+>}', name: 'photos.single', methods: ['GET'])]
-    public function single(Authentication $auth, int $photo_id, ?string $book_id = null): Response|RedirectResponse
+    public function single(
+        Authentication $auth,
+        DataModelPhotobookLike $likeModel,
+        int $photo_id,
+        ?string $book_id = null
+    ): Response|RedirectResponse
     {
         $photo = $this->model->get_iter($photo_id);
         $book = $this->photoUtils->getBook($book_id);
@@ -51,8 +55,6 @@ class PhotosController extends AbstractController
 
         if (!$this->policy->userCanRead($photo))
             throw new UnauthorizedException('You are not allowed to see this photo.');
-
-        $likeModel = $this->db->getModel('DataModelPhotobookLike');
 
         return $this->render('photos/single.html.twig', [
             'book' => $book,
@@ -97,7 +99,13 @@ class PhotosController extends AbstractController
     }
 
     #[Route('/{book_id}/photo/{photo_id<\d+>}/likes', name: 'photos.likes', methods: ['GET', 'POST'])]
-    public function likes(Authentication $auth, Request $request, int $photo_id, string $book_id): Response|RedirectResponse
+    public function likes(
+        Authentication $auth,
+        DataModelPhotobookLike $likeModel,
+        Request $request,
+        int $photo_id,
+        string $book_id,
+    ): Response|RedirectResponse
     {
         $photo = $this->model->get_iter($photo_id);
         $book = $this->photoUtils->getBook($book_id);
@@ -127,8 +135,6 @@ class PhotosController extends AbstractController
             $action = $form->get('like')->isClicked() ? 'like' : 'unlike';
         }
 
-        $likeModel = $this->db->getModel('DataModelPhotobookLike');
-
         if (isset($action)) {
             try {
                 if ($action === 'like')
@@ -153,7 +159,13 @@ class PhotosController extends AbstractController
     }
 
     #[Route('/{book_id}/photo/{photo_id<\d+>}/privacy', name: 'photos.privacy', methods: ['GET', 'POST'])]
-    public function privacy(Authentication $auth, Request $request, int $photo_id, string $book_id): Response|RedirectResponse
+    public function privacy(
+        Authentication $auth,
+        DataModelPhotobookPrivacy $privacyModel,
+        Request $request,
+        int  $photo_id,
+        string $book_id,
+    ): Response|RedirectResponse
     {
         $photo = $this->model->get_iter($photo_id);
         $book = $this->photoUtils->getBook($book_id);
@@ -169,8 +181,6 @@ class PhotosController extends AbstractController
             throw new UnauthorizedException('You are not allowed to change the visibility of your tag.');
 
         $member = $auth->identity->member();
-
-        $privacyModel = $this->db->getModel('DataModelPhotobookPrivacy');
 
         $data = [
             'visibility' => $privacyModel->is_visible($photo, $member) ? 'visible' : 'hidden',

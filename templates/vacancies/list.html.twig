@@ -11,10 +11,10 @@
             {% set tag_for = 'field-partner-' ~ partner.id %}
         {% endif %}
     {% elseif tag.field == 'type' %}
-        {% set tag_name = constant('DataModelVacancy::TYPE_OPTIONS')[tag.value] %}
+        {% set tag_name = constant('App\\DataModel\\DataModelVacancy::TYPE_OPTIONS')[tag.value] %}
         {% set tag_for = 'field-type-' ~ tag.value %}
     {% elseif tag.field == 'study_phase' %}
-        {% set tag_name = constant('DataModelVacancy::STUDY_PHASE_OPTIONS')[tag.value] %}
+        {% set tag_name = constant('App\\DataModel\\DataModelVacancy::STUDY_PHASE_OPTIONS')[tag.value] %}
         {% set tag_for = 'field-study_phase-' ~ tag.value %}
     {% else %}
         {% set tag_name = __('Unknown') %}
@@ -31,7 +31,7 @@
 {% block content %}
 <header class="block">
     {# TODO SFY: get model #}
-    {% set header = db.getModel('DataModelEditable').get_iter_from_title('vacancies') %}
+    {% set header = model('Page').get_iter_from_title('vacancies') %}
     <div class="level">
         <div class="level-left">
             <h1 class="title">{{ __('Vacancies') }}</h1>
@@ -136,7 +136,7 @@
                                     <i class="fas fa-hourglass-half" aria-hidden="true"></i>
                                     <span class="is-sr-only">{{ __('Job type') }}:</span>
                                 </span>
-                                {{ constant('DataModelVacancy::TYPE_OPTIONS')[iter.type] }}
+                                {{ constant('App\\DataModel\\DataModelVacancy::TYPE_OPTIONS')[iter.type] }}
                             </li>
                             <li class="divider" role="separator"></li>
                             <li class="property" title="{{ __('Skill level') }}">
@@ -144,7 +144,7 @@
                                     <i class="fas fa-user-graduate" aria-hidden="true"></i>
                                     <span class="is-sr-only">{{ __('Skill level') }}:</span>
                                 </span>
-                                {{ constant('DataModelVacancy::STUDY_PHASE_OPTIONS')[iter.study_phase] }}
+                                {{ constant('App\\DataModel\\DataModelVacancy::STUDY_PHASE_OPTIONS')[iter.study_phase] }}
                             </li>
                         {% endapply %}
                         </ul>

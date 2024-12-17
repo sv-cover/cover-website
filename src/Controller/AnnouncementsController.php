@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
+use App\DataModel\DataModelAnnouncement;
 use App\Exception\UnauthorizedException;
 use App\Form\AnnouncementType;
-use App\Service\Database;
 use App\Service\Policy;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -15,13 +15,10 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AnnouncementsController extends AbstractController
 {
-    private \DataModelAnnouncement $model;
-
     public function __construct(
-        private Database $db,
+        private DataModelAnnouncement $model,
         private Policy $policy,
-    ){
-        $this->model = $db->getModel('DataModelAnnouncement');
+    ) {
     }
 
     public function homepage(): Response

@@ -1,8 +1,8 @@
 <?php
 namespace App\Form\Type;
 
+use App\DataModel\DataModelMember;
 use App\Exception\NotFoundException;
-use App\Service\Database;
 use App\Validator\Member;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class MemberIdType extends AbstractType
 {
     public function __construct(
-        private Database $db,
+        private DataModelMember $memberModel,
     ) {
     }
 
@@ -40,7 +40,7 @@ class MemberIdType extends AbstractType
         if (!empty($view->vars['value'])) {
             try {
                 // TODO: Maybe change to a MemberType, so value will be member with no need for extra query?
-                $view->vars['member'] = $this->db->getModel('DataModelMember')->get_iter($view->vars['value']);
+                $view->vars['member'] = $this->memberModel->get_iter($view->vars['value']);
             } catch (NotFoundException $e) {
                 $view->vars['member'] = null;
             }

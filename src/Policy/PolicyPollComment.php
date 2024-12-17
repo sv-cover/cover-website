@@ -2,6 +2,7 @@
 
 namespace App\Policy;
 
+use App\DataModel\DataModelPollComment;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Policy\PolicyInterface;
@@ -13,7 +14,7 @@ class PolicyPollComment implements PolicyInterface
 
     public static function getSupportedModel(): string
     {
-        return \DataModelPollComment::class;
+        return DataModelPollComment::class;
     }
 
     public function __construct(

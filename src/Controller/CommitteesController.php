@@ -2,11 +2,11 @@
 
 namespace App\Controller;
 
+use App\DataModel\DataModelCommissie;
 use App\Exception\UnauthorizedException;
 use App\Form\CommitteeType;
 use App\Form\DataTransformer\IntToBooleanTransformer;
 use App\Service\Authentication;
-use App\Service\Database;
 use App\Service\Policy;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -19,20 +19,17 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class CommitteesController extends AbstractController
 {
-    private \DataModelCommissie $model;
-
     public function __construct(
-        private Database $db,
+        private DataModelCommissie $model,
         private Policy $policy,
-    ){
-        $this->model = $db->getModel('DataModelCommissie');
+    ) {
     }
 
     #[Route('/committees', name: 'committees.list', methods: ['GET'])]
     public function list(): Response
     {
-        $committees = $this->model->get(\DataModelCommissie::TYPE_COMMITTEE);
-        $working_groups = $this->model->get(\DataModelCommissie::TYPE_WORKING_GROUP);
+        $committees = $this->model->get(DataModelCommissie::TYPE_COMMITTEE);
+        $working_groups = $this->model->get(DataModelCommissie::TYPE_WORKING_GROUP);
 
         return $this->render('committees/list.html.twig', [
             'committees' => array_filter($committees, [$this->policy, 'userCanRead']),
@@ -62,7 +59,7 @@ class CommitteesController extends AbstractController
             $committee = $this->model->find_one(['login' => $slug]);
         else
             // Pick a random committee
-            $committee = $this->model->get_random(\DataModelCommissie::TYPE_COMMITTEE, true);
+            $committee = $this->model->get_random(DataModelCommissie::TYPE_COMMITTEE, true);
 
         return $this->render('committees/slide.html.twig', ['committee' => $committee]);
     }
@@ -71,7 +68,7 @@ class CommitteesController extends AbstractController
     public function create(Request $request): Response|RedirectResponse
     {
         $iter = $this->model->new_iter([
-            'type' => \DataModelCommissie::TYPE_COMMITTEE
+            'type' => DataModelCommissie::TYPE_COMMITTEE
         ]);
 
         if (!$this->policy->userCanCreate($iter))

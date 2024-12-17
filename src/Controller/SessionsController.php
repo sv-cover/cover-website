@@ -2,13 +2,15 @@
 
 namespace App\Controller;
 
+use App\DataModel\DataModelMember;
+use App\DataModel\DataModelPasswordResetToken;
+use App\DataModel\DataModelSession;
 use App\Exception\InactiveMemberException;
 use App\Exception\UnauthorizedException;
 use App\Form\Type\CommitteeIdType;
 use App\Form\Type\MemberIdType;
 use App\Legacy\Authentication\ImpersonatingIdentityProvider;
 use App\Service\Authentication;
-use App\Service\Database;
 use App\Utils\UrlUtils;
 use App\Validator\Member;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -33,14 +35,18 @@ class SessionsController extends AbstractController
     }
 
     #[Route('/sessions/{id}/delete', name: 'sessions.delete', methods: ['POST'])]
-    public function delete(string $id, Authentication $auth, Database $db, Request $request): Response|RedirectResponse
+    public function delete(
+        Authentication $auth,
+        DataModelSession $model,
+        Request $request,
+        string $id,
+    ): Response|RedirectResponse
     {
         // TODO SFY: test
         if (!$auth->loggedIn)
             throw new UnauthorizedException('You need to log in to manage your sessions');
 
         $member = $auth->getIdentity()->member();
-        $model = $db->getModel('DataModelSession');
 
         // TODO SFY: What if ID is empty?
         $session = $model->get_iter($id);
@@ -67,7 +73,11 @@ class SessionsController extends AbstractController
     }
 
     #[Route('/impersonate', name: 'impersonate', methods: ['GET', 'POST'])]
-    public function impersonate(Authentication $auth, Database $db, Request $request): Response|RedirectResponse
+    public function impersonate(
+        Authentication $auth,
+        DataModelMember $memberModel,
+        Request $request
+    ): Response|RedirectResponse
     {
         $identity = $auth->getIdentity();
 
@@ -119,8 +129,7 @@ class SessionsController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             if ($form['override_member']->getData() && !empty($form['override_member_id']->getData())) {
-                $member_model = $db->getModel('DataModelMember');
-                $override_member = $member_model->get_iter($form['override_member_id']->getData());
+                $override_member = $memberModel->get_iter($form['override_member_id']->getData());
                 $identity->override_member($override_member);
             } else {
                 $identity->reset_member();
@@ -142,7 +151,11 @@ class SessionsController extends AbstractController
     }
 
     #[Route('/login', name: 'login', methods: ['GET', 'POST'])]
-    public function login(Authentication $auth, Database $db, Request $request): Response|RedirectResponse
+    public function login(
+        Authentication $auth,
+        DataModelPasswordResetToken $passwordResetModel,
+        Request $request
+    ): Response|RedirectResponse
     {
         $referrer = $request->query->get('page', $this->generateUrl('homepage'));
 
@@ -153,7 +166,7 @@ class SessionsController extends AbstractController
             $external_domain = null;
 
         // Prevent returning to the logout link
-        // TODO: sessions?view=logout url?
+        // TODO SFY: sessions?view=logout url?
         if ($external_domain === null && in_array($referrer, ['/sessions.php?view=logout', $this->generateUrl('logout')])) //, $this->generateUrl('sessions', ['view' => 'logout'])]))
             $referrer = null;
 
@@ -200,8 +213,7 @@ class SessionsController extends AbstractController
                 if ($auth->getAuth()->login($form['email']->getData(), $form['password']->getData(), $form['remember']->getData(), $request->headers->get('user-agent'))) {
                     // User can apparently login, so invalidate all their password reset tokens
                     try {
-                        $password_reset_model = $db->getModel('DataModelPasswordResetToken');
-                        $password_reset_model->invalidate_all($auth->getIdentity()->member());
+                        $passwordResetModel->invalidate_all($auth->getIdentity()->member());
                     } catch (\Exception $exception) {
                         \Sentry\captureException($exception);
                     }

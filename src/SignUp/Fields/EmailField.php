@@ -2,6 +2,7 @@
 
 namespace App\SignUp\Fields;
 
+use App\DataIter\DataIterMember;
 use App\SignUp\SignUpFieldInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -62,7 +63,7 @@ class EmailField implements SignUpFieldInterface
         return $form->get($this->name)->getData();
     }
 
-    public function prefill(\DataIterMember $member): ?string
+    public function prefill(DataIterMember $member): ?string
     {
         if (!$this->autofill)
             return null;

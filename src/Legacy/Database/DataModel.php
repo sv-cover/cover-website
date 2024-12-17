@@ -2,7 +2,11 @@
 
 namespace App\Legacy\Database;
 
+use App\Legacy\Database\DatabasePDO;
+use App\Legacy\Database\DataIter;
+use App\Legacy\Database\DataIterNotFoundException;
 use App\Legacy\Database\GenericDataIter;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * This class provides a base class for accessing data. This class can
@@ -10,29 +14,26 @@ use App\Legacy\Database\GenericDataIter;
  * More complex models should inherit from this base class and implement
  * their own insert, update, delete, get and get_iter functions
  */
-class DataModel
+abstract class DataModel
 {
-    public $db; /** The database backend */
-    public $table; /** The table to model */
-    public $id;
-    public $dataiter = GenericDataIter::class;
-    public $fields = array();
-    protected $auto_increment;
-    
-    /**
-      * Create a new DataModel
-      * @param DatabasePgsql|DatabaseMysql $db the database backend to use (#DatabasePgsql or #DatabaseMysql)
-      * @param string|null $table the table to model 
-      * @param string $id the field name to use as unique id
-      */
-    public function __construct($db, $table = null, $id = 'id')
+    public string $table; /** The table to model */
+    public string $id = 'id';
+    public string $dataiter = GenericDataIter::class;
+    public array $fields = [];
+    protected ?bool $auto_increment;
+    public DatabasePDO $db;
+
+    #[Required]
+    public function setDb(DatabasePDO $db): void
     {
         $this->db = $db;
-        $this->table = $table;
-        $this->id = $id;
+    }
 
-        if ($this->auto_increment === null)
+    public function getAutoIncrement(): bool
+    {
+        if (!isset($this->auto_increment))
             $this->auto_increment = $this->id == 'id';
+        return $this->auto_increment;
     }
 
     public function new_iter($row = array(), $dataiter = null, $preseed = [])
@@ -69,7 +70,7 @@ class DataModel
             if (in_array($key, $fields))
                 $data[$key] = $value;
 
-        if ($this->auto_increment)
+        if ($this->getAutoIncrement())
             unset($data[$this->id]);
 
         if (count($data) === 0)
@@ -94,9 +95,9 @@ class DataModel
     public function insert(DataIter $iter)
     {
         if (!$this->table)
-            throw new RuntimeException(get_class($this) . '::$table is not set');
+            throw new \RuntimeException(get_class($this) . '::$table is not set');
         
-        return $this->_insert($this->table, $iter, $this->auto_increment);
+        return $this->_insert($this->table, $iter, $this->getAutoIncrement());
     }
     
     /**
@@ -155,7 +156,7 @@ class DataModel
     public function update(DataIter $iter)
     {
         if (!$this->table)
-            throw new RuntimeException(get_class($this) . '::$table is not set');
+            throw new \RuntimeException(get_class($this) . '::$table is not set');
 
         return $this->_update($this->table, $iter);
     }
@@ -182,7 +183,7 @@ class DataModel
     public function delete(DataIter $iter)
     {
         if (!$this->table)
-            throw new RuntimeException(get_class($this) . '::$table is not set');
+            throw new \RuntimeException(get_class($this) . '::$table is not set');
         
         return $this->_delete($this->table, $iter);
     }

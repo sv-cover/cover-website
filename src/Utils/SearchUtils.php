@@ -5,12 +5,14 @@ namespace App\Utils;
 use App\Legacy\Database\SearchResultInterface;
 use App\Legacy\Database\SearchProviderInterface;
 use App\Service\Policy;
-use App\Service\Database;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 final class SearchUtils
 {
     const HIGHLIGHT_FORMAT = '<span class="keyword">$1</span>'; // TODO SFY: use <mark> element
     const GLUE = '<span class="glue">...</span>';
+
+    private array $providers = [];
 
     public static function normalizeRank(string|float $rank): float
     {
@@ -26,58 +28,10 @@ final class SearchUtils
 
     public function __construct(
         private Policy $policy,
-        private Database $db,
+        #[AutowireIterator('app.search-provider')]
+        iterable $providers,
     ) {
-    }
-
-    private function getProviders(): array
-    {
-        return [
-            [
-                'model' => $this->db->getModel('DataModelMember'),
-                'category_name' => __('members'),
-            ],
-            [
-                'model' => $this->db->getModel('DataModelEditable'),
-                'category_name' => __('pages'),
-            ],
-            [
-                'model' => $this->db->getModel('DataModelCommissie'),
-                'category_name' => __('committees'),
-            ],
-            [
-                'model' => $this->db->getModel('DataModelAgenda'),
-                'category_name' => __('calendar events'),
-            ],
-            [
-                'model' => $this->db->getModel('DataModelPhotobook'),
-                'category_name' => __('photo books'),
-            ],
-            [
-                'model' => $this->db->getModel('DataModelAnnouncement'),
-                'category_name' => __('announcements'),
-            ],
-            [
-                'model' => $this->db->getModel('DataModelPartner'),
-                'category_name' => __('partners'),
-            ],
-            [
-                'model' => $this->db->getModel('DataModelVacancy'),
-                'category_name' => __('vacancies'),
-            ],
-            [
-                'model' => $this->db->getModel('DataModelPoll'),
-                'category_name' => __('polls'),
-            ],
-            [
-                'model' => $this->db->getModel('DataModelPollComment'),
-                'category_name' => __('poll comments'),
-            ],
-            [
-                'model' => $this->db->getModel('DataModelWiki'),
-                'category_name' => __('wiki pages'),
-            ],
-        ];
+        $this->providers = $providers instanceof \Traversable ? \iterator_to_array($providers) : $providers;
     }
 
     public function search(string $query): ?array
@@ -95,14 +49,14 @@ final class SearchUtils
         $timings = [];
 
         // Query all providers
-        foreach ($this->getProviders() as $provider) {
+        foreach ($this->providers as $provider) {
             try {
                 $start = \microtime(true);
-                $results = \array_merge($results, $provider['model']->search($query, 10));
-                $timings[$provider['category_name']] = \microtime(true) - $start;
+                $results = \array_merge($results, $provider->search($query, 10));
+                $timings[$provider::getName()] = \microtime(true) - $start;
             } catch (\Exception $exception) {
                 \Sentry\captureException($exception);
-                $errors[] = $provider['category_name'];
+                $errors[] = $provider::getName();
             }
         }
 

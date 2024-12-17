@@ -2,7 +2,10 @@
 
 namespace App\SignUp;
 
-use App\Service\Database;
+use App\DataIter\DataIterSignupEntry;
+use App\DataIter\DataIterSignupField;
+use App\DataIter\DataIterSignupForm;
+use App\DataModel\DataModelSignUpField;
 use App\SignUp\Fields;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -17,7 +20,7 @@ use Symfony\Component\Uid\Uuid;
 class SignUpFormManager implements ServiceSubscriberInterface
 {
     public function __construct(
-        private Database $db,
+        private DataModelSignUpField $fieldModel,
         private ContainerInterface $locator,
         private FormFactoryInterface $formFactory,
     ){
@@ -39,7 +42,7 @@ class SignUpFormManager implements ServiceSubscriberInterface
         ];
     }
 
-    protected function getField(\DataIterSignupField $iter): SignUpFieldInterface
+    protected function getField(DataIterSignupField $iter): SignUpFieldInterface
     {
         $field = $this->locator->get($iter['type']);
         $field->setName($iter['name']);
@@ -47,21 +50,18 @@ class SignUpFormManager implements ServiceSubscriberInterface
         return $field;
     }
 
-    protected function getFields(\DataIterSignupForm $form): \Generator
+    protected function getFields(DataIterSignupForm $form): \Generator
     {
         foreach ($form->get_fields() as $field)
             yield $field->get_id() => $this->getField($field);
     }
 
-    // TODO SFY: move to models once they have autowiring
-    public function createField(\DataIterSignupForm $form, string $type, ?callable $configure = null): \DataIterSignupField
+    public function createField(DataIterSignupForm $form, string $type, ?callable $configure = null): DataIterSignupField
     {
-        $model = $this->db->getModel('DataModelSignUpField');
-
         if (!isset(self::getSubscribedServices()[$type]))
             throw new \InvalidArgumentException('Unknown form field type');
 
-        $iter = $this->db->getModel('DataModelSignUpField')->new_iter([
+        $iter = $this->fieldModel->new_iter([
             'form_id' => $form->get_id(),
             'name' => Uuid::v4()->toRfc4122(), // UUID v4 in RFC 4122 contains dashes and therefore never returns a numeric string. Numeric strings cause issues with arrays.
             'type' => $type,
@@ -77,7 +77,7 @@ class SignUpFormManager implements ServiceSubscriberInterface
         return $iter;
     }
 
-    public function getForm(\DataIterSignupEntry $entry, array $defaults = []): FormInterface
+    public function getForm(DataIterSignupEntry $entry, array $defaults = []): FormInterface
     {
         $form = $entry['form'];
 
@@ -106,7 +106,7 @@ class SignUpFormManager implements ServiceSubscriberInterface
         return $builder->getForm();
     }
 
-    public function getConfigurationForm(\DataIterSignupField $iter): FormInterface
+    public function getConfigurationForm(DataIterSignupField $iter): FormInterface
     {
         $field = $this->getField($iter);
 
@@ -117,28 +117,28 @@ class SignUpFormManager implements ServiceSubscriberInterface
         return $builder->getForm();
     }
 
-    public function getConfigurationTemplate(\DataIterSignupField $iter): string
+    public function getConfigurationTemplate(DataIterSignupField $iter): string
     {
         $field = $this->getField($iter);
 
         return $field->getConfigurationTemplate();
     }
 
-    public function getColumnLabels(\DataIterSignupField $iter): array
+    public function getColumnLabels(DataIterSignupField $iter): array
     {
         $field = $this->getField($iter);
 
         return $field->columnLabels();
     }
 
-    public function getTypeLabel(\DataIterSignupField $iter): string
+    public function getTypeLabel(DataIterSignupField $iter): string
     {
         $field = $this->getField($iter);
 
         return self::getSubscribedServices()[$iter['type']]::getTypeLabel();
     }
 
-    public function exportEntry(\DataIterSignupEntry $entry): array
+    public function exportEntry(DataIterSignupEntry $entry): array
     {
         $data = [];
 
@@ -153,7 +153,7 @@ class SignUpFormManager implements ServiceSubscriberInterface
         return $data;
     }
 
-    public function prefillEntry(\DataIterSignupEntry $entry): void
+    public function prefillEntry(DataIterSignupEntry $entry): void
     {
         $values = [];
 
@@ -163,7 +163,7 @@ class SignUpFormManager implements ServiceSubscriberInterface
         $entry->set_values($values);
     }
 
-    public function processEntry(\DataIterSignupEntry $entry, FormInterface $form): void
+    public function processEntry(DataIterSignupEntry $entry, FormInterface $form): void
     {
         $values = [];
 
@@ -175,7 +175,7 @@ class SignUpFormManager implements ServiceSubscriberInterface
     }
 
     // TODO SFY: get rid of this function
-    public function renderEntryTable(\DataIterSignupEntry $entry)
+    public function renderEntryTable(DataIterSignupEntry $entry)
     {
         $rows = [];
 

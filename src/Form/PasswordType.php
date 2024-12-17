@@ -1,8 +1,8 @@
 <?php
 namespace App\Form;
 
+use App\DataModel\DataModelMember;
 use App\Service\Authentication;
-use App\Service\Database;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType as PasswordFieldType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
@@ -16,7 +16,7 @@ class PasswordType extends AbstractType
 {
     public function __construct(
         private Authentication $auth,
-        private Database $db,
+        private DataModelMember $memberModel,
     ){
     }
 
@@ -69,10 +69,9 @@ class PasswordType extends AbstractType
 
     public function validateCurrent($value, ExecutionContextInterface $context, $payload): void
     {
-        $model = $this->db->getModel('DataModelMember');
         $member = $this->getMember();
 
-        if (!$model->test_password($member, $value))
+        if (!$this->memberModel->test_password($member, $value))
             $context->buildViolation(__('That’s not your current password!'))
                 ->atPath('current')
                 ->addViolation();
@@ -80,10 +79,9 @@ class PasswordType extends AbstractType
 
     public function validatePassword($value, ExecutionContextInterface $context, $payload): void
     {
-        $model = $this->db->getModel('DataModelMember');
         $member = $this->getMember();
 
-        if ($model->test_password($member, $value))
+        if ($this->memberModel->test_password($member, $value))
             $context->buildViolation(__('Your new password cannot be the same as your current password!'))
                 ->atPath('password')
                 ->addViolation();

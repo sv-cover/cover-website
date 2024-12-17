@@ -2,6 +2,7 @@
 
 namespace App\SignUp\Fields;
 
+use App\DataIter\DataIterMember;
 use App\SignUp\SignUpFieldInterface;
 use App\Form\DataTransformer\IntToBooleanTransformer;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -59,7 +60,7 @@ class CheckboxField implements SignUpFieldInterface
         return $form->get($this->name)->getData();
     }
 
-    public function prefill(\DataIterMember $member): ?string
+    public function prefill(DataIterMember $member): ?string
     {
         return null;
     }

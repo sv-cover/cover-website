@@ -1,10 +1,10 @@
 {% extends 'profile/base.html.twig' %}
 
 {% macro profile_field(iter, field, label, href = null, external = false, value = null) %}
-    {% set visibility = db.getModel('DataModelMember').get_privacy_for_field(iter, field) %}
+    {% set visibility = model('DataModelMember').get_privacy_for_field(iter, field) %}
     {% if
-        visibility == constant('\DataModelMember::VISIBLE_TO_EVERYONE')
-        or (visibility == constant('\DataModelMember::VISIBLE_TO_MEMBERS') and auth.identity.is_member)
+        visibility == constant('App\\DataModel\\DataModelMember::VISIBLE_TO_EVERYONE')
+        or (visibility == constant('App\\DataModel\\DataModelMember::VISIBLE_TO_MEMBERS') and auth.identity.is_member)
         or auth.identity.member_in_committee(constant('COMMISSIE_BESTUUR'))
     %}
         <div class="profile-field">
@@ -19,7 +19,7 @@
                 {% else %}
                     {{ value ?? iter[field]|e }}
                 {% endif %}
-                {% if visibility == constant('DataModelMember::VISIBLE_TO_MEMBERS') %}
+                {% if visibility == constant('App\\DataModel\\DataModelMember::VISIBLE_TO_MEMBERS') %}
                     <span class="icon is-small">
                         <i
                             class="fas fa-lock"
@@ -28,7 +28,7 @@
                         ></i>
                         <span class="is-sr-only">{{ __('Only visible for logged-in members') }}</span>
                     </span>
-                {% elseif visibility == constant('DataModelMember::VISIBLE_TO_NONE') %}
+                {% elseif visibility == constant('App\\DataModel\\DataModelMember::VISIBLE_TO_NONE') %}
                     <span class="icon is-small">
                         <i
                             class="fas fa-eye-slash"
@@ -84,9 +84,9 @@
     </div>
 </article>
 
-{% set working_groups = committees|filter(c => c.type == constant('\DataModelCommissie::TYPE_WORKING_GROUP')) %}
-{% set others = committees|filter(c => c.type == constant('\DataModelCommissie::TYPE_OTHER')) %}
-{% set committees = committees|filter(c => c.type == constant('\DataModelCommissie::TYPE_COMMITTEE')) %}
+{% set working_groups = committees|filter(c => c.type == constant('App\\DataModel\\DataModelCommissie::TYPE_WORKING_GROUP')) %}
+{% set others = committees|filter(c => c.type == constant('App\\DataModel\\DataModelCommissie::TYPE_OTHER')) %}
+{% set committees = committees|filter(c => c.type == constant('App\\DataModel\\DataModelCommissie::TYPE_COMMITTEE')) %}
 <article class="block">
     <div class="profile-field">
         <div class="field-body">

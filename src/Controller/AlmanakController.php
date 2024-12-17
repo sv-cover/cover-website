@@ -2,10 +2,10 @@
 
 namespace App\Controller;
 
+use App\DataModel\DataModelMember;
 use App\Exception\UnauthorizedException;
 use App\Form\VacancyType;
 use App\Service\Authentication;
-use App\Service\Database;
 use App\Service\Policy;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,14 +18,11 @@ use ZipStream;
 
 class AlmanakController extends AbstractController
 {
-    private \DataModelMember $model;
-
     public function __construct(
         private Authentication $auth,
-        private Database $db,
+        private DataModelMember $model,
         private Policy $policy,
-    ){
-        $this->model = $db->getModel('DataModelMember');
+    ) {
     }
 
     public function almanakSearch(Request $request, string $search, ?int $limit = null): Response

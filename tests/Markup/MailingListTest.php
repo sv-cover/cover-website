@@ -2,7 +2,7 @@
 
 namespace App\Tests\Markup;
 
-use App\Service\Database;
+use App\DataModel\DataModelSession;
 use function App\Legacy\init;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\AbstractBrowser;
@@ -12,22 +12,20 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 // see https://github.com/symfony/symfony/tree/7.2/src/Symfony/Component/DomCrawler/Test/Constraint
 
 class MailingListTest extends WebTestCase
-{
-    protected Database $db;
+{]
     protected ?AbstractBrowser $client;
 
     protected function setUp(): void
     {
         $this->client = static::createClient();
         init(self::$kernel);
-        $this->db = static::getContainer()->get(Database::class);
     }
 
     protected function login(): void
     {
-        $db = static::getContainer()->get(Database::class);
+        $model = static::getContainer()->get(DataModelSession::class);
         $_SERVER['REMOTE_ADDR'] = '0.0.0.0';
-        $session = $db->getModel('DataModelSession')->create(1, 'test');
+        $session = $model->create(1, 'test');
         $this->client->getCookieJar()->set(new Cookie(
             'cover_session_id',
             $session->get('session_id'),

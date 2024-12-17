@@ -2,10 +2,13 @@
 
 namespace App\Controller;
 
+use App\DataIter\DataIterPage;
+use App\DataModel\DataModelBesturen;
+use App\DataModel\DataModelCommissie;
+use App\DataModel\DataModelPage;
 use App\Exception\UnauthorizedException;
 use App\Form\PageType;
 use App\Service\Authentication;
-use App\Service\Database;
 use App\Markup\Markup;
 use App\Service\Policy;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,13 +19,12 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class PageController extends AbstractController
 {
-    private \DataModelEditable $model;
-
     public function __construct(
-        private Database $db,
+        private DataModelBesturen $boardModel,
+        private DataModelCommissie $committeeModel,
+        private DataModelPage $model,
         private Policy $policy,
     ){
-        $this->model = $db->getModel('DataModelEditable');
     }
 
     #[Route('/page', name: 'page.list', methods: ['GET'])]
@@ -82,13 +84,13 @@ class PageController extends AbstractController
         ]);
     }
 
-    private function _render_single(\DataIterEditable $iter): Response|RedirectResponse
+    private function _render_single(DataIterPage $iter): Response|RedirectResponse
     {
-        $committee = $this->db->getModel('DataModelCommissie')->get_from_page($iter['id']);
+        $committee = $this->committeeModel->get_from_page($iter['id']);
         if (isset($committee))
             return $this->redirectToRoute('committees.single', ['slug' => $committee->get('login')], Response::HTTP_MOVED_PERMANENTLY);
 
-        $board = $this->db->getModel('DataModelBesturen')->get_from_page($iter['id']);
+        $board = $this->boardModel->get_from_page($iter['id']);
         if (isset($board))
             return $this->redirectToRoute('boards', ['_fragment' => $board->get('login')], Response::HTTP_MOVED_PERMANENTLY);
 
@@ -118,7 +120,7 @@ class PageController extends AbstractController
         return $this->_render_single($iter);
     }
 
-    private function _prepare_mail(Authentication $auth, \DataIterEditable $iter, string $difference): array
+    private function _prepare_mail(Authentication $auth, DataIterPage $iter, string $difference): array
     {
         $identity = $auth->getIdentity();
 
@@ -126,25 +128,23 @@ class PageController extends AbstractController
         $data['member_naam'] = \member_full_name($identity->member(), IGNORE_PRIVACY);
         $data['page'] = $difference;
 
-        $commissie_model = $this->db->getModel('DataModelCommissie');
+        $isInBoard = $identity->member_in_committee(COMMISSIE_BESTUUR);
+        $isInCommittee = $identity->member_in_committee($iter['committee_id']);
 
-        $in_bestuur = $identity->member_in_committee(COMMISSIE_BESTUUR);
-        $in_commissie = $identity->member_in_committee($iter['committee_id']);
-
-        if (!$in_commissie && $in_bestuur) {
+        if (!$isInCommittee && $isInBoard) {
             /* Bestuur changed something, notify commissie */
-            $data['commissie_naam'] = $commissie_model->get_naam(COMMISSIE_BESTUUR);
-            $data['email'] = [$commissie_model->get_email($iter['committee_id'])];
-        } elseif (!$in_bestuur && $in_commissie) {
+            $data['commissie_naam'] = $this->committeeModel->get_naam(COMMISSIE_BESTUUR);
+            $data['email'] = [$this->committeeModel->get_email($iter['committee_id'])];
+        } elseif (!$isInBoard && $isInCommittee) {
             /* Commissie changed something, notify bestuur */
-            $data['commissie_naam'] = $commissie_model->get_naam($iter['committee_id']);
-            $data['email'] = [$commissie_model->get_email(COMMISSIE_BESTUUR)];
+            $data['commissie_naam'] = $this->committeeModel->get_naam($iter['committee_id']);
+            $data['email'] = [$this->committeeModel->get_email(COMMISSIE_BESTUUR)];
         } else {
             /* AC/DCee changed something, notify bestuur and commissie */
-            $data['commissie_naam'] = $commissie_model->get_naam(COMMISSIE_EASY);
+            $data['commissie_naam'] = $this->committeeModel->get_naam(COMMISSIE_EASY);
             $data['email'] = [
-                $commissie_model->get_email($iter['committee_id']),
-                $commissie_model->get_email(COMMISSIE_BESTUUR)
+                $this->committeeModel->get_email($iter['committee_id']),
+                $this->committeeModel->get_email(COMMISSIE_BESTUUR)
             ];
         }
 

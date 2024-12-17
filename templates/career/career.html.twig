@@ -3,7 +3,7 @@
 {% block title __('Career') ~ ' – ' ~ parent() %}
 
 {% block page %}
-{% set header = db.getModel('DataModelEditable').get_iter_from_title('career') %}
+{% set header = model('Page').get_iter_from_title('career') %}
 <div class="career">
     <header class="hero has-image is-medium is-thumbnail">
         <figure class="hero-image">
@@ -45,7 +45,7 @@
                 {% if header %}
                     <div class="boxed-title-wrapper">
                         <div class="boxed-title is-6-mobile is-5-tablet">
-                            {{ header.locale_content|parse_markup }}
+                            {{ header.locale_content|strip_markup }}
                         </div>
                     </div>
                 {% endif %}
@@ -53,7 +53,7 @@
         </div>
     </header>
     <article class="section vacancies-section" id="vacancies">
-        {% set vacancies_page = db.getModel('DataModelEditable').get_iter_from_title('vacancies') %}
+        {% set vacancies_page = model('Page').get_iter_from_title('vacancies') %}
         <div class="container is-content-optimized">
             <div class="level">
                 <div class="level-left">
@@ -103,7 +103,7 @@
         </div>
     </article>
     <article class="section" id="profiles">
-        {% set partners_page = db.getModel('DataModelEditable').get_iter_from_title('partners') %}
+        {% set partners_page = model('Page').get_iter_from_title('partners') %}
         <div class="container is-content-optimized">
             <div class="level">
                 <div class="level-left">

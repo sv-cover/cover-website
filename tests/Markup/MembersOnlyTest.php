@@ -2,10 +2,10 @@
 
 namespace App\Tests\Markup;
 
+use App\DataModel\DataModelSession;
 use App\Markup\Markup;
 use App\Legacy\Authentication\ConstantSessionProvider;
 use App\Service\Authentication;
-use App\Service\Database;
 use function App\Legacy\init;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DomCrawler\Crawler;
@@ -15,7 +15,6 @@ use Symfony\Component\DomCrawler\Test\Constraint as CC;
 class MembersOnlyTest extends KernelTestCase
 {
     protected Authentication $auth;
-    protected Database $db;
     protected Markup $markup;
 
     protected function setUp(): void
@@ -24,7 +23,6 @@ class MembersOnlyTest extends KernelTestCase
         init(self::$kernel);
         $this->markup = static::getContainer()->get(Markup::class);
         $this->auth = static::getContainer()->get(Authentication::class);
-        $this->db = static::getContainer()->get(Database::class);
     }
 
     protected function render(string $markup): Crawler
@@ -35,7 +33,8 @@ class MembersOnlyTest extends KernelTestCase
     protected function login(): void
     {
         $_SERVER['REMOTE_ADDR'] = '0.0.0.0';
-        $session = $this->db->getModel('DataModelSession')->create(1, 'test');
+        $model = static::getContainer()->get(DataModelSession::class);
+        $session = $model->create(1, 'test');
         $auth = new ConstantSessionProvider($session);
         $this->auth->setAuth($auth);
     }

@@ -45,7 +45,7 @@
                 </div>
                 <div class="dropdown-menu" id="dropdown-menu" role="menu">
                     <div class="dropdown-content">
-                        {% for value, name in constant('DataModelVacancy::TYPE_OPTIONS') %}
+                        {% for value, name in constant('App\\DataModel\\DataModelVacancy::TYPE_OPTIONS') %}
                             <label class="checkbox dropdown-item" for="field-type-{{value}}" data-auto-submit-no-switch>
                                 <input
                                     type="checkbox"
@@ -73,7 +73,7 @@
                 </div>
                 <div class="dropdown-menu" id="dropdown-menu" role="menu">
                     <div class="dropdown-content">
-                        {% for value, name in constant('DataModelVacancy::STUDY_PHASE_OPTIONS') %}
+                        {% for value, name in constant('App\\DataModel\\DataModelVacancy::STUDY_PHASE_OPTIONS') %}
                             <label class="checkbox dropdown-item" for="field-study_phase-{{value}}" data-auto-submit-no-switch>
                                 <input
                                     type="checkbox"

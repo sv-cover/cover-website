@@ -2,6 +2,7 @@
 
 namespace App\Policy;
 
+use App\DataModel\DataModelAnnouncement;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Policy\PolicyInterface;
@@ -13,7 +14,7 @@ class PolicyAnnouncement implements PolicyInterface
 
     public static function getSupportedModel(): string
     {
-        return \DataModelAnnouncement::class;
+        return DataModelAnnouncement::class;
     }
 
     public function __construct(
@@ -35,13 +36,13 @@ class PolicyAnnouncement implements PolicyInterface
     {
         switch ($announcement['visibility'])
         {
-            case \DataModelAnnouncement::VISIBILITY_PUBLIC:
+            case DataModelAnnouncement::VISIBILITY_PUBLIC:
                 return true;
 
-            case \DataModelAnnouncement::VISIBILITY_MEMBERS:
+            case DataModelAnnouncement::VISIBILITY_MEMBERS:
                 return $this->identity->is_member() || $this->identity->is_donor();
 
-            case \DataModelAnnouncement::VISIBILITY_ACTIVE_MEMBERS:
+            case DataModelAnnouncement::VISIBILITY_ACTIVE_MEMBERS:
                 return $this->identity->member_in_committee();
 
             default:

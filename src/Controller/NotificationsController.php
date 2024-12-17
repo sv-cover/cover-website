@@ -2,8 +2,9 @@
 
 namespace App\Controller;
 
+use App\DataModel\DataModelAgenda;
+use App\DataModel\DataModelProfilePicture;
 use App\Service\Authentication;
-use App\Service\Database;
 use App\Service\Policy;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,7 +13,8 @@ class NotificationsController extends AbstractController
 {
     public function __construct(
         private Authentication $auth,
-        private Database $db,
+        private DataModelAgenda $eventModel,
+        private DataModelProfilePicture $profilePictureModel,
         private Policy $policy,
     ){
     }
@@ -38,7 +40,7 @@ class NotificationsController extends AbstractController
             ];
 
         $proposed_events = array_filter(
-            $this->db->getModel('DataModelAgenda')->get_proposed(),
+            $this->eventModel->get_proposed(),
             [$this->policy, 'userCanModerate']
         );
 
@@ -53,7 +55,7 @@ class NotificationsController extends AbstractController
             ];
 
         $unreviewed_profile_pictures = array_filter(
-            $this->db->getModel('DataModelProfilePicture')->find(['reviewed' => false]),
+            $this->profilePictureModel->find(['reviewed' => false]),
             [$this->policy, 'userCanReview']
         );
 
@@ -72,8 +74,8 @@ class NotificationsController extends AbstractController
 
     private function get_always_visible(): bool
     {
-        return $this->policy->userCanModerate($this->db->getModel('DataModelAgenda')->new_iter(['replacement_for' => true]))
-            || $this->policy->userCanReview($this->db->getModel('DataModelProfilePicture')->new_iter(['reviewed' => false]));
+        return $this->policy->userCanModerate($this->eventModel->new_iter(['replacement_for' => true]))
+            || $this->policy->userCanReview($this->profilePictureModel->new_iter(['reviewed' => false]));
     }
 
     /**

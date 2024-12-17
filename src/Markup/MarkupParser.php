@@ -4,6 +4,7 @@ namespace App\Markup;
 
 use App\Markup\NodeInterface;
 use App\Markup\NodeStack;
+use App\Markup\Node\RootNode;
 use App\Markup\ParserToken;
 use App\Markup\TagParserInterface;
 use App\Markup\TokenProcessorInterface;
@@ -27,7 +28,7 @@ class MarkupParser
     public function parse(string $markup): NodeInterface
     {
         if (empty($markup))
-            return '';
+            return new RootNode();
 
         $tokens = $this->tokenize($markup);
 

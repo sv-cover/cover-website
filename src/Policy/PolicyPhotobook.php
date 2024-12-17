@@ -2,6 +2,10 @@
 
 namespace App\Policy;
 
+use App\DataIter\DataIterPhotobook;
+use App\DataIter\DataIterFacesPhotobook;
+use App\DataIter\DataIterRootPhotobook;
+use App\DataModel\DataModelPhotobook;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Policy\PolicyInterface;
@@ -14,7 +18,7 @@ class PolicyPhotobook implements PolicyInterface
 
     public static function getSupportedModel(): string
     {
-        return \DataModelPhotobook::class;
+        return DataModelPhotobook::class;
     }
 
     public function __construct(
@@ -75,12 +79,12 @@ class PolicyPhotobook implements PolicyInterface
             return false;
 
         // Member-specific albums are also forbidden terrain unless they are about you
-        if (!$this->identity->is_member() && $book instanceof \DataIterFacesPhotobook)
+        if (!$this->identity->is_member() && $book instanceof DataIterFacesPhotobook)
             return $book['member_ids'] == [$this->identity->get('id')];
 
         // Member-specific albums are forbidden if one of the members has marked their photo* as hidden
         // or if their whole profile has been made inaccessible
-        if ($book instanceof \DataIterFacesPhotobook && !$this->identity->member_in_committee(COMMISSIE_BESTUUR))
+        if ($book instanceof DataIterFacesPhotobook && !$this->identity->member_in_committee(COMMISSIE_BESTUUR))
             foreach ($book['members'] as $member)
                 if (!$this->policyMember->userCanRead($member) || $member->is_private('foto', true))
                     return false;
@@ -113,9 +117,9 @@ class PolicyPhotobook implements PolicyInterface
         return $this->userCanUpdate($book);
     }
 
-    public function userCanDownloadBook(\DataIterPhotobook $book): bool
+    public function userCanDownloadBook(DataIterPhotobook $book): bool
     {
-        if ($book instanceof \DataIterRootPhotobook)
+        if ($book instanceof DataIterRootPhotobook)
             return false;
 
         if (!$this->identity->member())
@@ -127,7 +131,7 @@ class PolicyPhotobook implements PolicyInterface
         return false;
     }
 
-    public function userCanMarkAsRead(\DataIterPhotobook $book): bool
+    public function userCanMarkAsRead(DataIterPhotobook $book): bool
     {
         return // only logged in members can track their viewed photo books
             $this->auth->loggedIn
@@ -135,22 +139,25 @@ class PolicyPhotobook implements PolicyInterface
             // and only if we actually are watching a book
             && $book->get_id()
 
-            // which is not artificial (faces, likes) and has photos
-            && ctype_digit((string) $book->get_id()) && $book['num_books'] > 0;
+            // which is not artificial (faces, likes)
+            && ctype_digit((string) $book->get_id())
+
+            // and has photos
+            && $book['num_books'] > 0;
     }
 
     public function getAccessLevel()
     {
         if ($this->identity->member_in_committee(COMMISSIE_FOTOCIE))
-            return \DataModelPhotobook::VISIBILITY_PHOTOCEE;
+            return DataModelPhotobook::VISIBILITY_PHOTOCEE;
 
         if ($this->identity->member_in_committee())
-            return \DataModelPhotobook::VISIBILITY_ACTIVE_MEMBERS;
+            return DataModelPhotobook::VISIBILITY_ACTIVE_MEMBERS;
 
         if ($this->identity->is_member() || $this->identity->is_device())
-            return \DataModelPhotobook::VISIBILITY_MEMBERS;
+            return DataModelPhotobook::VISIBILITY_MEMBERS;
 
         else // Donors are also treated as PUBLIC
-            return \DataModelPhotobook::VISIBILITY_PUBLIC;
+            return DataModelPhotobook::VISIBILITY_PUBLIC;
     }
 }

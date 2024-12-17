@@ -3,8 +3,8 @@
 {% block title __('Former boards') ~ ' – ' ~ parent() %}
 
 {# TODO SFY: get model #}
-{% set header = db.getModel('DataModelEditable').get_iter_from_title('Oudbesturenpagina') %}
-{% set footer = db.getModel('DataModelEditable').get_iter_from_title('Oprichting Cover') %}
+{% set header = model('Page').get_iter_from_title('Oudbesturenpagina') %}
+{% set footer = model('Page').get_iter_from_title('Oprichting Cover') %}
 
 {% block page %}
 <article class="section former-boards">

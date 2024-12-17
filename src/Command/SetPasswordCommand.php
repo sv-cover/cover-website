@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use App\Service\Database;
+use App\DataModel\DataModelMember;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -16,7 +16,7 @@ class SetPasswordCommand extends Command
     private SymfonyStyle $io;
 
     public function __construct(
-        private Database $db,
+        private DataModelMember $model,
     ){
         parent::__construct();
     }
@@ -47,9 +47,8 @@ class SetPasswordCommand extends Command
             return $password;
         });
 
-        $model = $this->db->getModel('DataModelMember');
-        $member = $model->get_iter(intval($input->getArgument('id')));
-        $result = $model->set_password($member, $password);
+        $member = $this->model->get_iter(intval($input->getArgument('id')));
+        $result = $this->model->set_password($member, $password);
 
         if ($result)
             $this->io->success(\sprintf('Password successfully updated for %s (%d).', \member_full_name($member), $member->get_id()));

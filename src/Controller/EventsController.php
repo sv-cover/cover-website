@@ -2,12 +2,15 @@
 
 namespace App\Controller;
 
+use App\DataIter\DataIterAgenda;
+use App\DataIter\DataIterCommissie;
+use App\DataModel\DataModelAgenda;
+use App\DataModel\DataModelCommissie;
 use App\Exception\UnauthorizedException;
 use App\Form\DataTransformer\IntToBooleanTransformer;
 use App\Form\EventType;
 use App\Markup\Markup;
 use App\Service\Authentication;
-use App\Service\Database;
 use App\Service\Policy;
 use App\Utils\WebCal;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,13 +26,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class EventsController extends AbstractController
 {
-    private \DataModelAgenda $model;
-
     public function __construct(
-        private Database $db,
+        private DataModelAgenda $model,
         private Policy $policy,
     ){
-        $this->model = $db->getModel('DataModelAgenda');
     }
 
     /**
@@ -117,7 +117,7 @@ class EventsController extends AbstractController
     }
 
     #[Route('/events/create', name: 'events.create', methods: ['GET', 'POST'])]
-    public function create(Authentication $auth, Request $request): Response|RedirectResponse
+    public function create(Authentication $auth, DataModelCommissie $committeeModel, Request $request): Response|RedirectResponse
     {
         $iter = $this->model->new_iter();
 
@@ -138,7 +138,7 @@ class EventsController extends AbstractController
 
             $placeholders = [
                 'id' => $id,
-                'commissie_naam' => $this->db->getModel('DataModelCommissie')->get_naam($iter['committee_id']),
+                'commissie_naam' => $committeeModel->get_naam($iter['committee_id']),
                 'member_naam' => \member_full_name($auth->getIdentity()->member(), \IGNORE_PRIVACY),
             ];
 
@@ -171,14 +171,14 @@ class EventsController extends AbstractController
     }
 
     #[Route('/events/{id<\d+>}/update', name: 'events.update', methods: ['GET', 'POST'])]
-    public function update(Authentication $auth, Request $request, int $id): Response|RedirectResponse
+    public function update(Authentication $auth, DataModelCommissie $committeeModel, Request $request, int $id): Response|RedirectResponse
     {
         $iter = $this->model->get_iter($id);
 
         if (!$this->policy->userCanUpdate($iter))
             throw new UnauthorizedException('You are not allowed to edit this announcement.');
 
-        $orig = \DataIterAgenda::from_iter($iter);
+        $orig = DataIterAgenda::from_iter($iter);
 
         $form = $this->createForm(EventType::class, $iter, ['mapped' => false]);
         $form->handleRequest($request);
@@ -206,7 +206,7 @@ class EventsController extends AbstractController
 
                 $placeholders = [
                     'id' => $override_id,
-                    'commissie_naam' => $this->db->getModel('DataModelCommissie')->get_naam($iter['committee_id']),
+                    'commissie_naam' => $committeeModel->get_naam($iter['committee_id']),
                     'member_naam' => \member_full_name($auth->getIdentity()->member(), \IGNORE_PRIVACY),
                     'category' => implode(', ', array_map('ucfirst', explode(',', $iter['category']))),
                 ];
@@ -297,7 +297,7 @@ class EventsController extends AbstractController
     }
 
     #[Route('/events/{id<\d+>}/reject', name: 'events.reject', methods: ['GET', 'POST'])]
-    public function reject(Request $request, int $id): Response|RedirectResponse
+    public function reject(Request $request, DataModelCommissie $committeeModel, int $id): Response|RedirectResponse
     {
         $iter = $this->model->get_iter($id);
 
@@ -326,7 +326,6 @@ class EventsController extends AbstractController
             $subject = 'Rejected event: ' . $iter['kop'];
             $body = \parse_email('agenda_cancel.txt', $data);
 
-            $committeeModel = $this->db->getModel('DataModelCommissie');
             $email = $committeeModel->get_email($iter['committee_id']);
 
             mail($email, $subject, $body, "From: Study Association Cover <noreply@svcover.nl>\r\n");
@@ -441,7 +440,7 @@ class EventsController extends AbstractController
         ]);
     }
 
-    public function committeePage(\DataIterCommissie $committee): Response
+    public function committeePage(DataIterCommissie $committee): Response
     {
         $iters = $this->model->get_agendapunten();
 

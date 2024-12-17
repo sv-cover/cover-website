@@ -2,11 +2,12 @@
 
 namespace App\Policy;
 
+use App\DataModel\DataModelMember;
+use App\DataModel\DataModelProfilePicture;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Policy\PolicyInterface;
 use App\Service\Authentication;
-use App\Service\Database;
 
 class PolicyProfilePicture implements PolicyInterface
 {
@@ -14,12 +15,12 @@ class PolicyProfilePicture implements PolicyInterface
 
     public static function getSupportedModel(): string
     {
-        return \DataModelProfilePicture::class;
+        return DataModelProfilePicture::class;
     }
 
     public function __construct(
         protected Authentication $auth,
-        protected Database $db,
+        protected DataModelMember $memberModel,
     ) {
         $this->identity = $auth->getIdentity();
     }
@@ -48,7 +49,7 @@ class PolicyProfilePicture implements PolicyInterface
 
         // Everyone else has to obey your privacy settings. Only show photo if member still exists.
         return $iter['member']
-            && !$this->db->getModel('DataModelMember')->is_private($iter['member'], 'foto');
+            && !$this->memberModel->is_private($iter['member'], 'foto');
     }
 
     public function userCanUpdate(DataIter $iter): bool

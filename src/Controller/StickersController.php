@@ -2,10 +2,10 @@
 
 namespace App\Controller;
 
+use App\DataModel\DataModelSticker;
 use App\Exception\UnauthorizedException;
 use App\Form\StickerType;
 use App\Service\Authentication;
-use App\Service\Database;
 use App\Service\Policy;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -23,13 +23,10 @@ class StickersController extends AbstractController
 {
     const PHOTO_THUMBNAIL_WIDTH = 600;
 
-    private \DataModelSticker $model;
-
     public function __construct(
-        private Database $db,
+        private DataModelSticker $model,
         private Policy $policy,
-    ){
-        $this->model = $db->getModel('DataModelSticker');
+    ) {
     }
 
     #[Route('/stickers', name: 'stickers.list', methods: ['GET'])]

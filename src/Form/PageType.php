@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 
 /**
- * Form type for DataModelEditable (aka "Page")
+ * Form type for DataModelPage
  */
 class PageType extends AbstractType
 {

@@ -2,11 +2,17 @@
 
 namespace App\Controller;
 
+use App\DataIter\DataIterPhoto;
+use App\DataIter\DataIterPhotobook;
+use App\DataIter\DataIterRootPhotobook;
+use App\DataModel\DataModelPhotobook;
+use App\DataModel\DataModelPhotobookFace;
+use App\DataModel\DataModelPhotobookReactie;
 use App\Exception\UnauthorizedException;
 use App\Form\PhotoBookType;
 use App\Form\PhotoType;
+use App\Legacy\Database\DatabasePDO;
 use App\Service\Authentication;
-use App\Service\Database;
 use App\Service\Policy;
 use App\Utils\PhotoUtils;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,22 +35,25 @@ use ZipStream;
 #[Route('/photos', requirements: ['book_id' => '\d+|liked|member(_\d+)+'])]
 class PhotoBooksController extends AbstractController
 {
-    private \DataModelPhotobook $model;
     private AsciiSlugger $slugger;
 
     public function __construct(
-        private Database $db,
+        private DatabasePDO $db,
+        private DataModelPhotobook $model,
         private Policy $policy,
         private PhotoUtils $photoUtils,
-    ){
-        $this->model = $db->getModel('DataModelPhotobook');
+    ) {
         // No autowiring for custom options
         $this->slugger = new AsciiSlugger('en', ['en' => ['/' => '_', '\\' => '_']]);
     }
 
     #[Route('/', name: 'photos', methods: ['GET'])]
     #[Route('/{book_id}', name: 'photo_books.single', methods: ['GET'])]
-    public function single(Authentication $auth, ?string $book_id = null): Response
+    public function single(
+        Authentication $auth,
+        DataModelPhotobookReactie $commentModel,
+        ?string $book_id = null,
+    ): Response
     {
         $book = $this->photoUtils->getBook($book_id);
 
@@ -55,8 +64,8 @@ class PhotoBooksController extends AbstractController
             'book' => $book,
         ];
 
-        if ($book instanceof \DataIterRootPhotobook) {
-            $comments = $this->db->getModel('DataModelPhotobookReactie')->get_latest(10);
+        if ($book instanceof DataIterRootPhotobook) {
+            $comments = $commentModel->get_latest(10);
             $recentComments = [];
 
             foreach ($comments as $comment) {
@@ -71,7 +80,7 @@ class PhotoBooksController extends AbstractController
 
         $response = $this->render('photos/books/single.html.twig', $context);
 
-        if ($auth->loggedIn)
+        if ($auth->loggedIn && $this->policy->userCanMarkAsRead($book))
             $this->model->mark_read($auth->identity->get('id'), $book);
 
         return $response;
@@ -157,7 +166,11 @@ class PhotoBooksController extends AbstractController
     }
 
     #[Route('/{book_id}/add_photos', name: 'photo_books.add_photos', methods: ['GET', 'POST'])]
-    public function addPhotos(Request $request, string $book_id): Response|RedirectResponse
+    public function addPhotos(
+        DataModelPhotobookFace $faceModel,
+        Request $request,
+        string $book_id,
+    ): Response|RedirectResponse
     {
         $book = $this->photoUtils->getBook($book_id);
 
@@ -192,7 +205,7 @@ class PhotoBooksController extends AbstractController
 
             foreach ($form['photos']->getData() as $photo) {
                 try {
-                    $iter = new \DataIterPhoto($this->model, -1, [
+                    $iter = new DataIterPhoto($this->model, -1, [
                         'boek' => $book->get_id(),
                         'beschrijving' => $photo['beschrijving'],
                         'filepath' => $photo['filepath']
@@ -203,7 +216,7 @@ class PhotoBooksController extends AbstractController
 
                     $id = $this->model->insert($iter);
 
-                    $photos[] = new \DataIterPhoto($this->model, $id, $iter->data);
+                    $photos[] = new DataIterPhoto($this->model, $id, $iter->data);
                 } catch (\Exception $e) {
                     $errors[] = $e->getMessage();
                 }
@@ -215,7 +228,6 @@ class PhotoBooksController extends AbstractController
                 $this->model->update_book($book);
 
                 // Update faces (but re-run on all photos to align clusters)
-                $faceModel = $this->db->getModel('DataModelPhotobookFace');
                 $faceModel->refresh_faces($book->get_photos());
             }
 
@@ -426,14 +438,16 @@ class PhotoBooksController extends AbstractController
     }
 
     #[Route('/{book_id}/face_detection', name: 'photo_books.face_detection', methods: ['GET', 'POST'])]
-    public function faceDetection(Request $request, ?string $book_id = null): Response
+    public function faceDetection(
+        Request $request,
+        DataModelPhotobookFace $faceModel,
+        ?string $book_id = null,
+    ): Response
     {
         $book = $this->photoUtils->getBook($book_id);
 
         if (!$this->policy->userCanRead($book))
             throw new UnauthorizedException();
-
-        $faceModel = $this->db->getModel('DataModelPhotobookFace');
 
         $form = $this->createFormBuilder(null, ['csrf_token_id' => 'cluster_photos_' . $book->get_id()])
             ->add('submit', SubmitType::class, ['label' => __('Re-run face detection')])
@@ -489,7 +503,7 @@ class PhotoBooksController extends AbstractController
         return $this->redirectToRoute('photo_books.single', ['book_id' => $book->get_id()]);
     }
 
-    private function streamZip(\DataIterPhotobook $root): void
+    private function streamZip(DataIterPhotobook $root): void
     {
         $books = [$root];
 

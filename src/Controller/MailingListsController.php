@@ -2,13 +2,16 @@
 
 namespace App\Controller;
 
+use App\DataModel\DataModelMailinglist;
+use App\DataModel\DataModelMailinglistArchive;
+use App\DataModel\DataModelMailinglistSubscription;
+use App\DataModel\DataModelMember;
 use App\Exception\NotFoundException;
 use App\Exception\UnauthorizedException;
 use App\Form\MailingListType;
 use App\Form\Type\MemberIdType;
 use App\Legacy\Email\MessagePart;
 use App\Service\Authentication;
-use App\Service\Database;
 use App\Service\Policy;
 use App\Utils\UrlUtils;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -30,13 +33,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class MailingListsController extends AbstractController
 {
-    private \DataModelMailinglist $model;
-
     public function __construct(
-        private Database $db,
+        private DataModelMailinglist $model,
         private Policy $policy,
-    ){
-        $this->model = $db->getModel('DataModelMailinglist');
+    ) {
     }
 
     #[Route('/mailing_lists', name: 'mailing_lists.list', methods: ['GET'])]
@@ -118,7 +118,12 @@ class MailingListsController extends AbstractController
      * to the policy?
      */
     #[Route('/mailing_lists/{id<\d+>}/subscribe_member', name: 'mailing_lists.subscribe_member', methods: ['GET', 'POST'])]
-    public function subscribeMember(int $id, Request $request): Response|RedirectResponse
+    public function subscribeMember(
+        DataModelMailinglistSubscription $subscriptionModel,
+        DataModelMember $memberModel,
+        Request $request,
+        int $id
+    ): Response|RedirectResponse
     {
         $list = $this->model->get_iter($id);
 
@@ -134,8 +139,8 @@ class MailingListsController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $member = $this->db->getModel('DataModelMember')->get_iter($form->get('member_id')->getData());
-            $this->db->getModel('DataModelMailinglistSubscription')->subscribe_member($list, $member);
+            $member = $memberModel->get_iter($form->get('member_id')->getData());
+            $subscriptionModel->subscribe_member($list, $member);
             return $this->redirectToRoute('mailing_lists.single', ['id' => $list->get_id()]);
         }
 
@@ -151,7 +156,11 @@ class MailingListsController extends AbstractController
      * TODO: better naming to differentiate between admin and user actions
      */
     #[Route('/mailing_lists/{id<\d+>}/subscribe_guest', name: 'mailing_lists.subscribe_guest', methods: ['GET', 'POST'])]
-    public function subscribeGuest(int $id, Request $request): Response|RedirectResponse
+    public function subscribeGuest(
+        DataModelMailinglistSubscription $subscriptionModel,
+        Request $request,
+        int $id
+    ): Response|RedirectResponse
     {
         $list = $this->model->get_iter($id);
 
@@ -172,7 +181,7 @@ class MailingListsController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->db->getModel('DataModelMailinglistSubscription')->subscribe_guest(
+            $subscriptionModel->subscribe_guest(
                 $list,
                 $form->get('name')->getData(),
                 $form->get('email')->getData(),
@@ -224,7 +233,13 @@ class MailingListsController extends AbstractController
      * Endpoint to allow members to (un)subscribe from their profile page.
      */
     #[Route('/mailing_lists/{id<\d+>}/subscribe', name: 'mailing_lists.subsciption.create', methods: ['GET', 'POST'])]
-    public function subscriptionCreate(int $id, Request $request, Authentication $auth, UrlUtils $urlUtils): RedirectResponse
+    public function subscriptionCreate(
+        DataModelMailinglistSubscription $model,
+        Request $request,
+        Authentication $auth,
+        UrlUtils $urlUtils,
+        int $id,
+    ): RedirectResponse
     {
         $list = $this->model->get_iter($id);
 
@@ -242,8 +257,6 @@ class MailingListsController extends AbstractController
             ->add('do_unsubscribe', SubmitType::class, ['label' => __('Unsubscribe')])
             ->getForm();
         $form->handleRequest($request);
-
-        $model = $this->db->getModel('DataModelMailinglistSubscription');
 
         if ($form->isSubmitted() && $form->isValid()) {
             // `subscribe` changes only if JS works, otherwise `do_subscribe` and `do_unsubscribe` should override whatever value is set.
@@ -274,10 +287,12 @@ class MailingListsController extends AbstractController
      * Endpoint to allow people to unsubscribe through an unsubscribe link.
      */
     #[Route('/mailing_lists/subscription/{id}/unsubscribe', name: 'mailing_lists.subscription.unsubscribe', methods: ['GET', 'POST'])]
-    public function subscriptionDelete(string $id, Request $request): Response|RedirectResponse
+    public function subscriptionDelete(
+        DataModelMailinglistSubscription $model,
+        Request $request,
+        string $id,
+    ): Response|RedirectResponse
     {
-        $model = $this->db->getModel('DataModelMailinglistSubscription');
-
         try {
             $subscription = $model->get_iter($id);
         } catch (NotFoundException $e) {
@@ -360,14 +375,14 @@ class MailingListsController extends AbstractController
     }
 
     #[Route('/mailing_lists/{id<\d+>}/archive', name: 'mailing_lists.archive.list', methods: ['GET'])]
-    public function archiveList(int $id): Response
+    public function archiveList(DataModelMailinglistArchive $archiveModel, int $id): Response
     {
         $list = $this->model->get_iter($id);
 
         if (!$this->policy->userCanReadArchive($list))
             throw new UnauthorizedException('You cannot read the archives of this mailing list.');
 
-        $messages = $this->db->getModel('DataModelMailinglistArchive')->get_for_list($list);
+        $messages = $archiveModel->get_for_list($list);
 
         return $this->render('mailing_lists/archive_list.html.twig', [
             'list' => $list,
@@ -376,14 +391,14 @@ class MailingListsController extends AbstractController
     }
 
     #[Route('/mailing_lists/{id<\d+>}/archive/{message_id<\d+>}', name: 'mailing_lists.archive.single', methods: ['GET'])]
-    public function archiveSingle(int $id, int $message_id): Response
+    public function archiveSingle(DataModelMailinglistArchive $archiveModel, int $id, int $message_id): Response
     {
         $list = $this->model->get_iter($id);
 
         if (!$this->policy->userCanReadArchive($list))
             throw new UnauthorizedException('You cannot read the archives of this mailing list.');
 
-        $message = $this->db->getModel('DataModelMailinglistArchive')->get_iter($message_id);
+        $message = $archiveModel->get_iter($message_id);
 
         $html_body = null;
         $text_body = null;
@@ -408,7 +423,12 @@ class MailingListsController extends AbstractController
         return $this->render('mailing_lists/archive_single.html.twig', compact('list', 'message', 'subject', 'html_body', 'text_body', 'error'));
     }
 
-    public function markup(int|string $id, string $referrer, Authentication $auth): Response
+    public function markup(
+        Authentication $auth,
+        DataModelMailinglistSubscription $subscriptionModel,
+        int|string $id,
+        string $referrer,
+    ): Response
     {
         if (\is_string($id))
             $list = $this->model->get_iter_by_address($id);
@@ -421,7 +441,6 @@ class MailingListsController extends AbstractController
             ]);
 
         $member = $auth->identity->member();
-        $subscriptionModel = $this->db->getModel('DataModelMailinglistSubscription');
 
         $builder = $this->createFormBuilder(null, ['csrf_token_id' => 'mailinglist_subscription_' . $list['id']]);
 

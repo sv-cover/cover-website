@@ -33,7 +33,7 @@
                 <tr>
                     <td>{{ committee.naam }}</td>
                     <td>{{ committee.member_count }}</td>
-                    <td>{{ constant('DataModelCommissie::TYPE_OPTIONS')[committee.type]|title }}</td>
+                    <td>{{ constant('App\\DataModel\\DataModelCommissie::TYPE_OPTIONS')[committee.type]|title }}</td>
                     <td class="has-text-right is-nowrap">
                         {% if not committee.hidden and policy.userCanDelete(committee) %}
                             <a href="{{ path('committees.delete', {slug: committee.login}) }}" data-popup="modal">
@@ -72,7 +72,7 @@
             {% for committee in iters|filter(c => c.hidden) %}
                 <tr>
                     <td>{{ committee.naam }}</td>
-                    <td>{{ constant('DataModelCommissie::TYPE_OPTIONS')[committee.type]|title }}</td>
+                    <td>{{ constant('App\\DataModel\\DataModelCommissie::TYPE_OPTIONS')[committee.type]|title }}</td>
                     <td class="has-text-right is-nowrap">
                         {% if policy.userCanUpdate(committee) %}
                             <a href="{{ path('committees.update', {slug: committee.login}) }}">

@@ -2,50 +2,28 @@
 
 namespace App\Service;
 
-use App\Legacy\Database\DatabasePDO;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 class Database
 {
     private $db;
-    private $loadedModels = [];
+    private $models = [];
 
     public function __construct(
-        string $host,
-        string $user,
-        string $password,
-        string $database,
-        bool $showQueries,
+        #[AutowireIterator('app.data-model')]
+        iterable $models,
     ) {
-        $this->db = new DatabasePDO(compact('host', 'user', 'password', 'database'));
-        $this->db->track_history = $showQueries;
-    }
-
-    private function createModel(string $name): mixed
-    {
-        require_once 'src/Model/' . $name . '.php';
-
-        if (!class_exists($name))
-            throw new InvalidArgumentException(sprintf(__("Could not find the model %s"), $name));
-
-        $refl = new \ReflectionClass($name);
-        return $refl->newInstance($this->getDb());
+        foreach ($models as $model) {
+            $name = (new \ReflectionClass($model))->getShortName();
+            $this->models[$name] = $model;
+        }
     }
 
     public function getModel(string $name): mixed
     {
-        if (!isset($this->loadedModels[$name]))
-            $this->loadedModels[$name] = $this->createModel($name);
+        if (!isset($this->models[$name]))
+            throw new \InvalidArgumentException(sprintf(__("Could not find the model %s"), $name));
 
-        return $this->loadedModels[$name];
-    }
-
-    public function getDb(): DatabasePDO
-    {
-        return $this->db;
-    }
-
-    public function __call(string $name, array $arguments): mixed
-    {
-        return call_user_func_array([$this->db, $name], $arguments);
+        return $this->models[$name];
     }
 }

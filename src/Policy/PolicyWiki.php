@@ -2,6 +2,7 @@
 
 namespace App\Policy;
 
+use App\DataModel\DataModelWiki;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Policy\PolicyInterface;
@@ -11,7 +12,7 @@ class PolicyWiki implements PolicyInterface
 {
     public static function getSupportedModel(): string
     {
-        return \DataModelWiki::class;
+        return DataModelWiki::class;
     }
 
     public function userCanCreate(DataIter $wiki): bool

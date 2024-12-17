@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use App\DataModel\DataModelMember;
+use App\DataModel\DataModelSession;
 use App\Legacy\Authentication\CookieSessionProvider;
 use App\Legacy\Authentication\DeviceIdentityProvider;
 use App\Legacy\Authentication\GuestIdentityProvider;
@@ -15,10 +17,19 @@ class Authentication
     private $identity;
     private $session;
 
+    public function __construct(
+        protected DataModelSession $sessionModel,
+        protected DataModelMember $memberModel,
+    ) {
+    }
+
     public function getAuth()
     {
         if ($this->authenticator === null && CookieSessionProvider::class)
-            $this->authenticator = new CookieSessionProvider();
+            $this->authenticator = new CookieSessionProvider(
+                $this->sessionModel,
+                $this->memberModel,
+            );
         return $this->authenticator;
     }
 
@@ -49,10 +60,10 @@ class Authentication
         elseif ($authenticator->get_session()->get('type') === 'device')
             $identity = new DeviceIdentityProvider($authenticator);
         else
-            $identity = new MemberIdentityProvider($authenticator);
+            $identity = new MemberIdentityProvider($authenticator, $this->memberModel);
 
         if ($identity->member_in_committee(COMMISSIE_EASY))
-            $identity = new ImpersonatingIdentityProvider($authenticator);
+            $identity = new ImpersonatingIdentityProvider($authenticator, $this->memberModel);
 
         return $identity;
     }

@@ -2,11 +2,11 @@
 
 namespace App\Policy;
 
+use App\DataModel\DataModelPoll;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Policy\PolicyInterface;
 use App\Service\Authentication;
-use App\Service\Database;
 
 class PolicyPoll implements PolicyInterface
 {
@@ -14,12 +14,12 @@ class PolicyPoll implements PolicyInterface
 
     public static function getSupportedModel(): string
     {
-        return \DataModelPoll::class;
+        return DataModelPoll::class;
     }
 
     public function __construct(
         protected Authentication $auth,
-        protected Database $db,
+        protected DataModelPoll $pollModel,
     ) {
         $this->identity = $auth->getIdentity();
     }
@@ -29,7 +29,7 @@ class PolicyPoll implements PolicyInterface
         if (!$this->auth->loggedIn)
             return false;
 
-        $current_poll = $this->db->getModel('DataModelPoll')->get_current();
+        $current_poll = $this->pollModel->get_current();
         if (!$current_poll)
             return true;
 

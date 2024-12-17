@@ -2,9 +2,10 @@
 
 namespace App\Controller;
 
+use App\DataModel\DataModelBesturen;
+use App\DataModel\DataModelPage;
 use App\Exception\UnauthorizedException;
 use App\Form\BoardType;
-use App\Service\Database;
 use App\Service\Policy;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -15,13 +16,12 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class BoardsController extends AbstractController
 {
-    private \DataModelBesturen $model;
 
     public function __construct(
-        private Database $db,
+        private DataModelBesturen $model,
+        private DataModelPage $pageModel,
         private Policy $policy,
-    ){
-        $this->model = $db->getModel('DataModelBesturen');
+    ) {
     }
 
     #[Route('/boards', name: 'boards.list', methods: ['GET'])]
@@ -49,14 +49,12 @@ class BoardsController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $pageModel = $db->getModel('DataModelEditable');
-
-            $page = $pageModel->new_iter([
+            $page = $this->pageModel->new_iter([
                 'committee_id' => \COMMISSIE_BESTUUR,
                 'titel' => $iter['naam']
             ]);
 
-            $iter['page_id'] = $pageModel->insert($page, true);
+            $iter['page_id'] = $this->pageModel->insert($page, true);
 
             $id = $this->model->insert($iter);
             return $this->redirectToRoute('boards.single', ['id' => $iter->get_id()]);
@@ -82,7 +80,7 @@ class BoardsController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $page = $iter['page'];
             $page->set('titel', $iter['naam']);
-            $db->getModel('DataModelEditable')->update($page);
+            $this->pageModel->update($page);
 
             $this->model->update($iter);
             return $this->redirectToRoute('boards.single', ['id' => $iter->get_id()]);

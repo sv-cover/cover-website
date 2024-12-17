@@ -72,7 +72,7 @@ function markup_format_attribute($text)
     return htmlspecialchars($text, ENT_QUOTES, WEBSITE_ENCODING);
 }
 
-// only used in DataModelEditable::get_summary
+// only used in DataModelPage::get_summary
 function markup_strip($markup)
 {
     return preg_replace('/\[[^\[\]\s]*\]/', '', $markup ?? '');
@@ -259,7 +259,7 @@ function encode_data_uri($mime_type, $data)
     return 'data:' . $mime_type . ';base64,' . base64_encode($data);
 }
 
-// only used in DataModelEditable::get_summary
+// only used in DataModelPage::get_summary
 function summarize($text, $length)
 {
     $text = trim($text);

@@ -2,10 +2,13 @@
 
 namespace App\Controller;
 
+use App\DataIter\DataIterMember;
+use App\DataIter\DataIterProfilePicture;
+use App\DataModel\DataModelMember;
+use App\DataModel\DataModelProfilePicture;
 use App\Exception\UnauthorizedException;
 use App\Form\ProfilePictureType;
 use App\Service\Authentication;
-use App\Service\Database;
 use App\Service\Policy;
 use App\Utils\UrlUtils;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,14 +31,11 @@ class ProfilePicturesController extends AbstractController
 
     const MAX_WIDTH = 2000;
 
-    private \DataModelProfilePicture $model;
-
     public function __construct(
-        private Database $db,
+        private DataModelProfilePicture $model,
         private Policy $policy,
         private TagAwareCacheInterface $profilePicturesCache,
-    ){
-        $this->model = $db->getModel('DataModelProfilePicture');
+    ) {
     }
 
     /**
@@ -80,7 +80,7 @@ class ProfilePicturesController extends AbstractController
         );
     }
 
-    private function _generateOriginal(\DataIterProfilePicture $iter): string
+    private function _generateOriginal(DataIterProfilePicture $iter): string
     {
         $photo = $iter->get_stream();
 
@@ -98,7 +98,7 @@ class ProfilePicturesController extends AbstractController
         return $imagick->getImageBlob();
     }
 
-    private function _generateScaled(\DataIterProfilePicture $iter, string $format, int $width): string
+    private function _generateScaled(DataIterProfilePicture $iter, string $format, int $width): string
     {
         $photo = $iter->get_stream();
 
@@ -131,7 +131,7 @@ class ProfilePicturesController extends AbstractController
         return $imagick->getImageBlob();
     }
 
-    private function _generatePlaceholder(\DataIterMember $member, string $format, int $width, bool $private = false): string
+    private function _generatePlaceholder(DataIterMember $member, string $format, int $width, bool $private = false): string
     {
         // Determine text
         if ($private)
@@ -203,7 +203,7 @@ class ProfilePicturesController extends AbstractController
     /**
      * Serve cached original version of the profile picture.
      */
-    private function _serveCachedOriginal(Request $request, \DataIterProfilePicture $iter): response
+    private function _serveCachedOriginal(Request $request, DataIterProfilePicture $iter): response
     {
         $cache = $this->profilePicturesCache;
 
@@ -226,7 +226,7 @@ class ProfilePicturesController extends AbstractController
     /**
      * Serve cached scaled version of the profile picture.
      */
-    private function _serveCachedScaled(Request $request, \DataIterProfilePicture $iter, string $format, int $width): response
+    private function _serveCachedScaled(Request $request, DataIterProfilePicture $iter, string $format, int $width): response
     {
         $cache = $this->profilePicturesCache;
 
@@ -258,7 +258,7 @@ class ProfilePicturesController extends AbstractController
      * the key. The metadata contains a last upated date, and the hash in the
      * key helps us invalidate the cache on a name change.
      */
-    private function _serveCachedPlaceholder(Request $request, \DataIterMember $member, string $format, int $width): response
+    private function _serveCachedPlaceholder(Request $request, DataIterMember $member, string $format, int $width): response
     {
         $cache = $this->profilePicturesCache;
 
@@ -408,25 +408,24 @@ class ProfilePicturesController extends AbstractController
     )]
     public function member(
         Authentication $auth,
+        DataModelMember $memberModel,
         Request $request,
         int $member_id,
         string $format = self::FORMAT_SQUARE,
         int $width = self::MAX_WIDTH,
     ): Response
     {
-        $member_model = $this->db->getModel('DataModelMember');
-
-        $member = $member_model->get_iter($member_id); // Throws 404 if not exists
+        $member = $memberModel->get_iter($member_id); // Throws 404 if not exists
 
         $width = min($width, self::MAX_WIDTH);
 
         if ($format == self::FORMAT_ORIGINAL) {
-            if ($member_model->is_private($member, 'foto'))
+            if ($memberModel->is_private($member, 'foto'))
                 throw new UnauthorizedException('Photo is private');
             if (!$member->get_profile_picture())
                 throw $this->createNotFoundException('Member has no photo.');
             return $this->_serveCachedOriginal($request, $member->get_profile_picture());
-        } elseif ($member_model->is_private($member, 'foto') || !$member->get_profile_picture()) {
+        } elseif ($memberModel->is_private($member, 'foto') || !$member->get_profile_picture()) {
             return $this->_serveCachedPlaceholder($request, $member, $format, $width);
         } else {
             return $this->_serveCachedScaled($request, $member->get_profile_picture(), $format, $width);

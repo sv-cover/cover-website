@@ -2,6 +2,7 @@
 
 namespace App\Policy;
 
+use App\DataModel\DataModelVacancy;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Policy\PolicyInterface;
@@ -13,7 +14,7 @@ class PolicyVacancy implements PolicyInterface
 
     public static function getSupportedModel(): string
     {
-        return \DataModelVacancy::class;
+        return DataModelVacancy::class;
     }
 
     public function __construct(

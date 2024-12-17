@@ -2,6 +2,8 @@
 
 namespace App\Legacy\Database;
 
+use App\Legacy\Database\DataModel;
+
 /**
  * This class provides access to a data row in a #DataModel
  */
@@ -21,31 +23,7 @@ abstract class DataIter implements \JsonSerializable, \ArrayAccess
     
     protected $db = null;
 
-    /**
-     * Returns an instance of the DataModel that can fetch these
-     * specific DataIter types.
-     */
-    static public function model()
-    {
-        $class_name = get_called_class();
-
-        return get_model(preg_replace('{^DataIter}', 'DataModel', $class_name));
-    }
-
     abstract static public function fields();
-
-    /**
-     * Defines the set of rules applied during validation.
-     */
-    static public function rules()
-    {
-        $rules = [];
-
-        foreach (static::fields() as $field)
-            $rules[$field] = [];
-
-        return $rules;
-    }
 
     /**
      * Clones a DataIter. Useful for transforming one iter to another.
@@ -53,7 +31,7 @@ abstract class DataIter implements \JsonSerializable, \ArrayAccess
     static public function from_iter(DataIter $iter)
     {
         $class_name = get_called_class();
-        $instance = new $class_name($iter->model, $iter->get_id(), $iter->data);
+        $instance = new $class_name($iter->get_model(), $iter->get_id(), $iter->data);
         return $instance;
     }
 
@@ -63,12 +41,12 @@ abstract class DataIter implements \JsonSerializable, \ArrayAccess
     }
     
     /**
-      * Create a new DataIter
-      * @model the model the iter belongs to
-      * @id the id of the iter
-      * @data the data of the iter (a hashtable)
-      */
-    public function __construct(DataModel $model = null, $id, $data, array $seed = array())
+     * Create a new DataIter
+     * @model the model the iter belongs to
+     * @id the id of the iter
+     * @data the data of the iter (a hashtable)
+     */
+    public function __construct(DataModel $model = null, $id, $data, array $seed = [])
     {
         $this->model = $model;
         $this->data = $data;
@@ -94,11 +72,16 @@ abstract class DataIter implements \JsonSerializable, \ArrayAccess
         ];
     }
 
+    public function get_model(): DataModel
+    {
+        return $this->model;
+    }
+
     /**
-      * Get the id of the iter
-      *
-      * @result the id of the iter
-      */
+     * Get the id of the iter
+     *
+     * @result the id of the iter
+     */
     public function get_id()
     {
         return $this->_id;
@@ -193,11 +176,11 @@ abstract class DataIter implements \JsonSerializable, \ArrayAccess
     }
 
     /**
-      * Get iter data
-      * @field the data field name
-      *
-      * @result the data in the field
-      */
+     * Get iter data
+     * @field the data field name
+     *
+     * @result the data in the field
+     */
     public function get($field)
     {
         // Track getter dependencies
@@ -226,10 +209,10 @@ abstract class DataIter implements \JsonSerializable, \ArrayAccess
     }
     
     /**
-      * Set iter data
-      * @param string $field the data field name
-      * @param mixed $value the data value
-      */
+     * Set iter data
+     * @param string $field the data field name
+     * @param mixed $value the data value
+     */
     public function set($field, $value)
     {
         if ($field == 'id')
@@ -255,10 +238,10 @@ abstract class DataIter implements \JsonSerializable, \ArrayAccess
     }
 
     /**
-      * Set iter data for multiple fields
-      * @param array $values a hashtable where keys are the data field names and the 
-      * values are the data values 
-      */
+     * Set iter data for multiple fields
+     * @param array $values a hashtable where keys are the data field names and the
+     * values are the data values
+     */
     public function set_all(array $values) {
         foreach ($values as $field => $value)
             $this->set($field, $value);
@@ -271,19 +254,19 @@ abstract class DataIter implements \JsonSerializable, \ArrayAccess
     }
     
     /**
-      * Process changes up into the model
-      * 
-      * @result true if update was succesful, false otherwise
-      */
+     * Process changes up into the model
+     *
+     * @result true if update was succesful, false otherwise
+     */
     public function update() {
         return $this->model->update($this);
     }
     
     /**
-      * Returns whether the iter has been changed
-      *
-      * @result true if the iter has been changed, false otherwise
-      */        
+     * Returns whether the iter has been changed
+     *
+     * @result true if the iter has been changed, false otherwise
+     */
     public function has_changes() {
         return (count($this->_changes) != 0);
     }
@@ -298,20 +281,20 @@ abstract class DataIter implements \JsonSerializable, \ArrayAccess
     }
     
     /**
-      * Returns the field names that have been changed
-      *
-      * @result an array with the data field names that have been changed
-      */
+     * Returns the field names that have been changed
+     *
+     * @result an array with the data field names that have been changed
+     */
     public function changed_fields() {
         return $this->_changes;
     }
     
     /**
-      * Returns the field names and values that have been changed
-      *
-      * @result a hash with the data field names as the keys and data values
-      * as the values
-      */
+     * Returns the field names and values that have been changed
+     *
+     * @result a hash with the data field names as the keys and data values
+     * as the values
+     */
     public function changed_values() {
         return array_combine(
             $this->_changes,
@@ -319,24 +302,6 @@ abstract class DataIter implements \JsonSerializable, \ArrayAccess
                 return $this->data[$key];
             }, $this->_changes)
         );
-    }
-
-    /**
-     * Return a dataiter for all fields queried from a certain subresource.
-     * @return instance of <$type extends DataIter>
-     */
-    protected function getIter($field, $type)
-    {
-        // Call DataIter::model() on the specific DataIter type
-        $model = call_user_func([$type, 'model']);
-
-        $row = array();
-
-        foreach ($this->data as $k => $v)
-            if (strpos($k, $field . '__') === 0)
-                $row[substr($k, strlen($field) + 2)] = $v;
-
-        return $model->new_iter($row, $type);
     }
 
     /* ArrayAccess */
@@ -381,13 +346,5 @@ abstract class DataIter implements \JsonSerializable, \ArrayAccess
             || static::has_getter($field)
             || $this->has_value($field)
             || static::has_field($field);
-    }
-}
-
-class GenericDataIter extends DataIter
-{
-    static public function fields()
-    {
-        return [];
     }
 }

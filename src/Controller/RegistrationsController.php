@@ -2,11 +2,13 @@
 
 namespace App\Controller;
 
+use App\DataModel\DataModelMember;
+use App\DataModel\DataModelPage;
 use App\Exception\NotFoundException;
 use App\Exception\UnauthorizedException;
 use App\Form\RegistrationType;
+use App\Legacy\Database\DatabasePDO;
 use App\Service\Authentication;
-use App\Service\Database;
 use App\Service\Secretary;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -23,12 +25,10 @@ use Symfony\Component\String\ByteString;
 
 class RegistrationsController extends AbstractController
 {
-    private \DataModelMember $model;
-
     public function __construct(
-        private Database $db,
-    ){
-        $this->model = $db->getModel('DataModelMember');
+        private DatabasePDO $db,
+        private DataModelMember $model,
+    ) {
     }
 
     private function getDataForToken(string $token): array
@@ -109,7 +109,7 @@ class RegistrationsController extends AbstractController
     }
 
     #[Route('/join', name: 'registrations.join', methods: ['GET', 'POST'])]
-    public function join(Request $request): Response|RedirectResponse
+    public function join(DataModelPage $pageModel, Request $request): Response|RedirectResponse
     {
         $defaults = [
             'membership_study_phase' => 'b',
@@ -157,7 +157,7 @@ class RegistrationsController extends AbstractController
         }
 
         return $this->render('registrations/join_form.html.twig', [
-            'terms' => $this->db->getModel('DataModelEditable')->get_iter_from_title('Voorwaarden aanmelden'),
+            'terms' => $pageModel->get_iter_from_title('Voorwaarden aanmelden'),
             'form' => $form,
         ]);
     }

@@ -4,7 +4,6 @@ namespace App\Command;
 
 require_once 'src/Legacy/mailing_list.php';
 
-use App\Service\Database;
 use function App\Legacy\Email\MailingList\get_error_message;
 use function App\Legacy\Email\MailingList\send_mailinglist_mail;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -18,12 +17,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class SendMailingListMailCommand extends Command
 {
     private SymfonyStyle $io;
-
-    public function __construct(
-        private Database $db,
-    ){
-        parent::__construct();
-    }
 
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {

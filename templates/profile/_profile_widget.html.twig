@@ -9,7 +9,7 @@
             </a>
         </div>
     {% endif %}
-    {% set photobook = db.getModel('DataModelPhotobookFace').get_book([iter]) %}
+    {% set photobook = model('PhotobookFace').get_book([iter]) %}
     {% if policy.userCanRead(photobook) %}
         <div class="control">
             <a href="{{ path('photo_books.single', {book_id: photobook.id}) }}" class="button">

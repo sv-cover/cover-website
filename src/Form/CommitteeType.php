@@ -1,6 +1,7 @@
 <?php
 namespace App\Form;
 
+use App\DataModel\DataModelCommissie;
 use App\Form\CommitteeMemberType;
 use App\Form\DataTransformer\StringToDateTimeTransformer;
 use Symfony\Component\Form\AbstractType;
@@ -20,9 +21,9 @@ class CommitteeType extends AbstractType
             ->add('type', ChoiceType::class, [
                 'label' => __('Type'),
                 'choices'  => [
-                    __('Committee') => \DataModelCommissie::TYPE_COMMITTEE,
-                    __('Working Group') => \DataModelCommissie::TYPE_WORKING_GROUP,
-                    __('Other') => \DataModelCommissie::TYPE_OTHER,
+                    __('Committee') => DataModelCommissie::TYPE_COMMITTEE,
+                    __('Working Group') => DataModelCommissie::TYPE_WORKING_GROUP,
+                    __('Other') => DataModelCommissie::TYPE_OTHER,
                 ],
                 'expanded' => true,
                 'chips' => true,

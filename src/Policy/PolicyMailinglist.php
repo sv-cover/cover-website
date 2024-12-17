@@ -2,6 +2,8 @@
 
 namespace App\Policy;
 
+use App\DataIter\DataIterMailinglist;
+use App\DataModel\DataModelMailinglist;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Policy\PolicyInterface;
@@ -13,7 +15,7 @@ class PolicyMailinglist implements PolicyInterface
 
     public static function getSupportedModel(): string
     {
-        return \DataModelMailinglist::class;
+        return DataModelMailinglist::class;
     }
 
     public function __construct(
@@ -49,7 +51,7 @@ class PolicyMailinglist implements PolicyInterface
         return $this->userCanRead($iter);
     }
 
-    public function userCanSubscribe(\DataIterMailinglist $list): bool
+    public function userCanSubscribe(DataIterMailinglist $list): bool
     {
         if (!$this->auth->loggedIn)
             return false;
@@ -70,7 +72,7 @@ class PolicyMailinglist implements PolicyInterface
         return true;
     }
 
-    public function userCanUnsubscribe(\DataIterMailinglist $list): bool
+    public function userCanUnsubscribe(DataIterMailinglist $list): bool
     {
         // You cannot unsubscribe from non-public lists
         if (!$list['publiek'])
@@ -80,7 +82,7 @@ class PolicyMailinglist implements PolicyInterface
         return true;
     }
 
-    public function userCanReadArchive(\DataIterMailinglist $list): bool
+    public function userCanReadArchive(DataIterMailinglist $list): bool
     {
         if (!$this->auth->loggedIn)
             return false;

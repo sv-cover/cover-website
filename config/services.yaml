@@ -16,7 +16,16 @@ parameters:
         - png
         - svg
         - webp
+    app.filemanager_resizable_image_extensions:
+        - jpeg
+        - jpg
+        - png
     app.filemanager_root: 'https://filemanager.svcover.nl'
+    app.facedetect.script_path: opt/facedetect/suggest_faces.py
+    app.facedetect.python_path: '%env(APP_FACE_DETECT_PYTHON_PATH)%'
+    env(APP_FACE_DETECT_PYTHON_PATH): python
+    app.facedetect.log_path: '%env(APP_FACE_DETECT_LOG_PATH)%'
+    env(APP_FACE_DETECT_LOG_PATH): /dev/null
     app.no_iban_string: OUTSIDE_SEPA_AREA
     app.photos_dir: '%env(APP_PHOTOS_DIR)%'
     app.photos_scaled_dir: '%env(APP_PHOTOS_SCALED_DIR)%'
@@ -36,6 +45,10 @@ services:
             tags: ['app.policy']
         App\Markup\TokenParserInterface:
             tags: ['app.markup-token-parser']
+        App\Legacy\Database\DataModel:
+            tags: ['app.data-model']
+        App\Legacy\Database\SearchProviderInterface:
+            tags: ['app.search-provider']
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -48,18 +61,13 @@ services:
             - '../src/Legacy'
             - '../src/Model'
             - '../src/Markup/Node'
+            - '../src/DataIter'
 
     App\Service\Authentication:
         public: true
 
     App\Service\Database:
         public: true
-        arguments:
-            $host: '%env(DB_HOST)%'
-            $user: '%env(DB_USER)%'
-            $password: '%env(DB_PASSWORD)%'
-            $database: '%env(DB_DATABASE)%'
-            $showQueries: '%db.showQueries%'
 
     App\Service\Incassomatic:
         arguments:
@@ -73,11 +81,7 @@ services:
             $user: '%env(KAST_USER)%'
             $password: '%env(KAST_PASSWORD)%'
 
-    App\Service\Policy:
-        public: true
-
     App\Service\Secretary:
-        public: true
         arguments:
             $url: '%env(SECRETARY_URL)%'
             $user: '%env(SECRETARY_USER)%'
@@ -86,6 +90,23 @@ services:
     App\SignUp\Fields\:
         resource: '../src/SignUp/Fields'
         shared: false
+
+    App\Legacy\Database\DatabasePDO:
+        arguments:
+            $host: '%env(DB_HOST)%'
+            $user: '%env(DB_USER)%'
+            $password: '%env(DB_PASSWORD)%'
+            $database: '%env(DB_DATABASE)%'
+            $track_history: '%db.showQueries%'
+
+    App\Legacy\Database\DataModel:
+        abstract:  true
+        calls:
+            - setDb: ['@App\Legacy\Database\DatabasePDO']
+
+    App\DataModel\:
+        resource: '../src/DataModel'
+        parent: App\Legacy\Database\DataModel
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

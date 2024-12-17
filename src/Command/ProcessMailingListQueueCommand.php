@@ -4,8 +4,9 @@ namespace App\Command;
 
 require_once 'src/Legacy/mailing_list.php';
 
+use App\DataModel\DataModelCommissie;
+use App\DataModel\DataModelMailinglistQueue;
 use App\Legacy\Email\MessagePart;
-use App\Service\Database;
 use function App\Legacy\Email\personalize;
 use function App\Legacy\Email\MailingList\send_mailinglist_mail;
 use function App\Legacy\Email\MailingList\validate_message_to_all_committees;
@@ -31,7 +32,8 @@ class ProcessMailingListQueueCommand extends Command
     private SymfonyStyle $io;
 
     public function __construct(
-        private Database $db,
+        private DataModelCommissie $committeeModel,
+        private DataModelMailinglistQueue $queueModel,
         private UrlGeneratorInterface $urlGenerator,
     ){
         parent::__construct();
@@ -44,9 +46,7 @@ class ProcessMailingListQueueCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $model = $this->db->getModel('DataModelMailinglistQueue');
-
-        $queue = $model->find(['status' => 'waiting']);
+        $queue = $queueModel->find(['status' => 'waiting']);
 
         // Array_shift returns NULL if no results
         while ($queuedMessage = \array_shift($queue)) {
@@ -69,7 +69,7 @@ class ProcessMailingListQueueCommand extends Command
             }
 
             if ($result === 0) {
-               $model->delete($queuedMessage);
+               $queueModel->delete($queuedMessage);
             } else {
                 $message = $this->getErrorMessage($result);
                 $queuedMessage->set('status', sprintf('error_%s', $message));
@@ -77,7 +77,7 @@ class ProcessMailingListQueueCommand extends Command
             }
 
             // Query every iteration to prevent race conditions
-            $queue = $model->find(['status' => 'waiting']);
+            $queue = $queueModel->find(['status' => 'waiting']);
         }
 
         return Command::SUCCESS;
@@ -96,8 +96,6 @@ class ProcessMailingListQueueCommand extends Command
 
     private function sendToAllCommittees(MessagePart $message, string $to, string $from): int
     {
-        $model = $this->db->getModel('DataModelCommissie');
-
         $destinations = null;
         $loop_id = null;
 
@@ -108,7 +106,7 @@ class ProcessMailingListQueueCommand extends Command
 
         $message->addHeader('X-Loop', $loop_id);
 
-        $committees = $model->get($destinations[$to]); // Get all committees of that type, not including hidden committees (such as board)
+        $committees = $committeeModel->get($destinations[$to]); // Get all committees of that type, not including hidden committees (such as board)
 
         foreach ($committees as $committee) {
             $email = $committee['login'] . '@svcover.nl';

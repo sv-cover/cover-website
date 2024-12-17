@@ -1,6 +1,7 @@
 <?php
 namespace App\Policy;
 
+use App\DataModel\DataModelPhotobookFace;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Policy\PolicyInterface;
@@ -12,7 +13,7 @@ class PolicyPhotobookFace implements PolicyInterface
 
     public static function getSupportedModel(): string
     {
-        return \DataModelPhotobookFace::class;
+        return DataModelPhotobookFace::class;
     }
 
     public function __construct(

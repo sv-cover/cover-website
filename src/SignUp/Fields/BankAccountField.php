@@ -2,6 +2,7 @@
 
 namespace App\SignUp\Fields;
 
+use App\DataIter\DataIterMember;
 use App\Service\Incassomatic;
 use App\SignUp\SignUpFieldInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -72,7 +73,7 @@ class BankAccountField implements SignUpFieldInterface
         ]);
     }
 
-    public function prefill(\DataIterMember $member): ?string
+    public function prefill(DataIterMember $member): ?string
     {
         if (!$this->autofill)
             return null;

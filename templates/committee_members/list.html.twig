@@ -15,7 +15,7 @@
                 All types
             </a>
         </li>
-        {% for type_id, type_name in constant('DataModelCommissie::TYPE_OPTIONS') %}
+        {% for type_id, type_name in constant('App\\DataModel\\DataModelCommissie::TYPE_OPTIONS') %}
             <li class="{% if type == type_name %}is-active{% endif %}">
                 <a href="{{ path('committee_members', {type: type_name}) }}">
                     {{ type_name|title }}

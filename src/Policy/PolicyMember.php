@@ -2,6 +2,7 @@
 
 namespace App\Policy;
 
+use App\DataModel\DataModelMember;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Policy\PolicyInterface;
@@ -13,7 +14,7 @@ class PolicyMember implements PolicyInterface
 
     public static function getSupportedModel(): string
     {
-        return \DataModelMember::class;
+        return DataModelMember::class;
     }
 
     public function __construct(

@@ -2,13 +2,13 @@
 
 namespace App\Markup\TokenParser;
 
+use App\DataModel\DataModelCommissie;
 use App\Exception\NotFoundException;
 use App\Markup\NodeInterface;
 use App\Markup\ParserToken;
 use App\Markup\TokenProcessorInterface;
 use App\Markup\Node\InlineRendererNode;
 use App\Markup\TokenParser\AbstractTokenParser;
-use App\Service\Database;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
@@ -33,7 +33,7 @@ class MacroParser extends AbstractTokenParser implements TokenProcessorInterface
     private string $regex = '/\[\[\s*(?P<macro>[a-z_]+)\((?P<args>.*?)\)\s*\]\]/';
 
     public function __construct(
-        private Database $db,
+        private DataModelCommissie $committeeModel,
         private Environment $twig,
         private UrlGeneratorInterface $urlGenerator,
     ) {
@@ -68,7 +68,7 @@ class MacroParser extends AbstractTokenParser implements TokenProcessorInterface
     private function renderCommittee(string $name): string
     {
         try {
-            $committee = $this->db->getModel('DataModelCommissie')->get_from_name($name);
+            $committee = $this->committeeModel->get_from_name($name);
             $url = $this->urlGenerator->generate('committees.single', ['slug' => $committee['login']]);
             $name = $this->twig->getRuntime('Twig\Runtime\EscaperRuntime')->escape($committee['naam'], 'html');
             return "<a href=\"$url\">$name</a>";

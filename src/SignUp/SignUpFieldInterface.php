@@ -2,6 +2,7 @@
 
 namespace App\SignUp;
 
+use App\DataIter\DataIterMember;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -25,7 +26,7 @@ interface SignUpFieldInterface
     public function process(FormInterface $form): ?string;
 
     // Suggest a value (like process) for a logged-in member
-    public function prefill(\DataIterMember $member): ?string;
+    public function prefill(DataIterMember $member): ?string;
 
     // Add field to a symfony form
     public function buildForm(FormBuilderInterface $form_builder): void;

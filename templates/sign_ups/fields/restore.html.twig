@@ -13,7 +13,7 @@
         },
     }) }}
         <p>
-            {{ __('Deleted %s field…')|format(field.model.field_types[field.type].label|lower) }}
+            {{ __('Deleted %s field…')|format(sign_up_utils.getTypeLabel(field)|lower) }}
             {{ form_widget(form.submit, {
                 label: __('Restore'),
                 color: 'text',

@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use App\Service\Database;
+use App\DataModel\DataModelAgenda;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,16 +12,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 class AskAttendanceCommand extends Command
 {
     public function __construct(
-        private Database $db,
-    ){
+        private DataModelAgenda $model,
+    ) {
         parent::__construct();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $model = $this->db->getModel('DataModelAgenda');
-
-        $events = $model->get(new \DateTime('-1 days'), new \DateTime(), true);
+        $events = $this->model->get(new \DateTime('-1 days'), new \DateTime(), true);
 
         foreach ($events as $event) {
             // Skip external activities

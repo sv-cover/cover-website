@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
+use App\DataModel\DataModelConfiguratie;
 use App\Exception\UnauthorizedException;
 use App\Form\SettingsType;
-use App\Service\Database;
 use App\Service\Policy;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -15,13 +15,10 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class SettingsController extends AbstractController
 {
-    private \DataModelConfiguratie $model;
-
     public function __construct(
-        private Database $db,
+        private DataModelConfiguratie $model,
         private Policy $policy,
-    ){
-        $this->model = $db->getModel('DataModelConfiguratie');
+    ) {
     }
 
     #[Route('/settings', name: 'settings.list', methods: ['GET'])]

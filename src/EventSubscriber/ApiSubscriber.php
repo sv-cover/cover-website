@@ -1,8 +1,8 @@
 <?php
 namespace App\EventSubscriber;
 
+use App\DataModel\DataModelApplication;
 use App\Exception\UnauthorizedException;
-use App\Service\Database;
 use App\Controller\ApiController;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -24,7 +24,7 @@ class ApiSubscriber implements EventSubscriberInterface
     }
 
     public function __construct(
-        private Database $db,
+        private DataModelApplication $applicationModel,
     ) {
     }
 
@@ -49,12 +49,10 @@ class ApiSubscriber implements EventSubscriberInterface
 
         // We've got a post request to the API controller
 
-        $model = $this->db->getModel('DataModelApplication');
-
         if (empty($request->headers->get('X-App')))
             throw new AccessDeniedHttpException('App name is missing');
 
-        $app = $model->find_one(['key' => $request->headers->get('X-App')]);
+        $app = $this->applicationModel->find_one(['key' => $request->headers->get('X-App')]);
 
         if (!$app)
             throw new AccessDeniedHttpException('No app with that name available');

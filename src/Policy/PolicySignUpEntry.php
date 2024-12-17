@@ -2,6 +2,7 @@
 
 namespace App\Policy;
 
+use App\DataModel\DataModelSignUpEntry;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Policy\PolicyInterface;
@@ -13,7 +14,7 @@ class PolicySignUpEntry implements PolicyInterface
 
     public static function getSupportedModel(): string
     {
-        return \DataModelSignUpEntry::class;
+        return DataModelSignUpEntry::class;
     }
 
     public function __construct(

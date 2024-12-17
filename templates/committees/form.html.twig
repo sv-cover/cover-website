@@ -6,7 +6,7 @@
 <h1 class="title">{{ iter.has_id() ? __('Modify group') : __('Add a new group') }}</h1>
 {{ form_start(form) }}
     <datalist id="committees-suggested-functions">
-        {% for name, sort in db.getModel('DataModelCommissie').get_functies %}
+        {% for name, sort in model('Commissie').get_functies %}
             <option value="{{ name }}">
         {% endfor %}
     </datalist>
@@ -92,10 +92,10 @@
     {{ form_row(form.vacancies) }}
     <div class="field">
         <div class="control buttons">
-            {{ form_widget(form.submit, {'label': iter.has_id() ? __('Modify %s')|format(constant('DataModelCommissie::TYPE_OPTIONS')[iter.type]) : __('Create group')}) }}
+            {{ form_widget(form.submit, {'label': iter.has_id() ? __('Modify %s')|format(constant('App\\DataModel\\DataModelCommissie::TYPE_OPTIONS')[iter.type]) : __('Create group')}) }}
             {% if iter.has_id %}
                 <a href="{{ path('committees.single', {slug: iter.login}) }}" class="button">
-                    {{ __('Return to %s')|format(constant('DataModelCommissie::TYPE_OPTIONS')[iter.type]) }}
+                    {{ __('Return to %s')|format(constant('App\\DataModel\\DataModelCommissie::TYPE_OPTIONS')[iter.type]) }}
                 </a>
             {% else %}
                 <a href="{{ path('committees.list') }}" class="button">

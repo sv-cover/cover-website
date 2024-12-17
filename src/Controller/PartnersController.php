@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
+use App\DataModel\DataModelPartner;
 use App\Exception\UnauthorizedException;
 use App\Form\PartnerType;
-use App\Service\Database;
 use App\Service\Policy;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -16,13 +16,10 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class PartnersController extends AbstractController
 {
-    private \DataModelPartner $model;
-
     public function __construct(
-        private Database $db,
+        private DataModelPartner $model,
         private Policy $policy,
     ){
-        $this->model = $db->getModel('DataModelPartner');
     }
 
     #[Route('/partners', name: 'partners.list', methods: ['GET'])]
@@ -157,8 +154,8 @@ class PartnersController extends AbstractController
         });
 
         return $this->render('partners/_footer.html.twig', [
-            'main_partners' => array_filter($iters, fn($p) => $p['type'] == \DataModelPartner::TYPE_MAIN_SPONSOR),
-            'partners' => array_filter($iters, fn($p) => $p['type'] != \DataModelPartner::TYPE_MAIN_SPONSOR),
+            'main_partners' => array_filter($iters, fn($p) => $p['type'] == DataModelPartner::TYPE_MAIN_SPONSOR),
+            'partners' => array_filter($iters, fn($p) => $p['type'] != DataModelPartner::TYPE_MAIN_SPONSOR),
         ]);
     }
 }

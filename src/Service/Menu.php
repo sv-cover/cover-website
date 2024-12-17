@@ -2,8 +2,8 @@
 
 namespace App\Service;
 
+use App\DataModel\DataModelConfiguratie;
 use App\Service\Authentication;
-use App\Service\Database;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class Menu
@@ -11,8 +11,8 @@ class Menu
     private $identity;
 
     public function __construct(
-        private Database $db,
         private Authentication $auth,
+        private DataModelConfiguratie $settingsModel,
         private UrlGeneratorInterface $router,
     ) {
     }
@@ -110,7 +110,7 @@ class Menu
         }
         */
         $highlight = \json_decode(
-            $this->db->getModel('DataModelConfiguratie')->get_value('menu_highlight', '')
+            $this->settingsModel->get_value('menu_highlight', '')
         );
         if (!empty($highlight) && !empty($highlight->label) && !empty($highlight->url))
             $menu['highlight'] = [

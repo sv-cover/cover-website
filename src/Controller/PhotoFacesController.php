@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
+use App\DataIter\DataIterPhotobookFace;
+use App\DataModel\DataModelPhotobook;
+use App\DataModel\DataModelPhotobookFace;
 use App\Exception\UnauthorizedException;
 use App\Service\Authentication;
-use App\Service\Database;
 use App\Service\Policy;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -15,18 +17,14 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class PhotoFacesController extends AbstractController
 {
-    private \DataModelPhotobookFace $faceModel;
-    private \DataModelPhotobook $photoModel;
-
     public function __construct(
-        private Database $db,
+        private DataModelPhotobookFace $faceModel,
+        private DataModelPhotobook $photoModel,
         private Policy $policy,
-    ){
-        $this->faceModel = $db->getModel('DataModelPhotobookFace');
-        $this->photoModel = $db->getModel('DataModelPhotobook');
+    ) {
     }
 
-    private function getLinksForIter(\DataIterPhotobookFace $face)
+    private function getLinksForIter(DataIterPhotobookFace $face)
     {
         $links = [];
 
@@ -51,7 +49,7 @@ class PhotoFacesController extends AbstractController
         return $links;
     }
 
-    private function serializeFace(\DataIterPhotobookFace $face)
+    private function serializeFace(DataIterPhotobookFace $face)
     {
         if ($face['lid_id'])
             $suggested = null;
