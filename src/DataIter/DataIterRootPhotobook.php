@@ -19,16 +19,6 @@ class DataIterRootPhotobook extends DataIterPhotobook
         return $this->data['num_books'] + count($this->model->get_extra_books());
     }
 
-    public function get_next_book()
-    {
-        return null;
-    }
-
-    public function get_previous_book()
-    {
-        return null;
-    }
-
     public function get_parent()
     {
         return null;

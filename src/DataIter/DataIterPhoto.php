@@ -117,7 +117,7 @@ class DataIterPhoto extends DataIter
         if (!$this->file_exists())
             throw new NotFoundException("Could not find original file {$this->get('filepath')}");
 
-        return crc32_file($this->get_full_path());
+        return hash_file('CRC32', $this->get_full_path(), false);
     }
 
     public function compute_created_on_timestamp()

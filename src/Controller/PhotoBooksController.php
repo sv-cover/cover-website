@@ -317,7 +317,11 @@ class PhotoBooksController extends AbstractController
                         $exif_data = ['FileDateTime' => \filemtime($entry)];
 
                     if ($exif_thumbnail = @\exif_thumbnail($entry, $th_width, $th_height, $th_image_type))
-                        $thumbnail = \encode_data_uri(\image_type_to_mime_type($th_image_type), $exif_thumbnail);
+                        $thumbnail = sprintf(
+                            'data:%s;base64,%s',
+                            image_type_to_mime_type($th_image_type),
+                            base64_encode($exif_thumbnail),
+                        );
                     else
                         $thumbnail = null;
 

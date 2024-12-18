@@ -9,6 +9,8 @@ use App\Legacy\Authentication\SessionProviderInterface;
 
 class CookieSessionProvider implements SessionProviderInterface
 {
+    const string COOKIE_NAME = 'cover_session_id';
+
     private ?DataIterSession $session;
 
     private bool $is_restored = false;
@@ -36,6 +38,42 @@ class CookieSessionProvider implements SessionProviderInterface
         $this->is_restored = true;
     }
 
+    private function set_cookie($value, $cookie_time = 0)
+    {
+        // Determine the host name for the cookie (try to be as broad as possible so sd.svcover.nl can profit from it)
+        if (preg_match('/([^.]+)\.(?:[a-z\.]{2,6})$/i', $_SERVER['HTTP_HOST'], $match))
+            $domain = $match[0];
+        else if ($_SERVER['HTTP_HOST'] != 'localhost')
+            $domain = $_SERVER['HTTP_HOST'];
+        else
+            $domain = null;
+
+        $domain = preg_replace('/:\d+$/', '', $domain);
+
+        // If the value is empty, expire the cookie
+        if ($value === null)
+            $cookie_time = 1;
+
+        $options = [
+            'expires' => $cookie_time,
+            'path' => '/',
+            'domain' => $domain,
+            'httponly' => true,
+        ];
+
+        if (!empty($_SERVER['HTTPS'])) {
+            $options['secure'] = true;
+            $options['samesite'] = 'None';
+        }
+
+        setcookie(self::COOKIE_NAME, $value ?? '', $options);
+
+        if ($cookie_time === 0 || $cookie_time > time())
+            $_COOKIE[self::COOKIE_NAME] = $value;
+        else
+            unset($_COOKIE[self::COOKIE_NAME]);
+    }
+
     public function login($email, $password, $remember, $application)
     {
         $member = $this->member_model->login($email, $password);
@@ -56,9 +94,7 @@ class CookieSessionProvider implements SessionProviderInterface
         $cookie_time = time() + 24 * 3600 * 31 * 12;
         // TODO: set cookie_time to 0 if $remember == true, then session will end when browser closes
  
-        set_domain_cookie('cover_session_id',
-            $this->session->get('session_id'),
-            $cookie_time);
+        $this->set_cookie($this->session->get('session_id'), $cookie_time);
 
         return true;
     }
@@ -72,7 +108,7 @@ class CookieSessionProvider implements SessionProviderInterface
 
         $this->session_model->delete($session);
 
-        set_domain_cookie('cover_session_id', null);
+        $this->set_cookie(null);
 
         $this->is_restored = false;
         $this->session = null;
@@ -95,9 +131,7 @@ class CookieSessionProvider implements SessionProviderInterface
         // Set the cookie.
         $cookie_time = time() + 24 * 3600 * 365 * 99;
 
-        set_domain_cookie('cover_session_id',
-            $this->session->get('session_id'),
-            $cookie_time);
+        $this->set_cookie($this->session->get('session_id'), $cookie_time);
 
         return true;
     }

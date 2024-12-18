@@ -88,14 +88,7 @@ class DataIterPage extends DataIter implements SearchResultInterface
 
     public function get_summary($language = null)
     {
-        $content = $this->get_locale_content($language);
-
-        if (preg_match('/\[samenvatting\](.+?)\[\/samenvatting\]/msi', $content ?? '', $matches))
-            // TODO SFY: markup_strip
-            return markup_strip($matches[1]);
-
-        // TODO SFY: markup_strip
-        return $summary = summarize(markup_strip($content), 128);
+        return $this->model->get_summary_for_iter($this);
     }
 
     public function get_search_relevance(): float

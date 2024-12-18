@@ -107,16 +107,6 @@ class DataIterPhotobook extends DataIter implements SearchResultInterface
         return $this->model->get_book($this->get('parent_id'));
     }
 
-    public function get_next_book()
-    {
-        return $this->model->get_next_book($this);
-    }
-
-    public function get_previous_book()
-    {
-        return $this->model->get_previous_book($this);
-    }
-
     public function get_search_relevance(): float
     {
         $date = \DateTime::createFromFormat('d-m-Y', $this->get('date'));

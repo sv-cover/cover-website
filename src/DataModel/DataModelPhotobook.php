@@ -175,44 +175,6 @@ class DataModelPhotobook extends DataModel implements SearchProviderInterface
     }
 
     /**
-     * Get the book before a certain book
-     * @book a #DataIter representing a book
-     *
-     * @result a #DataIter
-     */
-    public function get_previous_book(DataIterPhotobook $book)
-    {
-        if (!$book['parent']) return null;
-
-        $children = $book['parent']['books_without_metadata'];
-
-        $index = array_usearch($book, $children, ['DataIter', 'is_same']);
-
-        return $index !== null && isset($children[$index - 1])
-            ? $children[$index - 1]
-            : null;
-    }
-
-    /**
-     * Get the book after a certain book
-     * @book a #DataIter representing a book
-     *
-     * @result a #DataIter
-     */
-    public function get_next_book(DataIterPhotobook $book)
-    {
-        if (!$book['parent']) return null;
-
-        $children = $book['parent']['books_without_metadata'];
-
-        $index = array_usearch($book, $children, ['DataIter', 'is_same']);
-
-        return $index !== null && isset($children[$index + 1])
-            ? $children[$index + 1]
-            : null;
-    }
-
-    /**
      * Get all the books in a certain book
      * @book a #DataIter representing a book
      *

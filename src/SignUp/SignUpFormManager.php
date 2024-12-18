@@ -173,41 +173,4 @@ class SignUpFormManager implements ServiceSubscriberInterface
 
         $entry->set_values($values);
     }
-
-    // TODO SFY: get rid of this function
-    public function renderEntryTable(DataIterSignupEntry $entry)
-    {
-        $rows = [];
-
-        $data = $this->exportEntry($entry);
-
-        foreach ($this->getFields($entry['form']) as $id => $field) {
-            if ($field instanceof Fields\CheckboxField) {
-                $label = $field->columnLabels();
-
-                if (!empty($data[key($label)])) {
-                    $rows[] = \sprintf(
-                        '<tr><td style="text-align:left" colspan="2">✓ %s</td></tr>',
-                        \markup_format_text(current($label)),
-                    );
-                } else {
-                    // Just don't add a row for it :)
-                }
-            } else {
-                foreach ($field->columnLabels() as $key => $label) {
-                    $rows[] = \sprintf(
-                        '<tr><th style="text-align:left">%s</th><td>%s</td></tr>',
-                        \markup_format_text($label),
-                        (
-                            $data[$key] === '' || $data[$key] === null
-                            ? '<em>left blank</em>'
-                            : \markup_format_text($data[$key])
-                        ),
-                    );
-                }
-            }
-        }
-
-        return \sprintf('<table>%s</table>', implode('', $rows));
-    }
 }

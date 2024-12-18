@@ -7,6 +7,7 @@ use App\DataModel\DataModelCommissie;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Database\DataModel;
 use App\Legacy\Database\SearchProviderInterface;
+use App\Markup\Markup;
 use App\Utils\SearchUtils;
 use Symfony\Component\DependencyInjection\Attribute\Lazy;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
@@ -16,6 +17,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
  */
 class DataModelPage extends DataModel implements SearchProviderInterface
 {
+    const int SUMMARY_LENGTH = 128;
     public string $dataiter = DataIterPage::class;
     public string $table = 'pages';
 
@@ -27,6 +29,7 @@ class DataModelPage extends DataModel implements SearchProviderInterface
     public function __construct(
         public ContainerBagInterface $params,
         #[Lazy] private DataModelCommissie $committeeModel, // Lazy to prevent circular dependencies
+        private Markup $markup,
     ) {
     }
 
@@ -59,7 +62,27 @@ class DataModelPage extends DataModel implements SearchProviderInterface
 
     public function get_summary($id)
     {
-        return $this->get_iter($id)->get_summary();
+        return $this->get_summary_for_iter($this->get_iter($id));
+    }
+
+    public function get_summary_for_iter(DataIterPage $iter)
+    {
+        $content = $iter->get_locale_content($language);
+
+        if (preg_match('/\[samenvatting\](.+?)\[\/samenvatting\]/msi', $content ?? '', $matches))
+            return $this->markup->strip($matches[1]);
+
+        $text = trim($this->markup->strip($content));
+
+        if (strlen($text) < self::SUMMARY_LENGTH)
+            return $text;
+
+        $summary = substr($text, 0, self::SUMMARY_LENGTH);
+
+        if (!in_array(substr($summary, -1, 1), ['.', ' ', '!', '?']))
+            $summary = substr($summary, 0, -1) . '…';
+
+        return $summary;
     }
 
     public function search(string $search_query, ?int $limit = null): array
