@@ -13,7 +13,7 @@
                 <img
                     class="is-rounded"
                     src="{{ path('profile_pictures.member', {member_id: new_comment.author.id, format: 'square', width: 128}) }}"
-                    alt="Photo of {{ new_comment.author|personal_full_name }}"
+                    alt="Photo of {{ new_comment.author.get_full_name(bePersonal: true) }}"
                 >
             </p>
         </figure>

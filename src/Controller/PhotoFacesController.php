@@ -69,11 +69,11 @@ class PhotoFacesController extends AbstractController
             'h' => $face['h'],
             'w' => $face['w'],
             'member_id' => $face['lid_id'],
-            'member_full_name' => $face['lid'] ? \member_full_name($face['lid'], \BE_PERSONAL) : null,
+            'member_full_name' => $face['lid'] ? $face['lid']->get_full_name(bePersonal: true) : null,
             'member_url' => $face['lid_id'] ? $this->generateUrl('profile.member', ['member_id' => $face['lid_id']]) : null,
             'custom_label' => $face['custom_label'],
             'suggested_id' => $suggested ? $suggested['id'] : null,
-            'suggested_full_name' => $suggested ? \member_full_name($suggested, \BE_PERSONAL) : null,
+            'suggested_full_name' => $suggested ? $suggested->get_full_name(bePersonal: true) : null,
             'suggested_url' => $suggested ? $this->generateUrl('profile.member', ['member_id' => $suggested['id']]) : null,
         ];
     }

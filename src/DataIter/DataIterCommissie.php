@@ -105,4 +105,11 @@ class DataIterCommissie extends DataIter implements SearchResultInterface
         else
             return $this['type'] === DataModelCommissie::TYPE_OTHER;
     }
+
+    public function get_search_member()
+    {
+        if (!empty($this['search_match_committee_member_id']))
+            return $this->model->get_member_for_search_result($this);
+        return null;
+    }
 }

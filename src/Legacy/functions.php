@@ -3,62 +3,6 @@ if (!defined('IN_SITE'))
     return;
 
 /**
- * Format a string with php-style variables with optional modifiers.
- *
- * Format description:
- *     $var            Will be replaced by the value of $params['var'].
- *     $var|modifier   Will be replaced by the value of modifier($params['var'])
- *
- * Example:
- *     format_string('This is the $day|ordinal day', array('day' => 5))
- *     results in "This is the 5th day"
- *
- * @param string $format the format of the string
- * @param array $params a table of variables that will be replaced
- * @return string a formatted string in which all the variables are replaced
- * as far as they can be found in $params.
- */
-function format_string($format, $params)
-{
-    if (!(is_array($params) || $params instanceof ArrayAccess))
-        throw new \InvalidArgumentException('$params has to behave like an array');
-
-    $callback =  function($match) use ($params) {
-        $path = explode('[', $match[1]);
-
-        // remove ] from all 1..n components
-        for ($i = 1; $i < count($path); ++$i)
-            $path[$i] = substr($path[$i], 0, -1);
-
-        // Step 0
-        $value = $params;
-
-        foreach ($path as $step) {
-            if (isset($value[$step])) {
-                $value = $value[$step];
-            } else {
-                $value = null;
-                break;
-            }
-        }
-
-        // If there is a modifier, apply it
-        if (isset($match[2]))
-            $value = call_user_func($match[2], $value);
-
-        return $value;
-    };
-
-    return preg_replace_callback('/\$([a-z][a-z0-9_]*(?:\[[a-z0-9_]+\])*)(?:\|([a-z_]+))?/i', $callback, $format);
-}
-
-// almost dead: only used in framework/member.php:member_full_name
-function optional($value)
-{
-    return !empty($value) ? ' ' . $value : '';
-}
-
-/**
  * Concatenates multiple path parts together with a directory separator (/) between them.
  *
  * @var string $path_component

@@ -35,7 +35,7 @@ class NotificationsController extends AbstractController
         $birthday = new \DateTime($member['geboortedatum']);
         if ($birthday->format('m-d') == (new \DateTime())->format('m-d'))
             $notifications[] = [
-                'message' => sprintf(__('Happy birthday, %s! 🥳'), \member_first_name($member)),
+                'message' => sprintf(__('Happy birthday, %s! 🥳'), $member['first_name']),
                 'class' => 'is-size-5',
             ];
 

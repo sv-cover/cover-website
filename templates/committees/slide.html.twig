@@ -17,7 +17,7 @@
             <div class="boxed-title has-text-weight-normal is-size-4 is-size-6-touch is-size-7-mobile">
                 {% for member in committee.members %}
                     {% if policy.userCanRead(member) %}
-                        <span class="name">{{ member|personal_full_name }}</span>
+                        <span class="name">{{ member.get_full_name(bePersonal: true) }}</span>
                     {% endif %}
                 {% endfor %}
             </div>
@@ -45,7 +45,7 @@
                         <img
                             loading="lazy"
                             src="{{ path('profile_pictures.member', {member_id: member.id, format: 'portrait', width: 512}) }}"
-                            alt="{{ __('Photo of %s')|format(member|full_name) }}"
+                            alt="{{ __('Photo of %s')|format(member.full_name) }}"
                         >
                     </figure>
                 {% endif %}

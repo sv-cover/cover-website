@@ -9,14 +9,20 @@
 <div class="media photo-comment" id="comment_{{ iter.id }}">
     <figure class="media-left">
         <p class="image avatar">
-            <img class="is-rounded" src="{{ path('profile_pictures.member', {member_id: iter.author.id, format: 'square', width: 128}) }}" alt="Photo of {{ iter.author|personal_full_name }}">
+            <img
+                class="is-rounded"
+                src="{{ path('profile_pictures.member', {member_id: iter.author.id, format: 'square', width: 128}) }}"
+                alt="Photo of {{ iter.author.get_full_name(bePersonal: true) }}"
+            >
         </p>
     </figure>
     <div class="media-content">
         <div class="content">
             <p>
                 <strong>
-                    <a href="{{ path('profile.member', {member_id: iter.author.id}) }}">{{ iter.author|personal_full_name }}</a>
+                    <a href="{{ path('profile.member', {member_id: iter.author.id}) }}">
+                        {{ iter.author.get_full_name(bePersonal: true) }}
+                    </a>
                 </strong>
                 <br>
                 {{ iter.reactie|parse_markup }}

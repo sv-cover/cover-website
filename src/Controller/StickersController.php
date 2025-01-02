@@ -70,7 +70,7 @@ class StickersController extends AbstractController
                             ? $this->generateUrl('profile.member', ['id' => $sticker['toegevoegd_door']])
                             : null,
                         'added_by_name' => $sticker['toegevoegd_door']
-                            ? \member_full_name($sticker['member'], \BE_PERSONAL)
+                            ? $sticker['member']->get_full_name(bePersonal: true)
                             : null,
                         'editable' => $this->policy->userCanUpdate($sticker),
                         'add_photo_url' => $this->policy->userCanUpdate($sticker)

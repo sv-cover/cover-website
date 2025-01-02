@@ -96,9 +96,9 @@
     <div class="profile-field">
         <div class="field-body">
             {% if committees|length > 0 %}
-                <p>{{ __('%s is a member of the following committees:')|format(iter|first_name) }}</p>
+                <p>{{ __('%s is a member of the following committees:')|format(iter.first_name) }}</p>
             {% else %}
-                <p>{{ __('%s is not a member of any committees.')|format(iter|first_name) }}</p>
+                <p>{{ __('%s is not a member of any committees.')|format(iter.first_name) }}</p>
             {% endif %}
         </div>
     </div>
@@ -121,7 +121,7 @@
         </div>
         <div class="profile-field">
             <div class="field-body">
-                <p>{{ __('%s is a member of the following working groups:')|format(iter|first_name) }}</p>
+                <p>{{ __('%s is a member of the following working groups:')|format(iter.first_name) }}</p>
             </div>
         </div>
         <ul class="profile-committees">
@@ -144,7 +144,7 @@
         </div>
         <div class="profile-field">
             <div class="field-body">
-                <p>{{ __('%s is a member of the following groups:')|format(iter|first_name) }}</p>
+                <p>{{ __('%s is a member of the following groups:')|format(iter.first_name) }}</p>
             </div>
         </div>
         <ul class="profile-committees">

@@ -128,7 +128,7 @@ class PageController extends AbstractController
 
         $context = [
             'page' => $iter->data,
-            'member_name' => \member_full_name($identity->member(), IGNORE_PRIVACY),
+            'member_name' => $identity->member()->get_full_name(ignorePrivacy: true),
             'differences' => $differences,
         ];
 

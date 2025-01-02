@@ -7,7 +7,9 @@
 {%- macro format_face_label(face) -%}
 <span class="face-label">
     {%- if face.lid_id is not null -%}
-        <a href="{{ path('profile.member', {member_id:  face.lid.id}) }}" data-face-id="{{ face.id }}">{{ face.lid|personal_full_name }}</a>
+        <a href="{{ path('profile.member', {member_id:  face.lid.id}) }}" data-face-id="{{ face.id }}">
+            {{ face.lid.get_full_name(bePersonal: true) }}
+        </a>
     {%- elseif face.custom_label != '' -%}
         <span class="custom-label" data-face-id="{{ face.id }}">{{ face.custom_label }}</span>
     {%- else -%}

@@ -65,7 +65,7 @@ class DataModelPage extends DataModel implements SearchProviderInterface
         return $this->get_summary_for_iter($this->get_iter($id));
     }
 
-    public function get_summary_for_iter(DataIterPage $iter)
+    public function get_summary_for_iter(DataIterPage $iter, ?string $language = null)
     {
         $content = $iter->get_locale_content($language);
 

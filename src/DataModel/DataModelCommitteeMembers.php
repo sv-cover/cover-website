@@ -2,11 +2,20 @@
 
 namespace App\DataModel;
 
+use App\DataIter\DataIterMember;
 use App\Legacy\Database\DataModel;
+use App\Service\Authentication;
+use Symfony\Component\DependencyInjection\Attribute\Lazy;
 
 class DataModelCommitteeMembers extends DataModel
 {
+    public string $dataiter = DataIterMember::class;
     public string $table = 'committee_members';
+
+    public function __construct(
+        #[Lazy] public Authentication $auth, // Lazy to prevent circular dependencies
+    ) {
+    }
 
     public function get_active_members($type = null, $include_hidden = false)
     {

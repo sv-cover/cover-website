@@ -25,7 +25,7 @@ class Markup
         return $this->render($markup, ['heading_offset' => $headingOffset]);
     }
 
-    public function strip(string $markup): string
+    public function strip(?string $markup): string
     {
         // Simple fix. Doesn't fully or correctly strip all markup, but it's
         // close enough. This is waaay more efficient.

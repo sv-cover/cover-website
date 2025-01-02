@@ -383,7 +383,7 @@ class DataModelMailinglistSubscription extends DataModel
                 throw new \RuntimeException('Subscribing to unknown list type not supported');
         }
 
-        $this->mailinglistModel->send_subscription_mail($list, member_full_name($member, IGNORE_PRIVACY), $member['email']);
+        $this->mailinglistModel->send_subscription_mail($list, $member->get_full_name(ignorePrivacy: true), $member['email']);
     }
 
     public function unsubscribe_member(DataIter $lijst, DataIterMember $member)

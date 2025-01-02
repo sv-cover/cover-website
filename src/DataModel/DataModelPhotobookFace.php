@@ -54,7 +54,7 @@ class DataModelPhotobookFace extends DataModel
     {
         return new DataIterFacesPhotobook($this, $this->photobookModel, -1, [
             'titel' => sprintf(__('Photos of %s'),
-                HumanizeUtils::join(array_map(fn($member) => member_first_name($member), $members))),
+                HumanizeUtils::join(array_map(fn($member) => $member['first_name'], $members))),
             'datum' => null,
             'parent_id' => 0,
             'member_ids' => array_map(fn($member) => $member->get_id(), $members),

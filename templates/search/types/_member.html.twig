@@ -11,11 +11,11 @@
 
 <div class="profile-widget">
     <figure class="profile-photo image is-128x128">
-        <img class="is-rounded" src="{{ path('profile_pictures.member', {member_id: result.id, format: 'square', width: 256}) }}" width="128" height="128" alt="Photo of {{ result|full_name }}">
+        <img class="is-rounded" src="{{ path('profile_pictures.member', {member_id: result.id, format: 'square', width: 256}) }}" width="128" height="128" alt="Photo of {{ result.full_name }}">
     </figure>
     <div class="profile-info">
         <h2 class="title is-5">
-            <a href="{{ path('profile.member', {id: result.id}) }}" data-search-main-link>{{ result|full_name }}</a>
+            <a href="{{ path('profile.member', {id: result.id}) }}" data-search-main-link>{{ result.full_name }}</a>
         </h2>
         {% if status is not null %}
             <p class="subtitle is-7">{{ status }}</p>

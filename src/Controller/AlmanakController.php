@@ -40,8 +40,8 @@ class AlmanakController extends AbstractController
                 fn($iter) => [
                     'id' => $iter->get_id(),
                     'starting_year' => $iter->get('beginjaar'),
-                    'first_name' => \member_first_name($iter),
-                    'name' => \member_full_name($iter)
+                    'first_name' => $iter->get_first_name(),
+                    'name' => $iter->get_full_name(),
                 ],
                 \array_values($iters)
             ));
@@ -128,7 +128,7 @@ class AlmanakController extends AbstractController
                 $item['voornaam'],
                 $item['tussenvoegsel'],
                 $item['achternaam'],
-                \member_full_name($item, \IGNORE_PRIVACY),
+                $item->get_full_name(ignorePrivacy: true),
                 $item['adres'],
                 $item['postcode'],
                 $item['woonplaats'],

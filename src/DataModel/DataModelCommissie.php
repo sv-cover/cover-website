@@ -509,5 +509,10 @@ class DataModelCommissie extends DataModel implements SearchProviderInterface
     {
         return $this->pageModel->get_summary($iter['page_id']);
     }
+
+    public function get_member_for_search_result(DataIterCommissie $iter)
+    {
+        return $this->memberModel->get_iter($iter['search_match_committee_member_id']);
+    }
 }
 

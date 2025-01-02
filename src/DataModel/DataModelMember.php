@@ -38,7 +38,7 @@ class DataModelMember extends DataModel implements SearchProviderInterface
     }
 
     public function __construct(
-        #[Lazy] private Authentication $auth, // Lazy to prevent circular dependencies
+        #[Lazy] public Authentication $auth, // Lazy to prevent circular dependencies
         #[Lazy] private DataModelProfilePicture $profilePictureModel, // Lazy to prevent circular dependencies
         public Secretary $secretary,
     ) {

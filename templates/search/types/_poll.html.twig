@@ -10,7 +10,7 @@
     {% elseif result.member %}
         {% set member_link = '<a href="%s">%s</a>'|format(
             path('profile.member', {id: result.member.id}),
-            result.member|full_name|e('html')) %}
+            result.member.full_name|e('html')) %}
         {{ __('%s asked on %s')|format(member_link, result.created_on|date('F j, Y')|e('html'))|raw }}
     {% else %}
         {{ __('Anonymous asked on %s'|format(result.created_on|date('F j, Y'))) }}

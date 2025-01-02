@@ -33,7 +33,7 @@
         "symfony/yaml": "7.1.*",
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/intl-extra": "^3.15",
-        "twig/twig": "^3.11",
+        "twig/twig": "^3.15",
         "zbateson/mail-mime-parser": "^3.0"
     },
     "config": {

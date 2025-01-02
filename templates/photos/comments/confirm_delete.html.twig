@@ -9,7 +9,7 @@
         <section class="modal-card-body">
             {{ form_start(form, {'id': 'delete-comment-form', 'action': app.request.requestUri }) }}
                 <div class="field">
-                    <p>{{ __('Are you sure you want to delete the comment posted by <em>%s</em>?')|format(iter.auteur|personal_full_name|e('html'))|raw }}</p>
+                    <p>{{ __('Are you sure you want to delete the comment posted by <em>%s</em>?')|format(iter.auteur.get_full_name(bePersonal: true)|e('html'))|raw }}</p>
                 </div>
                 {% set submit_button = form_widget(form.submit, {label: __('Delete comment'), color: 'danger', attr: {form: 'delete-comment-form'}}) %}
             {{ form_end(form) }}

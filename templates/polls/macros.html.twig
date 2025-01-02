@@ -166,7 +166,7 @@
             </a>
         {% elseif poll.member %}
             <a class="image is-64x64" href="{{ path('profile.member', {member_id: poll.member.id}) }}" title="{{ poll.member.full_name }}" aria-label="{{ poll.member.full_name }}">
-                <img class="is-rounded" width="64" height="64" src="{{ path('profile_pictures.member', {member_id: poll.member.id, format: 'square', width: 128}) }}" alt="{{ __('Photo of %s')|format(poll.member|full_name) }}">
+                <img class="is-rounded" width="64" height="64" src="{{ path('profile_pictures.member', {member_id: poll.member.id, format: 'square', width: 128}) }}" alt="{{ __('Photo of %s')|format(poll.member.full_name) }}">
             </a>
         {% else %}
             <div class="image is-64x64">
@@ -191,7 +191,7 @@
                     </a>
                 {% elseif poll.member %}
                     <a class="image is-48x48" href="{{ path('profile.member', {member_id: poll.member.id}) }}" title="{{ poll.member.full_name }}" aria-label="{{ poll.member.full_name }}">
-                        <img class="is-rounded" width="48" height="48" src="{{ path('profile_pictures.member', {member_id: poll.member.id, format: 'square', width: 96}) }}" alt="{{ __('Photo of %s')|format(poll.member|full_name) }}">
+                        <img class="is-rounded" width="48" height="48" src="{{ path('profile_pictures.member', {member_id: poll.member.id, format: 'square', width: 96}) }}" alt="{{ __('Photo of %s')|format(poll.member.full_name) }}">
                     </a>
                 {% else %}
                     <span class="image is-48x48">

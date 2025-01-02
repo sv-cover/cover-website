@@ -195,7 +195,7 @@ class ProfileController extends AbstractController
     {
         // Inform the board that member info has been changed.
         $subject = "Member details updated";
-        $body = sprintf("%s updated their member details:", member_full_name($iter, IGNORE_PRIVACY)) . "\n\n";
+        $body = sprintf("%s updated their member details:", $iter->get_full_name(ignorePrivacy: true)) . "\n\n";
 
         foreach ($iter->secretary_changed_values() as $field => $value)
             $body .= sprintf("%s:\t%s\n", $field, $value ?? "<deleted>");
@@ -212,7 +212,7 @@ class ProfileController extends AbstractController
             ->subject($subject)
             ->text(sprintf(
                 "%s updated their member details:\n\nYou can see the changes in sectary or in the administratie@svcover.nl mailbox.",
-                member_full_name($iter, IGNORE_PRIVACY)
+                $iter->get_full_name(ignorePrivacy: true)
             ))
         ;
         $this->mailer->send($email);
@@ -293,7 +293,7 @@ class ProfileController extends AbstractController
                     ->htmlTemplate('emails/profile_confirm_email.html.twig')
                     ->textTemplate('emails/profile_confirm_email.txt.twig')
                     ->context([
-                        'name' => \member_first_name($iter, \IGNORE_PRIVACY),
+                        'name' => $iter->get_first_name(ignorePrivacy: true),
                         'link' => $signed_url,
                     ])
                 ;

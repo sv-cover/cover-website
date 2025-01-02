@@ -148,7 +148,7 @@ class EventsController extends AbstractController
                 ->subject('New event ' . $iter['kop'])
                 ->textTemplate('emails/event_created.txt.twig')
                 ->context([
-                    'member_name' => \member_full_name($auth->getIdentity()->member(), \IGNORE_PRIVACY),
+                    'member_name' => $auth->getIdentity()->member()->get_full_name(ignorePrivacy: true),
                     'committee_name' => $committeeModel->get_naam($iter['committee_id']),
                     'event' => $iter,
                 ])
@@ -222,7 +222,7 @@ class EventsController extends AbstractController
                     ->textTemplate('emails/event_updated.txt.twig')
                     ->context([
                         'proposal_id' => $proposalId,
-                        'member_name' => \member_full_name($auth->getIdentity()->member(), \IGNORE_PRIVACY),
+                        'member_name' => $auth->getIdentity()->member()->get_full_name(ignorePrivacy: true),
                         'committee_name' => $committeeModel->get_naam($iter['committee_id']),
                         'event' => $iter,
                     ])
@@ -341,7 +341,7 @@ class EventsController extends AbstractController
                 ->subject('Rejected event: ' . $iter['kop'])
                 ->textTemplate('emails/event_rejected.txt.twig')
                 ->context([
-                    'member_name' => \member_full_name($auth->getIdentity()->member(), \IGNORE_PRIVACY),
+                    'member_name' => $auth->getIdentity()->member()->get_full_name(ignorePrivacy: true),
                     'event' => $iter,
                     'reason' => $form->get('reason')->getData(),
                 ])

@@ -88,7 +88,7 @@ class DataIterPage extends DataIter implements SearchResultInterface
 
     public function get_summary($language = null)
     {
-        return $this->model->get_summary_for_iter($this);
+        return $this->model->get_summary_for_iter($this, $language);
     }
 
     public function get_search_relevance(): float

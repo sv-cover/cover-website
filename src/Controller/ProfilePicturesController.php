@@ -265,7 +265,7 @@ class ProfilePicturesController extends AbstractController
         $cache = $this->profilePicturesCache;
 
         $private = $member->is_private('naam');
-        $hash = md5(member_full_name($member, \IGNORE_PRIVACY));
+        $hash = md5($member->get_full_name(ignorePrivacy: true));
 
         // Determine keys and tags
         $key = sprintf('placeholder_%s_%d_%s_%d', ($private ? 'private' : 'public'), $member->get_id(), $format, $width);

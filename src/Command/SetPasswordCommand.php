@@ -51,9 +51,9 @@ class SetPasswordCommand extends Command
         $result = $this->model->set_password($member, $password);
 
         if ($result)
-            $this->io->success(\sprintf('Password successfully updated for %s (%d).', \member_full_name($member), $member->get_id()));
+            $this->io->success(\sprintf('Password successfully updated for %s (%d).', $member->get_full_name(), $member->get_id()));
         else
-            $this->io->error(\sprintf('Failed to update password updated for %s (%d).', \member_full_name($member), $member->get_id()));
+            $this->io->error(\sprintf('Failed to update password updated for %s (%d).', $member->get_full_name(), $member->get_id()));
 
         return $result ? Command::SUCCESS : Command::FAILURE;
     }

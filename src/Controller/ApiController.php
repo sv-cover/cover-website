@@ -511,7 +511,7 @@ class ApiController extends AbstractController
         ;
         $this->mailer->send($email);
 
-        $email->subject('Welcome to Cover! (' . \member_full_name($member, \IGNORE_PRIVACY) . ')');
+        $email->subject('Welcome to Cover! (' . $member->get_full_name(ignorePrivacy: true) . ')');
         $email->to('administratie@svcover.nl');
         $this->mailer->send($email);
 

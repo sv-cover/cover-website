@@ -5,7 +5,7 @@
     <p class="subtitle is-7 match-reason">{{ __('%s is a member of this committee')|format(
         '<a href="%s">%s</a>'|format(
             path('profile.member', {id: result.search_match_committee_member_id}),
-            result.search_match_committee_member_id|full_name|e('html')))|raw }}</p>
+            result.search_member.full_name|e('html')))|raw }}</p>
 {% else %}
     <p class="subtitle is-7">{{ __('Committee') }}</p>
 {% endif %}

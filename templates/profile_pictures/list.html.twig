@@ -21,12 +21,12 @@
                 >
                     <img
                         src="{{ path('profile_pictures.single', {id: iter.id, format: 'square', width: 1024}) }}"
-                        alt="{{ __('Photo of %s')|format(iter.member|full_name_ignore_privacy) }}"
+                        alt="{{ __('Photo of %s')|format(iter.member.get_full_name(ignorePrivacy: true)) }}"
                     >
                 </a>
             </figure>
             <div class="card-content">
-                <h2 class="title is-5">{{ __('New photo for %s')|format(iter.member|full_name_ignore_privacy) }}</h2>
+                <h2 class="title is-5">{{ __('New photo for %s')|format(iter.member.get_full_name(ignorePrivacy: true)) }}</h2>
                 <p>
                     {{ __('Uploaded on') }}
                     {{ iter['created_on']|date('Y-m-d H:i') }}
@@ -72,11 +72,11 @@
                             loading="lazy"
                             class="is-rounded"
                             src="{{ path('profile_pictures.single', {id: iter.id, format: 'square', width: 1024}) }}"
-                            alt="{{ __('Photo of %s')|format(iter.member|personal_full_name) }}"
+                            alt="{{ __('Photo of %s')|format(iter.member.get_full_name(bePersonal: true)) }}"
                         >
                     </figure>
                     <div class="profile-info">
-                        <span class="name">{{ iter.member|personal_full_name }}</span>
+                        <span class="name">{{ iter.member.get_full_name(bePersonal: true) }}</span>
                         <span class="is-size-7">Updated: {{ iter['created_on']|date('Y-m-d') }}</span>
                     </div>
                 </a>

@@ -13,7 +13,7 @@
                 {% if iter.member_id == auth.identity.member.id %}
                     <p>{{ __('Are you sure you want to delete your profile picture?') }}</p>
                 {% else %}
-                    <p>{{ __('Are you sure you want to delete the profile picture <em>%s</em>?')|format(iter.member|full_name_ignore_privacy|e('html'))|raw }}</p>
+                    <p>{{ __('Are you sure you want to delete the profile picture <em>%s</em>?')|format(iter.member.get_full_name(ignorePrivacy: true)|e('html'))|raw }}</p>
                 {% endif %}
                 {% set submit_button = form_widget(form.submit, {label: __('Delete profile picture'), color: 'danger', attr: {form: 'delete-profile-picture-form'}}) %}
             {{ form_end(form) }}

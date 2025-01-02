@@ -132,12 +132,48 @@ class DataIterMember extends DataIter implements SearchResultInterface
     {
         trigger_error('Use DataIterMember::full_name instead of DataIterMember::naam', E_USER_NOTICE);
 
-        return member_full_name($this);
+        return $this->get_full_name();
     }
 
-    public function get_full_Name()
+    /**
+     * Get a clean version of the member's name, based on parameters. To be used
+     * in conjunction with the null coalescing operator (??).
+     */
+    private function _get_clean_name($ignorePrivacy, $bePersonal): ?string
     {
-        return member_full_name($this);
+        $identity = $this->model->auth->identity;
+        $isSelf = $identity->get('id') == $this->get_id();
+
+        if ($bePersonal && $isSelf)
+            return __('You!');
+
+        if (
+            !$ignorePrivacy
+            && !$isSelf
+            && !$identity->member_in_committee(COMMISSIE_BESTUUR)
+            && !$identity->member_in_committee(COMMISSIE_KANDIBESTUUR)
+            && $this->is_private('naam')
+        )
+            return __('Anonymous');
+
+        return null;
+    }
+
+    public function get_full_name($ignorePrivacy = false, $bePersonal = false)
+    {
+        $fullName = $this['voornaam'];
+
+        if (!empty($this['tussenvoegsel']))
+            $fullName .= ' ' . $this['tussenvoegsel'];
+
+        $fullName .= ' ' . $this['achternaam'];
+
+        return $this->_get_clean_name($ignorePrivacy, $bePersonal) ?? $fullName;
+    }
+
+    public function get_first_name($ignorePrivacy = false, $bePersonal = false)
+    {
+        return $this->_get_clean_name($ignorePrivacy, $bePersonal) ?? $this['voornaam'];
     }
 
     public function is_private($field, $unless_self = false)

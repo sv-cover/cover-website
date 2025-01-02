@@ -29,16 +29,6 @@ class LegacyExtension extends AbstractExtension
     public function getFilters(): array
     {
         return [
-            new TwigFilter('full_name', function($member) {
-                return $member ? member_full_name($member) : null;
-            }),
-            new TwigFilter('personal_full_name', function($member) {
-                return $member ? member_full_name($member, BE_PERSONAL) : null;
-            }),
-            new TwigFilter('full_name_ignore_privacy', function($member) {
-                return $member ? member_full_name($member, IGNORE_PRIVACY) : null;
-            }),
-            new TwigFilter('first_name', 'member_first_name'),
             // new TwigFilter('vformat', 'vsprintf'),
             // new TwigFilter('flip', 'array_flip'),
             // new TwigFilter('values', 'array_values'),
