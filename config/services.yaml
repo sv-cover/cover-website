@@ -9,6 +9,7 @@ parameters:
     app.cache_dir:  '%env(default:kernel.cache_dir:APP_CACHE_DIR)%'
     app.committee_interest_log: '%env(default::APP_COMMITTEE_INTEREST_LOG)%'
     app.email_board: board@svcover.nl
+    app.email_bounces: bounces@svcover.nl
     app.external_webcal_url: '%env(default::APP_EXTERNAL_WEBCAL_URL)%'
     app.filemanager_image_extensions:
         - jpeg

@@ -10,7 +10,6 @@ use App\Exception\NotFoundException;
 use App\Exception\UnauthorizedException;
 use App\Form\MailingListType;
 use App\Form\Type\MemberIdType;
-use App\Legacy\Email\MessagePart;
 use App\Service\Authentication;
 use App\Service\Policy;
 use App\Utils\UrlUtils;
@@ -30,6 +29,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Constraints as Assert;
+use ZBateson\MailMimeParser\MailMimeParser;
 
 class MailingListsController extends AbstractController
 {
@@ -406,16 +406,12 @@ class MailingListsController extends AbstractController
         $error = null;
 
         try {
-            $parsed = MessagePart::parse_text($message['bericht']);
+            $parser = new MailMimeParser();
+            $parsed = $parser->parse($message['bericht'], false);
 
-            $subject = $parsed->header('Subject');
-
-            foreach ($parsed->textParts() as $part) {
-                if (\preg_match('/^text\/html\b/i', $part->header('Content-Type')))
-                    $html_body = $part->body();
-                else
-                    $text_body = $part->body();
-            }
+            $subject = $parsed->getSubject();
+            $text_body = $parsed->getTextContent();
+            $html_body = $parsed->getHtmlContent();
         } catch (\Exception $e) {
             $error = $e;
         }

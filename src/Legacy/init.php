@@ -24,7 +24,6 @@ require_once 'src/Legacy/constants.php';
 require_once 'src/Legacy/member.php';
 require_once 'src/Legacy/functions.php';
 require_once 'src/Legacy/i18n.php';
-require_once 'src/Legacy/email.php';
 
 /* Initialize session */
 // TODO SFY can we do without starting the session?

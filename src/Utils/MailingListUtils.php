@@ -8,8 +8,17 @@ use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelMailinglist;
 use App\DataModel\DataModelMailinglistArchive;
 use App\DataModel\DataModelMailinglistQueue;
-use App\Legacy\Email\MessagePart;
-use App\Legacy\Email\PeakableStream;
+use App\Markup\Markup;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\RawMessage;
+use ZBateson\MailMimeParser\MailMimeParser;
+use ZBateson\MailMimeParser\Message;
+use ZBateson\MailMimeParser\Header\AddressHeader;
+use ZBateson\MailMimeParser\Header\HeaderConsts;
 
 final class MailingListUtils
 {
@@ -80,48 +89,44 @@ final class MailingListUtils
         private DataModelMailinglist $mailingListModel,
         private DataModelMailinglistArchive $archive,
         private DataModelMailinglistQueue $queue,
+        private MailerInterface $mailer,
+        private Markup $markup,
+        private ContainerBagInterface $params,
     ) {
     }
 
-    public function sendMessage(MessagePart $message, string $email): int
+    protected function inLoop(Message $message, string $loopId): bool
     {
-        $message->addHeader('X-Mailing-List-Destination', $email);
+        foreach ($message->getAllHeadersByName('X-Loop') as $header)
+            if ($header->getValue() == $loopId)
+                return true;
+        return false;
+    }
 
-        // Set up the proper pipes and thingies for the sendmail call;
-        $descriptors = [
-            0 => ["pipe", "r"],  // stdin is a pipe that the child will read from
-            1 => ["pipe", "w"],  // stdout is a pipe that the child will write to
-            2 => ["file", "php://stderr", "a"],   // stderr is a file to write to
-        ];
+    // TODO SFY: support Message
+    public function sendMessage(Message $message, string $email): void
+    {
+        $message->setRawHeader('X-Mailing-List-Destination', $email);
 
-        $cwd = '/';
 
-        $env = [];
+        $_email = new RawMessage(strval($message));
 
-        if (getenv('SENDMAIL'))
-            $sendmailPath = getenv('SENDMAIL');
-        else
-            // Strip args from sendmail path in ini
-            list($sendmailPath) = explode(' ', ini_get('sendmail_path'));
+        $envelope = new Envelope(
+            new Address($this->params->get('app.email_bounces')),
+            [new Address($email)]
+        );
 
-        // Start sendmail with the target email address as argument
-        $sendmail = proc_open(
-            $sendmailPath . ' -oi ' . escapeshellarg($email),
-            $descriptors, $pipes, $cwd, $env);
-
-        // Write message to the stdin of sendmail
-        fwrite($pipes[0], $message->toString());
-        fclose($pipes[0]);
-
-        return proc_close($sendmail);
+        $this->mailer->send($_email, $envelope);
     }
 
     public function sendMailingListMail($bufferStream): int
     {
+        $parser = new MailMimeParser();
+
         try {
             // Read the complete email from the stdin.
             rewind($bufferStream);
-            $message = MessagePart::parse_stream(new PeakableStream($bufferStream));
+            $message = $parser->parse($bufferStream, false);
         } catch (\Exception $exception) {
             \Sentry\captureException($exception);
             return self::COULD_NOT_PARSE_MESSAGE;
@@ -131,17 +136,23 @@ final class MailingListUtils
         $committee = null;
 
         // Test at least the sender already
-        $from = $this->parseEmailAddress($message->header('From') ?? '');
+        $from = $message->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getEmail();
         if (empty($from))
             return self::COULD_NOT_DETERMINE_SENDER;
 
-        $destinationsHeader = $message->header('Envelope-To') ?? $message->header('X-Mailing-List-Destination') ?? $message->header('To');
-        $destinations = $this->parseEmailAddresses($destinationsHeader);
+        $destinations = (
+            $message->getHeaderAs('Envelope-To', AddressHeader::class)
+            ?? $message->getHeaderAs('X-Mailing-List-Destination', AddressHeader::class)
+            ?? $message->getHeader(HeaderConsts::TO)
+        );
+
         if (empty($destinations))
             return self::COULD_NOT_DETERMINE_DESTINATION;
 
-        if ($message->header('X-Spam-Flag') == 'YES')
+        if ($message->getHeaderValue('X-Spam-Flag') == 'YES')
             return self::MARKED_AS_SPAM;
+
+        $destinations = array_map(fn($a) => $a->getEmail(), $destinations->getAddresses());
 
         $returnCode = 0;
 
@@ -174,18 +185,18 @@ final class MailingListUtils
         return $returnCode;
     }
 
-    public function sendWelcomeMail(DataIterMailinglist $list, string $to): int
+    public function sendWelcomeMail(DataIterMailinglist $list, string $to): void
     {
-        $message = new \Cover\email\MessagePart();
+        $email = (new Email())
+            ->to($to)
+            ->from(new Address($list['adres'], $list['naam']))
+            ->replyTo(new Address('webcie@rug.nl', 'AC/DCee Cover'))
+            ->subject((string) $list['on_first_email_subject'])
+            ->text($this->markup->strip($list['on_first_email_message']))
+            ->html($this->markup->parse($list['on_first_email_message']))
+        ;
 
-        $message->setHeader('To', $to);
-        $message->setHeader('From', sprintf('%s <%s>', $list['naam'], $list['adres']));
-        $message->setHeader('Reply-To', 'AC/DCee Cover <webcie@rug.nl>');
-        $message->setHeader('Subject', (string) $list['on_first_email_subject']);
-        $message->addBody('text/plain', strip_tags($list['on_first_email_message']));
-        $message->addBody('text/html', $list['on_first_email_message']);
-
-        return $this->sendMessage($message, $to);
+        $this->mailer->send($email);
     }
 
     /**
@@ -197,24 +208,31 @@ final class MailingListUtils
      * If any changes are actually made, this function also drops the DKIM-Signature
      * from the email.
      */
-    public function personalize(MessagePart $message, callable $transformer): MessagePart
+    public function personalize(Message $message, callable $transformer): Message
     {
         $changed = false;
 
-        $change_checker = function($text, $contentType) use ($transformer, &$changed) {
+        $changeChecker = function($text, $contentType) use ($transformer, &$changed) {
             $output = $transformer($text, $contentType);
             $changed = $changed || $output != $text;
             return $output;
         };
 
-        $derived = $message->derive($change_checker);
+        $copy = clone $message;
 
-        $derived->setHeader('Subject', $change_checker($message->header('Subject'), null));
+        for ($idx = 0; $idx < $message->getPartCount(); $idx ++) {
+            $part = $message->getPart($idx);
+            $part->setContent(
+                $changeChecker($part->getContent() ?? '', $part->getContentType())
+            );
+        }
+
+        $copy->setRawHeader('Subject', $changeChecker($message->getSubject(), null));
 
         if ($changed)
-            $derived->removeHeader('DKIM-Signature');
+            $copy->removeSingleHeader('DKIM-Signature');
 
-        return $derived;
+        return $copy;
     }
 
     public function parseEmailAddress(string $email): ?string
@@ -239,7 +257,7 @@ final class MailingListUtils
     }
 
     public function validateMessageToAllCommittees(
-        MessagePart $message,
+        Message $message,
         string &$to,
         string $from,
         ?array &$destinations = null,
@@ -267,7 +285,7 @@ final class MailingListUtils
 
         $loopId = sprintf('all-%s', $to);
 
-        if (in_array($loopId, $message->headers('X-Loop')))
+        if ($this->inLoop($message, $loopId))
             return self::MAIL_LOOP_DETECTED;
 
         return 0;
@@ -290,21 +308,21 @@ final class MailingListUtils
      * address ending in @svcover.nl.
      */
     public function processMessageToAllCommittees(
-        MessagePart $message,
+        Message $message,
         string $to,
-        string $from
+        string $from,
     ): int
     {
         $result = $this->validateMessageToAllCommittees($message, $to, $from);
 
         if ($result === 0)
-            $this->queue->queue($message->toString(), $to, 'all_committees');
+            $this->queue->queue(strval($message), $to, 'all_committees');
 
         return $result;
     }
 
     public function validateMessageToCommittee(
-        MessagePart $message,
+        Message $message,
         string $to,
         ?DataIterCommissie &$committee = null,
         ?string &$loopId = null,
@@ -320,14 +338,14 @@ final class MailingListUtils
 
         $loopId = sprintf('committee-%d', $committee['id']);
 
-        if (in_array($loopId, $message->headers('X-Loop')))
+        if ($this->inLoop($message, $loopId))
             return self::MAIL_LOOP_DETECTED;
 
         return 0;
     }
 
     public function processMessageToCommittee(
-        MessagePart $message,
+        Message $message,
         string $to,
         ?DataIterCommissie &$committee = null,
     ): int
@@ -335,18 +353,18 @@ final class MailingListUtils
         $result = $this->validateMessageToCommittee($message, $to, $committee);
 
         if ($result === 0)
-            $this->queue->queue($message->toString(), $to, 'committee');
+            $this->queue->queue(strval($message), $to, 'committee');
 
         return $result;
     }
 
     public function validateMessageToMailinglist(
-        MessagePart $message,
+        Message $message,
         string $to,
         string $from,
         ?DataIterMailinglist &$list = null,
         ?array &$subscriptions = null,
-        ?string &$loopId = null
+        ?string &$loopId = null,
     ): int
     {
         // Find that mailing list
@@ -359,7 +377,7 @@ final class MailingListUtils
 
         $loopId = sprintf('mailinglist-%d', $list['id']);
 
-        if (in_array($loopId, $message->headers('X-Loop')))
+        if ($this->inLoop($message, $loopId))
             return self::MAIL_LOOP_DETECTED;
 
         // Find everyone who is subscribed to that list
@@ -415,27 +433,27 @@ final class MailingListUtils
     }
 
     public function processMessageToMailinglist(
-        MessagePart $message,
+        Message $message,
         string $to,
         string $from,
-        ?DataIterMailinglist &$list = null
+        ?DataIterMailinglist &$list = null,
     ): int
     {
         $list = null;
         $result = $this->validateMessageToMailinglist($message, $to, $from, $list);
 
         if ($result === 0)
-            $this->queue->queue($message->toString(), $to, 'mailinglist', $list);
+            $this->queue->queue(strval($message), $to, 'mailinglist', $list);
 
         return $result;
     }
 
     public function procesReturnToSender(
-        MessagePart $message,
+        Message $message,
         string $from,
         string $destination,
-        int $returnCode
-    ): int
+        int $returnCode,
+    ): void
     {
         $notice = 'Sorry, but your message';
         $notice .= ($destination ? ' to ' . $destination : '');
@@ -444,12 +462,37 @@ final class MailingListUtils
 
         echo "Return message to sender $from\n";
 
-        $reply = \Cover\email\reply($message, $notice);
+        $email = (new Email())
+            ->to($from)
+            ->replyTo(new Address('webcie@rug.nl', 'AC/DCee Cover'))
+            ->subject('Message could not be delivered: ' . $message->getSubject())
+        ;
 
-        $reply->setHeader('Subject', 'Message could not be delivered: ' . $message->header('Subject'));
-        $reply->setHeader('From', 'Cover Mail Monkey <monkies@svcover.nl>');
-        $reply->setHeader('Reply-To', 'AC/DCee Cover <webcie@rug.nl>');
+        $messageId = $message->getHeaderValue('Message-ID');
+        if ($messageId) {
+            $email->getHeaders()->addIdHeader('In-Reply-To', $messageId);
 
-        return $this->sendMessage($reply, $from);
+            $references = $message->getHeaderValue('References');
+
+            if ($references)
+                $email->getHeaders()->addTextHeader('References', $messageId . "\n" . $references);
+            else
+                $email->getHeaders()->addIdHeader('References', $messageId);
+        }
+
+        if ($textBody = $message->getTextContent())
+            $email->text($notice . "\n\n" . $textBody);
+        else
+            $email->text($notice);
+
+        if ($htmlBody = $message->getHtmlContent()) {
+            $email->html(
+                sprintf('<p>%s</p><blockquote style="margin:0 0 0 0.8ex; border-left: 1px #ccc solid; padding-left: 1ex">%s</blockquote>',
+                nl2br(htmlspecialchars($notice)),
+                $htmlBody
+            ));
+        }
+
+        $this->mailer->send($email);
     }
 }
