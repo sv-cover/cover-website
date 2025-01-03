@@ -7,6 +7,7 @@ use App\Exception\UnauthorizedException;
 use App\Form\StickerType;
 use App\Service\Authentication;
 use App\Service\Policy;
+use App\Utils\ImageUtils;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -25,6 +26,7 @@ class StickersController extends AbstractController
 
     public function __construct(
         private DataModelSticker $model,
+        private ImageUtils $imageUtils,
         private Policy $policy,
     ) {
     }
@@ -166,8 +168,8 @@ class StickersController extends AbstractController
         $imagick->readImageFile($photo);
 
         // Fix orientation, remove exif data
-        apply_image_orientation($imagick);
-        strip_exif_data($imagick);
+        $this->imageUtils->reorient($imagick);
+        $this->imageUtils->stripExif($imagick);
 
         // Scale to target width
         $imagick->scaleImage(self::PHOTO_THUMBNAIL_WIDTH, 0);

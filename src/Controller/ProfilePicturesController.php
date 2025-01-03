@@ -10,6 +10,7 @@ use App\Exception\UnauthorizedException;
 use App\Form\ProfilePictureType;
 use App\Service\Authentication;
 use App\Service\Policy;
+use App\Utils\ImageUtils;
 use App\Utils\UrlUtils;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -35,6 +36,7 @@ class ProfilePicturesController extends AbstractController
 
     public function __construct(
         private DataModelProfilePicture $model,
+        private ImageUtils $imageUtils,
         private Policy $policy,
         private TagAwareCacheInterface $profilePicturesCache,
     ) {
@@ -90,8 +92,8 @@ class ProfilePicturesController extends AbstractController
         $imagick->readImageFile($photo['photo']);
 
         // Fix orientation, remove exif data
-        apply_image_orientation($imagick);
-        strip_exif_data($imagick);
+        $this->imageUtils->reorient($imagick);
+        $this->imageUtils->stripExif($imagick);
 
         // Write the image as a progressive JPEG
         $imagick->setImageFormat('jpeg');
@@ -108,8 +110,8 @@ class ProfilePicturesController extends AbstractController
         $imagick->readImageFile($photo['photo']);
 
         // Fix orientation, remove exif data
-        apply_image_orientation($imagick);
-        strip_exif_data($imagick);
+        $this->imageUtils->reorient($imagick);
+        $this->imageUtils->stripExif($imagick);
 
         // Crop to square
         if ($format == self::FORMAT_SQUARE)

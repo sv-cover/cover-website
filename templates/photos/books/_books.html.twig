@@ -44,7 +44,7 @@
                 <div class="new-badge">{{ __('New!') }}</div>
             {% endif %}
             <div class="thumbnail-images columns is-gapless is-mobile" aria-hidden="true">
-                {% for photo in photo_utils.getBookThumbnails(book, 3) %}
+                {% for photo in photo_book_utils.getBookThumbnails(book, 3) %}
                     {% set size = photo.get_scaled_size(null, 300) %}
                     <div class="column image {{ loop.first ? 'active' : '' }}">
                         <figure>

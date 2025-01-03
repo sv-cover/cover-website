@@ -10,7 +10,7 @@ use App\Exception\UnauthorizedException;
 use App\Form\PhotoType;
 use App\Service\Authentication;
 use App\Service\Policy;
-use App\Utils\PhotoUtils;
+use App\Utils\PhotoBookUtils;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -30,7 +30,7 @@ class PhotosController extends AbstractController
     public function __construct(
         private DataModelPhotobook $model,
         private Policy $policy,
-        private PhotoUtils $photoUtils,
+        private PhotoBookUtils $photoBookUtils,
     ) {
     }
 
@@ -44,7 +44,7 @@ class PhotosController extends AbstractController
     ): Response|RedirectResponse
     {
         $photo = $this->model->get_iter($photo_id);
-        $book = $this->photoUtils->getBook($book_id);
+        $book = $this->photoBookUtils->getBook($book_id);
 
         if (!$book->has_photo($photo))
             // Illegal situation! Redirect to a legal route.
@@ -67,7 +67,7 @@ class PhotosController extends AbstractController
     public function update(Request $request, int $photo_id, string $book_id): Response|RedirectResponse
     {
         $photo = $this->model->get_iter($photo_id);
-        $book = $this->photoUtils->getBook($book_id);
+        $book = $this->photoBookUtils->getBook($book_id);
 
         if (!$book->has_photo($photo))
             // Illegal situation! Redirect to a legal route.
@@ -108,7 +108,7 @@ class PhotosController extends AbstractController
     ): Response|RedirectResponse
     {
         $photo = $this->model->get_iter($photo_id);
-        $book = $this->photoUtils->getBook($book_id);
+        $book = $this->photoBookUtils->getBook($book_id);
 
         if (!$book->has_photo($photo))
             // Illegal situation! Redirect to a legal route.
@@ -168,7 +168,7 @@ class PhotosController extends AbstractController
     ): Response|RedirectResponse
     {
         $photo = $this->model->get_iter($photo_id);
-        $book = $this->photoUtils->getBook($book_id);
+        $book = $this->photoBookUtils->getBook($book_id);
 
         if (!$book->has_photo($photo))
             // Illegal situation! Redirect to a legal route.

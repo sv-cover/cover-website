@@ -10,9 +10,34 @@ use App\DataModel\DataModelPhotobookLike;
 use App\DataModel\DataModelPhotobookFace;
 use App\Service\Authentication;
 
-final class PhotoUtils
+final class PhotoBookUtils
 {
     private $book;
+
+    public static function path_concat($path_components): string
+    {
+        $path_components = func_get_args();
+
+        $path = '';
+
+        foreach ($path_components as $path_component)
+        {
+            if (strlen($path) === 0)
+                $path .= rtrim($path_component, '/');
+            else
+                $path .= '/' . trim($path_component, '/');
+        }
+
+        return $path;
+    }
+
+    public static function path_subtract(string $full_path, string $basedir): string
+    {
+        if (substr($full_path, 0, strlen($basedir)) != $basedir)
+            throw new \InvalidArgumentException('Full path is not a path inside the given base directory');
+
+        return ltrim(substr($full_path, strlen($basedir)), '/');
+    }
 
     public function __construct(
         private Authentication $auth,

@@ -21,7 +21,6 @@ else
 
 require_once 'src/Legacy/proxies.php';
 require_once 'src/Legacy/constants.php';
-require_once 'src/Legacy/functions.php';
 require_once 'src/Legacy/i18n.php';
 
 /* Initialize session */

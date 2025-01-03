@@ -14,7 +14,7 @@ use App\Form\PhotoType;
 use App\Legacy\Database\DatabasePDO;
 use App\Service\Authentication;
 use App\Service\Policy;
-use App\Utils\PhotoUtils;
+use App\Utils\PhotoBookUtils;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -41,7 +41,7 @@ class PhotoBooksController extends AbstractController
         private DatabasePDO $db,
         private DataModelPhotobook $model,
         private Policy $policy,
-        private PhotoUtils $photoUtils,
+        private PhotoBookUtils $photoBookUtils,
     ) {
         // No autowiring for custom options
         $this->slugger = new AsciiSlugger('en', ['en' => ['/' => '_', '\\' => '_']]);
@@ -55,7 +55,7 @@ class PhotoBooksController extends AbstractController
         ?string $book_id = null,
     ): Response
     {
-        $book = $this->photoUtils->getBook($book_id);
+        $book = $this->photoBookUtils->getBook($book_id);
 
         if (!$this->policy->userCanRead($book))
             throw new UnauthorizedException();
@@ -89,7 +89,7 @@ class PhotoBooksController extends AbstractController
     #[Route('/{book_id}/create', name: 'photo_books.create', methods: ['GET', 'POST'])]
     public function create(Request $request, string $book_id): Response|RedirectResponse
     {
-        $book = $this->photoUtils->getBook($book_id)->new_book();
+        $book = $this->photoBookUtils->getBook($book_id)->new_book();
 
         if (!$this->policy->userCanCreate($book))
             throw new UnauthorizedException('You are not allowed to create new photo books inside this photo book.');
@@ -111,7 +111,7 @@ class PhotoBooksController extends AbstractController
     #[Route('/{book_id}/update', name: 'photo_books.update', methods: ['GET', 'POST'])]
     public function update(Request $request, string $book_id): Response|RedirectResponse
     {
-        $book = $this->photoUtils->getBook($book_id);
+        $book = $this->photoBookUtils->getBook($book_id);
 
         if (!$this->policy->userCanUpdate($book))
             throw new UnauthorizedException('You are not allowed to edit this photobook.');
@@ -133,7 +133,7 @@ class PhotoBooksController extends AbstractController
     #[Route('/{book_id}/delete', name: 'photo_books.delete', methods: ['GET', 'POST'])]
     public function delete(Request $request, string $book_id): Response|RedirectResponse
     {
-        $book = $this->photoUtils->getBook($book_id);
+        $book = $this->photoBookUtils->getBook($book_id);
 
         if (!$this->policy->userCanDelete($book))
             throw new UnauthorizedException('You are not allowed to delete this photobook.');
@@ -172,7 +172,7 @@ class PhotoBooksController extends AbstractController
         string $book_id,
     ): Response|RedirectResponse
     {
-        $book = $this->photoUtils->getBook($book_id);
+        $book = $this->photoBookUtils->getBook($book_id);
 
         if (!$this->policy->userCanUpdate($book))
             throw new UnauthorizedException('You are not allowed to add photos to this photobook.');
@@ -248,7 +248,7 @@ class PhotoBooksController extends AbstractController
         #[MapQueryParameter] ?string $path = null,
     ): Response
     {
-        $book = $this->photoUtils->getBook($book_id);
+        $book = $this->photoBookUtils->getBook($book_id);
 
         if (!$this->policy->userCanUpdate($book))
             throw new UnauthorizedException();
@@ -256,14 +256,14 @@ class PhotoBooksController extends AbstractController
         $photosDir = $this->getParameter('app.photos_dir');
 
         if (!empty($path))
-            $fsPath = \path_concat($photosDir, $path);
+            $fsPath = PhotoBookUtils::path_concat($photosDir, $path);
         else
             $fsPath = $photosDir;
 
         $entries = [];
         foreach (new \FilesystemIterator($fsPath) as $entry)
             if (is_dir($entry))
-                $entries[] = \path_subtract($entry, $photosDir);
+                $entries[] = PhotoBookUtils::path_subtract($entry, $photosDir);
         rsort($entries);
 
         return $this->json($entries);
@@ -275,13 +275,13 @@ class PhotoBooksController extends AbstractController
         #[MapQueryParameter] ?string $path = null,
     ): StreamedResponse
     {
-        $book = $this->photoUtils->getBook($book_id);
+        $book = $this->photoBookUtils->getBook($book_id);
 
         if (!$this->policy->userCanUpdate($book))
             throw new UnauthorizedException();
 
         $photosDir = $this->getParameter('app.photos_dir');
-        $fsPath = \path_concat($photosDir, $path);
+        $fsPath = PhotoBookUtils::path_concat($photosDir, $path);
 
         $iter = \is_dir($fsPath) ? new \FilesystemIterator($fsPath) : [];
 
@@ -300,7 +300,7 @@ class PhotoBooksController extends AbstractController
 
                     $id = null;
                     $description = '';
-                    $filePath = \path_subtract($entry, $photosDir);
+                    $filePath = PhotoBookUtils::path_subtract($entry, $photosDir);
 
                     // Find existing photo
                     foreach ($bookPhotos as $photo) {
@@ -360,7 +360,7 @@ class PhotoBooksController extends AbstractController
         #[MapQueryParameter] array $photo_id,
     ): Response
     {
-        $book = $this->photoUtils->getBook($book_id);
+        $book = $this->photoBookUtils->getBook($book_id);
 
         if (!$this->policy->userCanUpdate($book))
             throw new UnauthorizedException('You are not allowed to delete photos from this photobook.');
@@ -397,7 +397,7 @@ class PhotoBooksController extends AbstractController
         if (!$order)
             throw new BadRequestHttpException('Order parameter missing');
 
-        $book = $this->photoUtils->getBook($book_id);
+        $book = $this->photoBookUtils->getBook($book_id);
 
         if (!$this->policy->userCanUpdate($book))
             throw new UnauthorizedException('You are not allowed to edit this photobook.');
@@ -423,7 +423,7 @@ class PhotoBooksController extends AbstractController
         if (!$order)
             throw new BadRequestHttpException('Order parameter missing');
 
-        $parent = $this->photoUtils->getBook($book_id);
+        $parent = $this->photoBookUtils->getBook($book_id);
 
         if (!$this->policy->userCanUpdate($parent))
             throw new UnauthorizedException('You are not allowed to edit this photobook.');
@@ -448,7 +448,7 @@ class PhotoBooksController extends AbstractController
         ?string $book_id = null,
     ): Response
     {
-        $book = $this->photoUtils->getBook($book_id);
+        $book = $this->photoBookUtils->getBook($book_id);
 
         if (!$this->policy->userCanRead($book))
             throw new UnauthorizedException();
@@ -491,7 +491,7 @@ class PhotoBooksController extends AbstractController
     #[Route('/{book_id}/mark_read', name: 'photo_books.mark_read', methods: ['POST'])]
     public function markRead(Authentication $auth, Request $request, string $book_id): RedirectResponse
     {
-        $book = $this->photoUtils->getBook($book_id);
+        $book = $this->photoBookUtils->getBook($book_id);
 
         if (!$this->policy->userCanMarkAsRead($book))
             throw new UnauthorizedException();
@@ -585,7 +585,7 @@ class PhotoBooksController extends AbstractController
     #[Route('/{book_id}/download', name: 'photo_books.download', methods: ['GET'])]
     public function download(Request $request, string $book_id): StreamedResponse
     {
-        $book = $this->photoUtils->getBook($book_id);
+        $book = $this->photoBookUtils->getBook($book_id);
 
         if (!$this->policy->userCanDownloadBook($book))
             throw new UnauthorizedException();
@@ -611,7 +611,7 @@ class PhotoBooksController extends AbstractController
     #[Route('/{book_id}/download/confirm', name: 'photo_books.download.confirm', methods: ['GET'])]
     public function downloadConfirm(Request $request, string $book_id): Response
     {
-        $book = $this->photoUtils->getBook($book_id);
+        $book = $this->photoBookUtils->getBook($book_id);
 
         if (!$this->policy->userCanDownloadBook($book))
             throw new UnauthorizedException();

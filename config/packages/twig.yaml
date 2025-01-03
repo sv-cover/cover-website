@@ -7,7 +7,7 @@ twig:
         humanize: '@App\Utils\HumanizeUtils'
         menu: '@App\Service\Menu'
         policy: '@App\Service\Policy'
-        photo_utils: '@App\Utils\PhotoUtils'
+        photo_book_utils: '@App\Utils\PhotoBookUtils'
         search_utils: '@App\Utils\SearchUtils'
         sign_up_utils: '@App\SignUp\SignUpFormManager'
         config:

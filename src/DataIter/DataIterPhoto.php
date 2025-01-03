@@ -4,6 +4,7 @@ namespace App\DataIter;
 
 use App\Exception\NotFoundException;
 use App\Legacy\Database\DataIter;
+use App\Utils\PhotoBookUtils;
 
 class DataIterPhoto extends DataIter
 {
@@ -144,7 +145,7 @@ class DataIterPhoto extends DataIter
 
     public function get_full_path()
     {
-        return path_concat($this->model->params->get('app.photos_dir'), $this->get('filepath'));
+        return PhotoBookUtils::path_concat($this->model->params->get('app.photos_dir'), $this->get('filepath'));
     }
 
     public function file_exists()

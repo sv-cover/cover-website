@@ -10,7 +10,7 @@ use App\Exception\UnauthorizedException;
 use App\Form\PhotoCommentType;
 use App\Service\Authentication;
 use App\Service\Policy;
-use App\Utils\PhotoUtils;
+use App\Utils\PhotoBookUtils;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,7 +28,7 @@ class PhotoCommentsController extends AbstractController
         private DataModelPhotobook $bookModel,
         private DataModelPhotobookReactie $model,
         private Policy $policy,
-        private PhotoUtils $photoUtils,
+        private PhotoBookUtils $photoBookUtils,
     ) {
     }
 
@@ -38,7 +38,7 @@ class PhotoCommentsController extends AbstractController
         $this->photo = $this->bookModel->get_iter($photo_id);
 
         $book_id = $request->attributes->get('_route_params')['book_id'];
-        $this->book = $this->photoUtils->getBook($book_id);
+        $this->book = $this->photoBookUtils->getBook($book_id);
 
         if (!$this->book->has_photo($this->photo))
             // Illegal situation! Redirect to a legal route.
