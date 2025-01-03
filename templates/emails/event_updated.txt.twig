@@ -6,7 +6,7 @@ Name:     {{ event.kop }}
 From:     {{ event.van }}
 Until:    {{ event.tot }}
 Location: {{ event.locatie }}
-Category: {{ humanize.join(event.category|split(',')|map(c => c|title)) }}
+Category: {{ event.category|split(',')|map(c => c|title)|join(', ', __(' and ')) }}
 
 {{ event.beschrijving ~}}
 

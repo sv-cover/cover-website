@@ -40,7 +40,7 @@
             <p>{{ __N(
                 'Results from the %s category are missing due to errors.',
                 'Results from the categories %s are missing due to errors.',
-                humanize.join(resultset.errors), resultset.errors|length
+                resultset.errors|join(', ', __(' and ')), resultset.errors|length
             ) }}</p>
         {% endif %}
     </div>

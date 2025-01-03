@@ -7,12 +7,16 @@ final class HumanizeUtils
     /**
      * A.K.A. implode_human
      * Implode a list while separating it with , (except for the last item
-     * for which "and" is used instead of a comma
+     * for which "and" is used instead of a comma)
+     *
+     * This can be used inside templates, but Twig's join also supports the same
+     * functionality, so that's preferred.
+     *
      * @list the list to implode
      *
      * @result a string in the format item1, item2 and item3
      */
-    public static function join(array $list): string
+    public static function implode(array $list): string
     {
         $len = count($list);
 
@@ -21,7 +25,7 @@ final class HumanizeUtils
         elseif ($len === 1)
             return reset($list);
         else
-            return implode(', ', array_slice($list, 0, $len - 1)) . ' ' . __('and') . ' ' . end($list);
+            return implode(', ', array_slice($list, 0, $len - 1)) . __(' and ') . end($list);
     }
 
     public static function fileSize(int $bytes, int $decimals = 2): string

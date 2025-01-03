@@ -27,7 +27,7 @@
         {% set known_faces = known_faces|merge([__N('%d Unknown', '%d Unknown', unknown_count)]) %}
     {% endif %}
 
-    {{ humanize.join(known_faces)|raw }}
+    {{ known_faces|join(', ', __(' and '))|raw }}
 {%- endmacro -%}
 
 {% block page %}
