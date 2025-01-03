@@ -9,6 +9,7 @@ use App\Legacy\Database\DataModel;
 use App\Legacy\Database\SearchProviderInterface;
 use App\Markup\Markup;
 use App\Service\Filemanager;
+use App\Service\I18n;
 use App\Utils\SearchUtils;
 use Symfony\Component\DependencyInjection\Attribute\Lazy;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
@@ -91,7 +92,7 @@ class DataModelPage extends DataModel implements SearchProviderInterface
     {
         // TODO: This thing barely works. Try searching the contact page.
 
-        $preferred_language = i18n_get_language();
+        $preferred_language = I18n::getLanguage();
 
         $weights = [];
 

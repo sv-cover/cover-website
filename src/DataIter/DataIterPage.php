@@ -4,6 +4,7 @@ namespace App\DataIter;
 
 use App\Legacy\Database\DataIter;
 use App\Legacy\Database\SearchResultInterface;
+use App\Service\I18n;
 use App\Utils\SearchUtils;
 
 class DataIterPage extends DataIter implements SearchResultInterface
@@ -54,7 +55,7 @@ class DataIterPage extends DataIter implements SearchResultInterface
             $language = $this['search_language'];
 
         if (!$language)
-            $language = i18n_get_language();
+            $language = I18n::getLanguage();
 
         $preferred_fields = $language == 'en'
             ? array('content_en', 'content')

@@ -62,6 +62,7 @@ services:
             - '../src/Legacy'
             - '../src/Markup/Node'
             - '../src/DataIter'
+            - '../src/functions.php'
 
     App\Service\Authentication:
         public: true

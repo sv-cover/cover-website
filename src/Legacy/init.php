@@ -21,11 +21,8 @@ else
 
 require_once 'src/Legacy/proxies.php';
 require_once 'src/Legacy/constants.php';
-require_once 'src/Legacy/i18n.php';
 
 /* Initialize session */
 // TODO SFY can we do without starting the session?
 // https://symfony.com/doc/current/session.html#integrating-with-legacy-applications
 // session_start();
-
-init_i18n();

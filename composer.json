@@ -45,11 +45,13 @@
         "sort-packages": true
     },
     "autoload": {
+        "files": [ "src/functions.php" ],
         "psr-4": {
             "App\\": "src/"
-        }
+        },
     },
     "autoload-dev": {
+        "files": [ "src/functions.php" ],
         "psr-4": {
             "App\\Tests\\": "tests/"
         }

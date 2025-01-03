@@ -3,6 +3,7 @@
 namespace App\Twig;
 
 use App\Legacy\Database\DataModel;
+use App\Service\I18n;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Twig\Extension\AbstractExtension;
@@ -29,6 +30,8 @@ class LegacyExtension extends AbstractExtension
     public function getFilters(): array
     {
         return [
+            new TwigFilter('trans', [I18n::class, 'translate']),
+            new TwigFilter('translate_parts', [I18n::class, 'translateParts']),
             // new TwigFilter('vformat', 'vsprintf'),
             // new TwigFilter('flip', 'array_flip'),
             // new TwigFilter('values', 'array_values'),
@@ -85,6 +88,9 @@ class LegacyExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
+            new TwigFunction('__', [I18n::class, 'translate']),
+            new TwigFunction('__N', [I18n::class, 'translatePluralize']),
+            new TwigFunction('__translate_parts', [I18n::class, 'translateParts']),
             new TwigFunction('login_path', [$this, 'getLoginPath']),
             new TwigFunction('logout_path', [$this, 'getLogoutPath']),
             new TwigFunction('model', [$this, 'getModel']),
