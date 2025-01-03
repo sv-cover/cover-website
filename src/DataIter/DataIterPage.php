@@ -25,26 +25,16 @@ class DataIterPage extends DataIter implements SearchResultInterface
 
     public function get_cover_image($width=null)
     {
-        return get_filemanager_url($this['cover_image_url'], $width);
+        return $this->model->filemanager->getFileUrl($this['cover_image_url'], $width);
     }
 
     public function get_cover_image_orientation()
     {
-        $filemanager_root = $this->model->params->get('app.filemanager_root');
-        $resize_exts = $this->model->params->get('app.filemanager_resizable_image_extensions');
+        $size = $this->model->filemanager->getImageSize($this['cover_image_url']);
 
-        if (empty($this['cover_image_url']) || !in_array(pathinfo($this['cover_image_url'], PATHINFO_EXTENSION), $resize_exts))
-            return false; // Can't determine size
-
-        $result = file_get_contents(sprintf('%s/images/size?f=%s', $filemanager_root, urlencode($this['cover_image_url'])));
-        try {
-            $result = json_decode($result);
-            $width = $result->width;
-            $height = $result->height;
-        } catch (\Exception $e) {
+        if (!isset($size))
             return false;
-        }
-
+        [$width, $height] = $size;
         if ($width == $height)
             return 'square';
         if ($width > $height)

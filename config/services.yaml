@@ -60,7 +60,6 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
             - '../src/Legacy'
-            - '../src/Model'
             - '../src/Markup/Node'
             - '../src/DataIter'
 
@@ -69,6 +68,12 @@ services:
 
     App\Service\Database:
         public: true
+
+    App\Service\Filemanager:
+        arguments:
+            $url: '%app.filemanager_root%'
+            $resizableExtensions: '%app.filemanager_resizable_image_extensions%'
+            $imageExtensions: '%app.filemanager_image_extensions%'
 
     App\Service\Incassomatic:
         arguments:

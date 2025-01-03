@@ -20,15 +20,6 @@ function get_identity() {
     return $kernel->getContainer()->get('App\Service\Authentication')->getIdentity();
 }
 
-function get_model(string $name) {
-    global $kernel;
-
-    if (!isset($kernel))
-        return null;
-
-    return $kernel->getContainer()->get('App\Service\Database')->getModel($name);
-}
-
 function get_config_value(string $name, mixed $default = null) {
     global $kernel;
 

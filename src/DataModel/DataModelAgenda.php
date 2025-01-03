@@ -9,6 +9,7 @@ use App\Legacy\Database\DataIter;
 use App\Legacy\Database\DataModel;
 use App\Legacy\Database\SearchProviderInterface;
 use App\Service\Authentication;
+use App\Service\Filemanager;
 use App\Utils\SearchUtils;
 
 class DataModelAgenda extends DataModel implements SearchProviderInterface
@@ -23,6 +24,7 @@ class DataModelAgenda extends DataModel implements SearchProviderInterface
 
     public function __construct(
         private Authentication $auth,
+        public Filemanager $filemanager,
         private DataModelCommissie $committeeModel,
         private DataModelSignUpForm $signUpFormModel,
     ) {

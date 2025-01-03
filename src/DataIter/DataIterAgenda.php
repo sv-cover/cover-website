@@ -78,7 +78,7 @@ class DataIterAgenda extends DataIter implements SearchResultInterface
 
     public function get_image($width=null)
     {
-        return \get_filemanager_url($this['image_url'], $width);
+        return $this->model->filemanager->getFileUrl($this['image_url'], $width);
     }
 
     public function get_committee()

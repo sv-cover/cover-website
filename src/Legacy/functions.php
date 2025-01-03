@@ -88,14 +88,3 @@ function strip_exif_data(\Imagick $image)
     if ($profiles)
         $image->profileImage('icc', $profiles['icc']);
 }
-
-function get_filemanager_url($path, $width=null)
-{
-    if (empty($path))
-        return '';
-    $filemanager_root = get_config_value('filemanager_root', 'https://filemanager.svcover.nl');
-    $resize_exts = get_config_value('filemanager_image_resize_extensions', ['jpg', 'jpeg', 'png']);
-    if (!$width || !in_array(pathinfo($path, PATHINFO_EXTENSION), $resize_exts))
-        return sprintf('%s/%s', $filemanager_root, $path);
-    return sprintf('%s/images/resize?f=%s&w=%d', $filemanager_root, urlencode($path), $width);
-}

@@ -7,6 +7,7 @@ use App\DataModel\DataModelVacancy;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Database\DataModel;
 use App\Legacy\Database\SearchProviderInterface;
+use App\Service\Filemanager;
 use Symfony\Component\DependencyInjection\Attribute\Lazy;
 
 class DataModelPartner extends DataModel implements SearchProviderInterface
@@ -30,6 +31,7 @@ class DataModelPartner extends DataModel implements SearchProviderInterface
     }
 
     public function __construct(
+        public Filemanager $filemanager,
         #[Lazy] private DataModelVacancy $vacancyModel, // Lazy to prevent circular dependencies
     ) {
     }

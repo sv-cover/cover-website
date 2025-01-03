@@ -8,6 +8,7 @@ use App\Legacy\Database\DataIter;
 use App\Legacy\Database\DataModel;
 use App\Legacy\Database\SearchProviderInterface;
 use App\Markup\Markup;
+use App\Service\Filemanager;
 use App\Utils\SearchUtils;
 use Symfony\Component\DependencyInjection\Attribute\Lazy;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
@@ -28,6 +29,7 @@ class DataModelPage extends DataModel implements SearchProviderInterface
 
     public function __construct(
         public ContainerBagInterface $params,
+        public Filemanager $filemanager,
         #[Lazy] private DataModelCommissie $committeeModel, // Lazy to prevent circular dependencies
         private Markup $markup,
     ) {

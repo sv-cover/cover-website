@@ -36,12 +36,12 @@ class DataIterPartner extends DataIter implements SearchResultInterface
 
     public function get_logo($width=null)
     {
-        return get_filemanager_url($this['logo_url'], $width);
+        return $this->model->filemanager->getFileUrl($this['logo_url'], $width);
     }
 
     public function get_logo_dark($width=null)
     {
-        return get_filemanager_url($this['logo_dark_url'], $width);
+        return $this->model->filemanager->getFileUrl($this['logo_dark_url'], $width);
     }
 
     public function get_vacancies()
