@@ -5,10 +5,10 @@ namespace App\Policy;
 use App\DataIter\DataIterMailinglist;
 use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelMailinglist;
+use App\Legacy\Authentication\Authentication;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Policy\PolicyInterface;
-use App\Service\Authentication;
 
 class PolicyMailinglist implements PolicyInterface
 {

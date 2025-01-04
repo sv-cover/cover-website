@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Bridge;
 
 use App\DataIter\DataIterMember;
 use Symfony\Contracts\HttpClient\HttpClientInterface;

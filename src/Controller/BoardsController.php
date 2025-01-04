@@ -7,7 +7,7 @@ use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelPage;
 use App\Exception\UnauthorizedException;
 use App\Form\BoardType;
-use App\Service\Policy;
+use App\Legacy\Policy\Policy;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Response;

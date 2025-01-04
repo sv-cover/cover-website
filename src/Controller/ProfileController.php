@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+use App\Bridge\Incassomatic;
+use App\Bridge\Kast;
+use App\Bridge\Secretary;
 use App\DataIter\DataIterMember;
 use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelEmailConfirmationToken;
@@ -11,11 +14,8 @@ use App\DataModel\DataModelSession;
 use App\Exception\UnauthorizedException;
 use App\Form\PasswordType;
 use App\Form\ProfilePictureType;
-use App\Service\Authentication;
-use App\Service\Incassomatic;
-use App\Service\Kast;
-use App\Service\Policy;
-use App\Service\Secretary;
+use App\Legacy\Authentication\Authentication;
+use App\Legacy\Policy\Policy;
 use JeroenDesloovere\VCard\VCard;
 use Misd\PhoneNumberBundle\Validator\Constraints\PhoneNumber as AssertPhoneNumber;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;

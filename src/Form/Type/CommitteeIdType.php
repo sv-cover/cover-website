@@ -2,8 +2,8 @@
 namespace App\Form\Type;
 
 use App\DataModel\DataModelCommissie;
-use App\Service\Authentication;
 use App\Form\ChoiceList\CommitteeChoiceLoader;
+use App\Legacy\Authentication\Authentication;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\ChoiceList;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;

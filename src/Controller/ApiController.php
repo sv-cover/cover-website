@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Bridge\Secretary;
 use App\DataModel\DataModelAgenda;
 use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelMailinglist;
@@ -11,11 +12,10 @@ use App\DataModel\DataModelPasswordResetToken;
 use App\DataModel\DataModelSession;
 use App\Exception\NotFoundException;
 use App\Exception\UnauthorizedException;
+use App\Legacy\Authentication\Authentication;
 use App\Legacy\Authentication\ConstantSessionProvider;
 use App\Legacy\Authentication\DeviceIdentityProvider;
-use App\Service\Authentication;
-use App\Service\Policy;
-use App\Service\Secretary;
+use App\Legacy\Policy\Policy;
 use App\Utils\MailingListUtils;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

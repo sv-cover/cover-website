@@ -4,8 +4,8 @@ namespace App\Tests\Markup;
 
 use App\DataModel\DataModelSession;
 use App\Markup\Markup;
+use App\Legacy\Authentication\Authentication;
 use App\Legacy\Authentication\ConstantSessionProvider;
-use App\Service\Authentication;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Test\Constraint as CC;

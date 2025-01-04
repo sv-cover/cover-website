@@ -4,7 +4,7 @@ namespace App\Utils;
 
 use App\Legacy\Database\SearchResultInterface;
 use App\Legacy\Database\SearchProviderInterface;
-use App\Service\Policy;
+use App\Legacy\Policy\Policy;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 final class SearchUtils

@@ -56,36 +56,35 @@ services:
     App\:
         resource: '../src/'
         exclude:
+            - '../src/DataIter'
             - '../src/DependencyInjection/'
             - '../src/Entity/'
-            - '../src/Kernel.php'
-            - '../src/Legacy'
-            - '../src/Markup/Node'
-            - '../src/DataIter'
             - '../src/functions.php'
+            - '../src/Kernel.php'
+            - '../src/Markup/Node'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
-    App\Service\Filemanager:
+    App\Bridge\Filemanager:
         arguments:
             $url: '%app.filemanager_root%'
             $resizableExtensions: '%app.filemanager_resizable_image_extensions%'
             $imageExtensions: '%app.filemanager_image_extensions%'
 
-    App\Service\Incassomatic:
+    App\Bridge\Incassomatic:
         arguments:
             $url: '%env(INCASSOMATIC_URL)%'
             $app: '%env(INCASSOMATIC_APP)%'
             $secret: '%env(INCASSOMATIC_SECRET)%'
 
-    App\Service\Kast:
+    App\Bridge\Kast:
         arguments:
             $url: '%env(KAST_URL)%'
             $user: '%env(KAST_USER)%'
             $password: '%env(KAST_PASSWORD)%'
 
-    App\Service\Secretary:
+    App\Bridge\Secretary:
         arguments:
             $url: '%env(SECRETARY_URL)%'
             $user: '%env(SECRETARY_USER)%'

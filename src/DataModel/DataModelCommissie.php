@@ -6,11 +6,11 @@ use App\DataIter\DataIterCommissie;
 use App\DataIter\DataIterMember;
 use App\DataModel\DataModelPage;
 use App\DataModel\DataModelMember;
+use App\Legacy\Authentication\Authentication;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Database\DataIterNotFoundException;
 use App\Legacy\Database\DataModel;
 use App\Legacy\Database\SearchProviderInterface;
-use App\Service\Authentication;
 use Symfony\Component\DependencyInjection\Attribute\Lazy;
 
 /**

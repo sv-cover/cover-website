@@ -9,10 +9,10 @@ use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelMember;
 use App\DataModel\DataModelPollComment;
 use App\DataModel\DataModelPollLike;
+use App\Legacy\Authentication\Authentication;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Database\DataModel;
 use App\Legacy\Database\SearchProviderInterface;
-use App\Service\Authentication;
 use Symfony\Component\DependencyInjection\Attribute\Lazy;
 
 class DataModelPoll extends DataModel implements SearchProviderInterface

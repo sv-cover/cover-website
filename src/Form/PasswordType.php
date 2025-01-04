@@ -2,7 +2,7 @@
 namespace App\Form;
 
 use App\DataModel\DataModelMember;
-use App\Service\Authentication;
+use App\Legacy\Authentication\Authentication;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType as PasswordFieldType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;

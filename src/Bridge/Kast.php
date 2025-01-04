@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Bridge;
 
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;

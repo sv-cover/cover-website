@@ -2,14 +2,14 @@
 
 namespace App\DataModel;
 
+use App\Bridge\Filemanager;
 use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelSignUpForm;
 use App\DataIter\DataIterAgenda;
+use App\Legacy\Authentication\Authentication;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Database\DataModel;
 use App\Legacy\Database\SearchProviderInterface;
-use App\Service\Authentication;
-use App\Service\Filemanager;
 use App\Utils\SearchUtils;
 
 class DataModelAgenda extends DataModel implements SearchProviderInterface

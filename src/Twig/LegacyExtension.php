@@ -3,7 +3,7 @@
 namespace App\Twig;
 
 use App\Legacy\Database\DataModel;
-use App\Service\I18n;
+use App\Legacy\I18n;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Twig\Extension\AbstractExtension;

@@ -6,7 +6,7 @@ use App\DataModel\DataModelSignUpField;
 use App\DataModel\DataModelSignUpForm;
 use App\Exception\UnauthorizedException;
 use App\Form\SignUpFieldType;
-use App\Service\Policy;
+use App\Legacy\Policy\Policy;
 use App\SignUp\SignUpFormManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;

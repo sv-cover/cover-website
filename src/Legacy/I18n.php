@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Legacy;
 
 /**
  * Service for internationalization (i18n). The purpose of this service is to

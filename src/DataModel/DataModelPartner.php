@@ -2,12 +2,12 @@
 
 namespace App\DataModel;
 
+use App\Bridge\Filemanager;
 use App\DataIter\DataIterPartner;
 use App\DataModel\DataModelVacancy;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Database\DataModel;
 use App\Legacy\Database\SearchProviderInterface;
-use App\Service\Filemanager;
 use Symfony\Component\DependencyInjection\Attribute\Lazy;
 
 class DataModelPartner extends DataModel implements SearchProviderInterface

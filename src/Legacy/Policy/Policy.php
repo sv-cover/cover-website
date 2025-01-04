@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Service;
+namespace App\Legacy\Policy;
 
-use App\Legacy\Policy\PolicyInterface;
-use App\Legacy\Policy\PolicyNotFoundException;
+use App\Legacy\Authentication\Authentication;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Database\DataModel;
+use App\Legacy\Policy\PolicyInterface;
+use App\Legacy\Policy\PolicyNotFoundException;
 use App\Policy as Policies;
-use App\Service\Authentication;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 class Policy

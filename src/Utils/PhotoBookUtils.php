@@ -8,7 +8,7 @@ use App\DataModel\DataModelMember;
 use App\DataModel\DataModelPhotobook;
 use App\DataModel\DataModelPhotobookLike;
 use App\DataModel\DataModelPhotobookFace;
-use App\Service\Authentication;
+use App\Legacy\Authentication\Authentication;
 
 final class PhotoBookUtils
 {

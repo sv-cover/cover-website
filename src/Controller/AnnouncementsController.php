@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\DataModel\DataModelAnnouncement;
 use App\Exception\UnauthorizedException;
 use App\Form\AnnouncementType;
-use App\Service\Policy;
+use App\Legacy\Policy\Policy;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Response;

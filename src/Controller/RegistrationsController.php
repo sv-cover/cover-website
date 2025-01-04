@@ -2,15 +2,15 @@
 
 namespace App\Controller;
 
+use App\Bridge\Secretary;
 use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelMember;
 use App\DataModel\DataModelPage;
 use App\Exception\NotFoundException;
 use App\Exception\UnauthorizedException;
 use App\Form\RegistrationType;
+use App\Legacy\Authentication\Authentication;
 use App\Legacy\Database\DatabasePDO;
-use App\Service\Authentication;
-use App\Service\Secretary;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;

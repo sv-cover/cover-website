@@ -2,16 +2,16 @@
 
 namespace App\DataModel;
 
+use App\Bridge\Secretary;
 use App\DataIter\DataIterMember;
 use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelProfilePicture;
 use App\Exception\InactiveMemberException;
+use App\Legacy\Authentication\Authentication;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Database\DataModel;
 use App\Legacy\Database\SearchProviderInterface;
 use App\Legacy\Database\DataIterNotFoundException;
-use App\Service\Authentication;
-use App\Service\Secretary;
 use Symfony\Component\DependencyInjection\Attribute\Lazy;
 
 class DataModelMember extends DataModel implements SearchProviderInterface

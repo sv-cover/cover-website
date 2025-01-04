@@ -3,8 +3,8 @@
 namespace App\DataModel;
 
 use App\DataIter\DataIterMember;
+use App\Legacy\Authentication\Authentication;
 use App\Legacy\Database\DataModel;
-use App\Service\Authentication;
 use Symfony\Component\DependencyInjection\Attribute\Lazy;
 
 class DataModelCommitteeMembers extends DataModel

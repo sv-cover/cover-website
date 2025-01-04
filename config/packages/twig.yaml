@@ -3,10 +3,10 @@ twig:
     paths:
         'templates/_layout': 'layout'
     globals:
-        auth: '@App\Service\Authentication'
+        auth: '@App\Legacy\Authentication\Authentication'
         humanize: '@App\Utils\HumanizeUtils'
-        menu: '@App\Service\Menu'
-        policy: '@App\Service\Policy'
+        menu: '@App\Menu'
+        policy: '@App\Legacy\Policy\Policy'
         photo_book_utils: '@App\Utils\PhotoBookUtils'
         search_utils: '@App\Utils\SearchUtils'
         sign_up_utils: '@App\SignUp\SignUpFormManager'

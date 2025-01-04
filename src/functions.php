@@ -2,7 +2,7 @@
 
 // namespace App; No namespace, make available globally
 
-use App\Service\I18n;
+use App\Legacy\I18n;
 
 if (!\function_exists(__::class)) {
     function __($message)

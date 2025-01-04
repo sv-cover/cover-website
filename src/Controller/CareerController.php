@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\DataModel\DataModelPartner;
 use App\DataModel\DataModelVacancy;
-use App\Service\Policy;
+use App\Legacy\Policy\Policy;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

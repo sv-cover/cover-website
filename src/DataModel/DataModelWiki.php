@@ -3,9 +3,9 @@
 namespace App\DataModel;
 
 use App\DataIter\DataIterWiki;
+use App\Legacy\Authentication\Authentication;
 use App\Legacy\Database\DataModel;
 use App\Legacy\Database\SearchProviderInterface;
-use App\Service\Authentication;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 
 class WikiRemoteCallException extends \Exception

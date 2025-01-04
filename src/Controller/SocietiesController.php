@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Exception\UnauthorizedException;
-use App\Service\Authentication;
+use App\Legacy\Authentication\Authentication;
 use Misd\PhoneNumberBundle\Validator\Constraints\PhoneNumber as AssertPhoneNumber;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

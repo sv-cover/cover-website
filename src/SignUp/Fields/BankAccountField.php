@@ -2,8 +2,8 @@
 
 namespace App\SignUp\Fields;
 
+use App\Bridge\Incassomatic;
 use App\DataIter\DataIterMember;
-use App\Service\Incassomatic;
 use App\SignUp\SignUpFieldInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;

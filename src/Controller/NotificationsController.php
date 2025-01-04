@@ -4,8 +4,8 @@ namespace App\Controller;
 
 use App\DataModel\DataModelAgenda;
 use App\DataModel\DataModelProfilePicture;
-use App\Service\Authentication;
-use App\Service\Policy;
+use App\Legacy\Authentication\Authentication;
+use App\Legacy\Policy\Policy;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 

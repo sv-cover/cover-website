@@ -4,7 +4,7 @@ namespace App\Form;
 use App\DataModel\DataModelAgenda;
 use App\DataModel\DataModelCommissie;
 use App\Form\Type\CommitteeIdType;
-use App\Service\Authentication;
+use App\Legacy\Authentication\Authentication;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;

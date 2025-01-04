@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelCommitteeMembers;
 use App\Exception\UnauthorizedException;
-use App\Service\Authentication;
+use App\Legacy\Authentication\Authentication;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;

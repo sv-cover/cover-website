@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Legacy\Authentication;
 
 use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelMember;

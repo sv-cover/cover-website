@@ -3,11 +3,11 @@
 namespace App\Policy;
 
 use App\DataModel\DataModelPhoto;
+use App\Legacy\Authentication\Authentication;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Policy\PolicyInterface;
 use App\Policy\PolicyPhotobook;
-use App\Service\Authentication;
 
 class PolicyPhoto implements PolicyInterface
 {

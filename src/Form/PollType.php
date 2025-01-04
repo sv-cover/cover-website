@@ -4,7 +4,7 @@ namespace App\Form;
 use App\Form\Type\CommitteeIdType;
 use App\Form\Type\MarkupType;
 use App\Form\DataTransformer\StringToDateTimeTransformer;
-use App\Service\Authentication;
+use App\Legacy\Authentication\Authentication;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;

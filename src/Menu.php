@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Service;
+namespace App;
 
 use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelConfiguratie;
-use App\Service\Authentication;
+use App\Legacy\Authentication\Authentication;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class Menu

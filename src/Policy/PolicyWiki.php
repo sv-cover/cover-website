@@ -3,10 +3,10 @@
 namespace App\Policy;
 
 use App\DataModel\DataModelWiki;
+use App\Legacy\Authentication\Authentication;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Policy\PolicyInterface;
-use App\Service\Authentication;
 
 class PolicyWiki implements PolicyInterface
 {

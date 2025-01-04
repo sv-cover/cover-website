@@ -2,7 +2,7 @@
 namespace App\Form\ChoiceList;
 
 use App\DataModel\DataModelCommissie;
-use App\Service\Authentication;
+use App\Legacy\Authentication\Authentication;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;

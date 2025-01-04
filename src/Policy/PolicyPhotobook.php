@@ -7,11 +7,11 @@ use App\DataIter\DataIterFacesPhotobook;
 use App\DataIter\DataIterRootPhotobook;
 use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelPhotobook;
+use App\Legacy\Authentication\Authentication;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Policy\PolicyInterface;
 use App\Policy\PolicyMember;
-use App\Service\Authentication;
 
 class PolicyPhotobook implements PolicyInterface
 {

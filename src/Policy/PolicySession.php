@@ -4,10 +4,10 @@ namespace App\Policy;
 
 use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelSession;
+use App\Legacy\Authentication\Authentication;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Policy\PolicyInterface;
-use App\Service\Authentication;
 
 // NB: this policy is currently only used for device sessions.
 class PolicySession implements PolicyInterface

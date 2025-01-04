@@ -2,7 +2,7 @@
 
 namespace App\Markup\TokenParser;
 
-use App\Service\Authentication;
+use App\Legacy\Authentication\Authentication;
 use App\Markup\NodeInterface;
 use App\Markup\TagParserInterface;
 use App\Markup\Node\BlockRendererNode;

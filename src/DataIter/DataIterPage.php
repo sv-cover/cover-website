@@ -4,7 +4,7 @@ namespace App\DataIter;
 
 use App\Legacy\Database\DataIter;
 use App\Legacy\Database\SearchResultInterface;
-use App\Service\I18n;
+use App\Legacy\I18n;
 use App\Utils\SearchUtils;
 
 class DataIterPage extends DataIter implements SearchResultInterface

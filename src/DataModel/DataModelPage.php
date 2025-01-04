@@ -2,14 +2,14 @@
 
 namespace App\DataModel;
 
+use App\Bridge\Filemanager;
 use App\DataIter\DataIterPage;
 use App\DataModel\DataModelCommissie;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Database\DataModel;
 use App\Legacy\Database\SearchProviderInterface;
+use App\Legacy\I18n;
 use App\Markup\Markup;
-use App\Service\Filemanager;
-use App\Service\I18n;
 use App\Utils\SearchUtils;
 use Symfony\Component\DependencyInjection\Attribute\Lazy;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
