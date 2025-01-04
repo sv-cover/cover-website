@@ -4,6 +4,7 @@ namespace App\DataIter;
 
 use App\Legacy\Database\DataIter;
 use App\Legacy\Database\SearchResultInterface;
+use App\Utils\SearchUtils;
 
 class DataIterWiki extends DataIter implements SearchResultInterface
 {
@@ -14,7 +15,7 @@ class DataIterWiki extends DataIter implements SearchResultInterface
 
     public function get_search_relevance(): float
     {
-        return normalize_search_rank($this->get('score'));
+        return SearchUtils::normalizeRank($this->get('score'));
     }
 
     public function get_search_type(): string
@@ -24,6 +25,6 @@ class DataIterWiki extends DataIter implements SearchResultInterface
 
     public function get_absolute_path(): string
     {
-        return sprintf($this->model->params->get('wiki_public_url'), $this->get('id'));
+        return $this->model->wiki->getPageUrl($this->get_id());
     }
 }

@@ -10,6 +10,7 @@ parameters:
     app.committee_interest_log: '%env(default::APP_COMMITTEE_INTEREST_LOG)%'
     app.email_board: board@svcover.nl
     app.email_bounces: bounces@svcover.nl
+    app.email_support: acdcee@svcover.nl
     app.external_webcal_url: '%env(default::APP_EXTERNAL_WEBCAL_URL)%'
     app.filemanager_image_extensions:
         - jpeg
@@ -90,9 +91,14 @@ services:
             $user: '%env(SECRETARY_USER)%'
             $password: '%env(SECRETARY_PASSWORD)%'
 
-    App\SignUp\Fields\:
-        resource: '../src/SignUp/Fields'
-        shared: false
+    App\Bridge\Wiki:
+        arguments:
+            $url: '%env(WIKI_API_URL)%'
+            $pageUrl: '%env(WIKI_PAGE_URL)%'
+
+    App\DataModel\:
+        resource: '../src/DataModel'
+        parent: App\Legacy\Database\DataModel
 
     App\Legacy\Database\DatabasePDO:
         arguments:
@@ -107,6 +113,6 @@ services:
         calls:
             - setDb: ['@App\Legacy\Database\DatabasePDO']
 
-    App\DataModel\:
-        resource: '../src/DataModel'
-        parent: App\Legacy\Database\DataModel
+    App\SignUp\Fields\:
+        resource: '../src/SignUp/Fields'
+        shared: false

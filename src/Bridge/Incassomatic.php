@@ -40,7 +40,7 @@ class Incassomatic
         return $response->toArray();
     }
 
-    public function createContract(DataIterMember $member) :array
+    public function createContract(DataIterMember $member): array
     {
         $data = [
             'cover_id' => $member->get_id(),
@@ -62,7 +62,7 @@ class Incassomatic
         return \current(\array_filter($contracts, fn($c) => $c['is_geldig']));
     }
 
-    public function getDebits(DataIterMember $member, ?int $limit = null) : array
+    public function getDebits(DataIterMember $member, ?int $limit = null): array
     {
         $params = [
             'cover_id' => $member->get_id(),
