@@ -3,7 +3,7 @@
 {% block title __('Career') ~ ' – ' ~ parent() %}
 
 {% block page %}
-{% set header = model('Page').get_iter_from_title('career') %}
+{% set header = get_page('career_header') %}
 <div class="career">
     <header class="hero has-image is-medium is-thumbnail">
         <figure class="hero-image">
@@ -53,7 +53,7 @@
         </div>
     </header>
     <article class="section vacancies-section" id="vacancies">
-        {% set vacancies_page = model('Page').get_iter_from_title('vacancies') %}
+        {% set vacancies_page = get_page('vacancies_header') %}
         <div class="container is-content-optimized">
             <div class="level">
                 <div class="level-left">
@@ -103,7 +103,7 @@
         </div>
     </article>
     <article class="section" id="profiles">
-        {% set partners_page = model('Page').get_iter_from_title('partners') %}
+        {% set partners_page = get_page('partners_header') %}
         <div class="container is-content-optimized">
             <div class="level">
                 <div class="level-left">

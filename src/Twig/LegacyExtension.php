@@ -2,7 +2,6 @@
 
 namespace App\Twig;
 
-use App\Legacy\Database\DataModel;
 use App\Legacy\I18n;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
@@ -14,17 +13,9 @@ use Twig\TwigTest;
 
 class LegacyExtension extends AbstractExtension
 {
-    private array $models = [];
-
     public function __construct(
         private UrlGeneratorInterface $router,
-        #[AutowireIterator('app.data-model')]
-        iterable $models,
     ) {
-        foreach ($models as $model) {
-            $name = (new \ReflectionClass($model))->getShortName();
-            $this->models[$name] = $model;
-        }
     }
 
     public function getFilters(): array
@@ -93,7 +84,6 @@ class LegacyExtension extends AbstractExtension
             new TwigFunction('__translate_parts', [I18n::class, 'translateParts']),
             new TwigFunction('login_path', [$this, 'getLoginPath']),
             new TwigFunction('logout_path', [$this, 'getLogoutPath']),
-            new TwigFunction('model', [$this, 'getModel']),
         ];
     }
 
@@ -121,16 +111,5 @@ class LegacyExtension extends AbstractExtension
             $referrer = $_SERVER['REQUEST_URI'];
 
         return $this->router->generate($name, compact('referrer'));
-    }
-
-    public function getModel($name): DataModel
-    {
-        if (!str_starts_with($name, 'DataModel'))
-            $name = 'DataModel' . $name;
-
-        if (!isset($this->models[$name]))
-            throw new \InvalidArgumentException(sprintf(__("Could not find the model %s"), $name));
-
-        return $this->models[$name];
     }
 }

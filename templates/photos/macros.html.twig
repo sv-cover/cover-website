@@ -7,34 +7,19 @@
     {%- endfor -%}
 {%- endmacro %}
 
-{% macro classnames(photo, context) %}
-    {%- if context.my_likes[photo.id] is defined %}liked{% endif -%}
-    {%- if context.visibility[photo.id] is defined and context.visibility[photo.id] == false %} privacy-hidden{% endif -%}
+{% macro classnames(photo, meta) %}
+    {%- if meta.my_likes[photo.id] is defined %}liked{% endif -%}
+    {%- if meta.visibility[photo.id] is defined and meta.visibility[photo.id] == false %} privacy-hidden{% endif -%}
 {% endmacro %}
 
 {% macro gallery(photos, context) %}
     {% import _self as macros %}
 
-    {# Make sure the context is how we expect it to be, in case this macro is called from somewhere else #}
-    {# TODO SFY don't call models directly from templates #}
-    {% if context.likes is not defined %}
-        {% set context = context|merge({'likes': model('PhotobookLike').count_for_photos(photos)}) %}
-    {% endif  %}
-
-    {% if context.my_likes is not defined %}
-        {% if auth.loggedIn %}
-            {% set context = context|merge({'my_likes': model('PhotobookLike').get_for_lid(auth.identity.member)}) %}
-        {% else %}
-            {% set context = context|merge({'my_likes': []}) %}
-        {% endif %}
-    {% endif %}
-
-    {% if context.visibility is not defined %}
-        {% if context.book is instanceof('App\\DataIter\\DataIterFacesPhotobook') %}
-            {% set context = context|merge({'visibility': model('PhotobookPrivacy').get_visibility_for_photos(photos, auth.identity.member)}) %}
-        {% else %}
-            {% set context = context|merge({'visibility': []}) %}
-        {% endif %}
+    {# Get metadata if not provided #}
+    {% if context.meta is defined %}
+        {% set meta = context.meta %}
+    {% else %}
+        {% set meta = photo_book_utils.getPhotoMeta(photos, context.book) %}
     {% endif %}
 
     {# Now render #}
@@ -44,8 +29,8 @@
 
         {# Set flex-basis to bins close to their scaled width, with a min of 200 and a max of 1000 #}
         {% set basis = ((size[0] / 50)|round) * 50 %}
-        {% set visibility_hidden = context.visibility[photo.id] is defined and context.visibility[photo.id] == false %}
-        <li class="photo column has-basis-{{ min(max(basis, 200), 1000) }} {{ macros.classnames(photo, context) }}" data-id="{{ photo.id }}" id="photo-{{ photo.id }}">
+        {% set visibility_hidden = meta.visibility[photo.id] is defined and meta.visibility[photo.id] == false %}
+        <li class="photo column has-basis-{{ min(max(basis, 200), 1000) }} {{ macros.classnames(photo, meta) }}" data-id="{{ photo.id }}" id="photo-{{ photo.id }}">
             <a
                 href="{{ path('photos.single', {book_id: context.book.id, photo_id: photo.id}) }}"
                 {% if photo.beschrijving %}title="{{ photo.beschrijving }}"{% endif %}
@@ -60,7 +45,7 @@
                     <span class="title">{{ photo.beschrijving }}</span>
                 {% endif %}
 
-                {% set num_likes = context.likes[photo.id] is defined ? context.likes[photo.id] : 0 %}
+                {% set num_likes = meta.likes[photo.id] is defined ? meta.likes[photo.id] : 0 %}
                 {% if photo.num_reacties > 0 or num_likes > 0  or visibility_hidden %}
                     <ul class="controls">
                         {% if photo.num_reacties > 0 %}
@@ -71,7 +56,7 @@
                             </li>
                         {% endif %}
 
-                        {% set liked = context.my_likes[photo.id] is defined %}
+                        {% set liked = meta.my_likes[photo.id] is defined %}
                         {% if num_likes > 0 %}
                             <li class="likes" title="{{ __N('%d person liked this photo.', '%d people liked this photo.', num_likes) }} {% if liked %}{{ __('You liked this photo.')}}{% endif %}">
                                 <i

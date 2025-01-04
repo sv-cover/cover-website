@@ -30,8 +30,7 @@
 
 {% block content %}
 <header class="block">
-    {# TODO SFY: get model #}
-    {% set header = model('Page').get_iter_from_title('vacancies') %}
+    {% set header = get_page('vacancies_header') %}
     <div class="level">
         <div class="level-left">
             <h1 class="title">{{ __('Vacancies') }}</h1>

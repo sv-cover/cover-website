@@ -252,9 +252,9 @@ class DataModelCommissie extends DataModel implements SearchProviderInterface
         return $members;
     }
 
-    public function get_lid_for_functie($commissie_id, $functie)
+    public function get_lid_for_functie($name, $functie)
     {
-        $committee = $this->get_iter($commissie_id);
+        $committee = $this->get_from_name($name);
 
         $leden = $this->get_members($committee);
 

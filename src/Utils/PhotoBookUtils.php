@@ -2,12 +2,14 @@
 
 namespace App\Utils;
 
+use App\DataIter\DataIterFacesPhotobook;
 use App\DataIter\DataIterPhoto;
 use App\DataIter\DataIterPhotobook;
 use App\DataModel\DataModelMember;
 use App\DataModel\DataModelPhotobook;
 use App\DataModel\DataModelPhotobookLike;
 use App\DataModel\DataModelPhotobookFace;
+use App\DataModel\DataModelPhotobookPrivacy;
 use App\Legacy\Authentication\Authentication;
 
 final class PhotoBookUtils
@@ -45,6 +47,7 @@ final class PhotoBookUtils
         private DataModelPhotobook $bookModel,
         private DataModelPhotobookLike $likeModel,
         private DataModelPhotobookFace $faceModel,
+        private DataModelPhotobookPrivacy $privacyModel,
     ) {
     }
 
@@ -82,5 +85,25 @@ final class PhotoBookUtils
     public function getBookThumbnails(DataIterPhotobook $book, int $count): array
     {
         return $this->bookModel->get_photos_recursive($book, $count, true, 0.69);
+    }
+
+    public function getPhotoMeta(array $photos, DataIterPhotobook $book): array
+    {
+        $context = [
+            'likes' => $this->likeModel->count_for_photos($photos),
+            'my_likes' => [],
+            'visibility' => [],
+        ];
+
+        if ($this->auth->loggedIn)
+            $context['my_likes'] = $this->likeModel->get_for_lid($this->auth->identity->member());
+
+        if ($this->auth->loggedIn && $book instanceof DataIterFacesPhotobook)
+            $context['visibility'] = $this->privacyModel->get_visibility_for_photos(
+                $photos,
+                $this->auth->identity->member(),
+            );
+
+        return $context;
     }
 }

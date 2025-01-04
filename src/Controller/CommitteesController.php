@@ -92,6 +92,7 @@ class CommitteesController extends AbstractController
         return $this->render('committees/form.html.twig', [
             'iter' => $iter,
             'form' => $form,
+            'functions' => $this->model->get_functies(),
         ]);
     }
 
@@ -152,6 +153,7 @@ class CommitteesController extends AbstractController
         return $this->render('committees/form.html.twig', [
             'iter' => $iter,
             'form' => $form,
+            'functions' => $this->model->get_functies(),
         ]);
     }
 

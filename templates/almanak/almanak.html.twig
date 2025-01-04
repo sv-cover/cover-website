@@ -93,8 +93,7 @@
                 <div class="tabs is-toggle" id="starting-year">
                     <div class="is-sr-only">{{ __('Filter starting year') }}</div>
                     <ul>
-                        {# TODO SFY refactor #}
-                        {% for year in model('Member').get_distinct_years|filter(year => year != '')|reverse %}
+                        {% for year in years|reverse %}
                             <li class="{% if app.request.query.getInt('year') == year %}is-active{% endif %}">
                                 <a href="{{ path('almanak', {year: year}) }}">{{ year }}</a>
                             </li>

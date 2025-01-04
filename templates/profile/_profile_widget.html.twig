@@ -9,10 +9,9 @@
             </a>
         </div>
     {% endif %}
-    {% set photobook = model('PhotobookFace').get_book([iter]) %}
-    {% if policy.userCanRead(photobook) %}
+    {% if policy.userCanRead(iter.photobook) %}
         <div class="control">
-            <a href="{{ path('photo_books.single', {book_id: photobook.id}) }}" class="button">
+            <a href="{{ path('photo_books.single', {book_id: iter.photobook.id}) }}" class="button">
                 <span class="icon">
                     <i class="fas fa-images" aria-hidden="true"></i>
                 </span>

@@ -2,6 +2,10 @@
 
 namespace App\Twig;
 
+use App\DataIter\DataIterMember;
+use App\DataIter\DataIterPage;
+use App\DataModel\DataModelCommissie;
+use App\DataModel\DataModelPage;
 use App\Utils\HumanizeUtils;
 use libphonenumber\PhoneNumberUtil;
 use libphonenumber\PhoneNumberFormat;
@@ -17,6 +21,8 @@ use Twig\TwigTest;
 class AppExtension extends AbstractExtension
 {
     public function __construct(
+        private DataModelCommissie $committeeModel,
+        private DataModelPage $pageModel,
         private UrlGeneratorInterface $router,
         private ContainerBagInterface $params,
         private HumanizeUtils $humanize,
@@ -37,9 +43,8 @@ class AppExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            // new TwigFunction('login_path', [$this, 'get_login_path']),
-            // new TwigFunction('logout_path', [$this, 'get_logout_path']),
-            // new TwigFunction('get_config_value', [$this, 'get_config_value']), // TODO: find better place
+            new TwigFunction('committee_member', [$this, 'getCommitteeMember']),
+            new TwigFunction('get_page', [$this, 'getPageFromSlug']),
         ];
     }
 
@@ -120,5 +125,15 @@ class AppExtension extends AbstractExtension
         } catch (\libphonenumber\NumberParseException $e) {
             return $phoneNumber;
         }
+    }
+
+    public function getCommitteeMember(string $slug, string $function): DataIterMember
+    {
+        return $this->committeeModel->get_lid_for_functie($slug, $function);
+    }
+
+    public function getPageFromSlug(string $slug): DataIterPage
+    {
+        return $this->pageModel->get_iter_from_slug($slug);
     }
 }

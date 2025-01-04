@@ -1,7 +1,7 @@
 {% extends 'profile/base.html.twig' %}
 
 {% macro profile_field(iter, field, label, href = null, external = false, value = null) %}
-    {% set visibility = model('DataModelMember').get_privacy_for_field(iter, field) %}
+    {% set visibility = iter.get_privacy_for_field(field) %}
     {% if
         visibility == constant('App\\DataModel\\DataModelMember::VISIBLE_TO_EVERYONE')
         or (visibility == constant('App\\DataModel\\DataModelMember::VISIBLE_TO_MEMBERS') and auth.identity.is_member)

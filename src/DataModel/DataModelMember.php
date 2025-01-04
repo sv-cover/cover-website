@@ -5,6 +5,7 @@ namespace App\DataModel;
 use App\Bridge\Secretary;
 use App\DataIter\DataIterMember;
 use App\DataModel\DataModelCommissie;
+use App\DataModel\DataModelPhotobookFace;
 use App\DataModel\DataModelProfilePicture;
 use App\Exception\InactiveMemberException;
 use App\Legacy\Authentication\Authentication;
@@ -40,6 +41,7 @@ class DataModelMember extends DataModel implements SearchProviderInterface
 
     public function __construct(
         #[Lazy] public Authentication $auth, // Lazy to prevent circular dependencies
+        #[Lazy] private DataModelPhotobookFace $photobookModel, // Lazy to prevent circular dependencies
         #[Lazy] private DataModelProfilePicture $profilePictureModel, // Lazy to prevent circular dependencies
         public Secretary $secretary,
     ) {
@@ -523,5 +525,10 @@ class DataModelMember extends DataModel implements SearchProviderInterface
     public function get_profile_picture(DataIterMember $iter)
     {
         return $this->profilePictureModel->get_for_member($iter);
+    }
+
+    public function get_photobook_for_iter(DataIterMember $iter)
+    {
+        return $this->photobookModel->get_book([$iter]);
     }
 }

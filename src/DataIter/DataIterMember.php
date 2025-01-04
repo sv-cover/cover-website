@@ -192,6 +192,16 @@ class DataIterMember extends DataIter implements SearchResultInterface
         return 'member';
     }
 
+    public function get_photobook()
+    {
+        return $this->model->get_photobook_for_iter($this);
+    }
+
+    public function get_privacy_for_field($field)
+    {
+        return $this->model->get_privacy_for_field($this, $field);
+    }
+
     public function get_profile_picture()
     {
         try {

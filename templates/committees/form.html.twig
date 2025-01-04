@@ -6,7 +6,7 @@
 <h1 class="title">{{ iter.has_id() ? __('Modify group') : __('Add a new group') }}</h1>
 {{ form_start(form) }}
     <datalist id="committees-suggested-functions">
-        {% for name, sort in model('Commissie').get_functies %}
+        {% for name, sort in functions %}
             <option value="{{ name }}">
         {% endfor %}
     </datalist>

@@ -26,6 +26,14 @@ class AlmanakController extends AbstractController
     ) {
     }
 
+    protected function render(string $view, array $parameters = [], ?Response $response = null): Response
+    {
+        $context = [
+            'years' => array_filter($this->model->get_distinct_years(), fn($y) => $y != ''),
+        ];
+        return parent::render($view, array_merge($context, $parameters), $response);
+    }
+
     public function almanakSearch(Request $request, string $search, ?int $limit = null): Response
     {
         $iters = $this->model->search_name($search, $limit);

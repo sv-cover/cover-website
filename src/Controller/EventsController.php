@@ -6,6 +6,7 @@ use App\DataIter\DataIterAgenda;
 use App\DataIter\DataIterCommissie;
 use App\DataModel\DataModelAgenda;
 use App\DataModel\DataModelCommissie;
+use App\DataModel\DataModelSession;
 use App\Exception\UnauthorizedException;
 use App\Form\DataTransformer\IntToBooleanTransformer;
 use App\Form\EventType;
@@ -91,7 +92,11 @@ class EventsController extends AbstractController
      * 3. it deconflicts route matching with events.single
      */
     #[Route('/events/{year<\d{4}-\d{4}>}', name: 'events.list', methods: ['GET'])]
-    public function list(?string $year = null): Response|RedirectResponse
+    public function list(
+        Authentication $auth,
+        DataModelSession $sessionModel,
+        ?string $year = null
+    ): Response|RedirectResponse
     {
         $year = $year ? intval(substr($year, 0, 4)) : null;
 
@@ -115,6 +120,7 @@ class EventsController extends AbstractController
         return $this->render('events/list.html.twig', [
             'iters' => $iters,
             'navigation' => $this->getNavigation($year),
+            'calendar_session' => $sessionModel->getForApplication($auth->identity->get('id'), 'calendar'),
         ]);
     }
 
@@ -381,9 +387,14 @@ class EventsController extends AbstractController
     }
 
     #[Route('/events/subscribe', name: 'events.subscribe', methods: ['GET'])]
-    public function subscribe(): Response
+    public function subscribe(
+        Authentication $auth,
+        DataModelSession $sessionModel,
+    ): Response
     {
-        return $this->render('events/subscribe.html.twig');
+        return $this->render('events/subscribe.html.twig', [
+            'calendar_session' => $sessionModel->getForApplication($auth->identity->get('id'), 'calendar'),
+        ]);
     }
 
     // If debugging is hard, temporarily change schemes to 'http'

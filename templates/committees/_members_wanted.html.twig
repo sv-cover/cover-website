@@ -1,4 +1,4 @@
-{% set commissioner = model('Commissie').get_lid_for_functie(constant('App\\DataModel\\DataModelCommissie::BOARD'), 'commissioner of internal affairs') %}
+{% set commissioner = committee_member('board', 'commissioner of internal affairs') %}
 
 {% macro interest_button(committee) %}
     {% if auth.identity.is_member and not auth.identity.member_in_committee(committee.id) %}

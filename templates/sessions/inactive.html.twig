@@ -1,6 +1,6 @@
 {% extends '@layout/layout.html.twig' %}
 
-{% set secretary = model('Commissie').get_lid_for_functie(constant('App\\DataModel\\DataModelCommissie::BOARD'), 'secretary') %}
+{% set secretary = committee_member('board', 'secretary') %}
 
 {% block content %}
 <h1 class="title">{{ __('Log in') }}</h1>
