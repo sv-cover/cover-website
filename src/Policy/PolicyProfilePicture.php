@@ -2,6 +2,7 @@
 
 namespace App\Policy;
 
+use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelMember;
 use App\DataModel\DataModelProfilePicture;
 use App\Legacy\Authentication\IdentityProviderInterface;
@@ -31,7 +32,7 @@ class PolicyProfilePicture implements PolicyInterface
             return false;
 
         return $iter['member_id'] == $this->identity->get('id')
-            || $this->identity->member_in_committee(COMMISSIE_EASY);
+            || $this->identity->member_in_committee(DataModelCommissie::WEBCIE);
     }
 
     public function userCanRead(DataIter $iter): bool
@@ -41,9 +42,9 @@ class PolicyProfilePicture implements PolicyInterface
             return true;
 
         // Admins always get to see profile pictures
-        if ($this->identity->member_in_committee(COMMISSIE_BESTUUR)
-            || $this->identity->member_in_committee(COMMISSIE_KANDIBESTUUR)
-            || $this->identity->member_in_committee(COMMISSIE_EASY)
+        if ($this->identity->member_in_committee(DataModelCommissie::BOARD)
+            || $this->identity->member_in_committee(DataModelCommissie::CANDY)
+            || $this->identity->member_in_committee(DataModelCommissie::WEBCIE)
         )
             return true;
 
@@ -63,9 +64,9 @@ class PolicyProfilePicture implements PolicyInterface
         if ($iter['member_id'] == $this->identity->get('id'))
             return true;
 
-        return $this->identity->member_in_committee(COMMISSIE_BESTUUR)
-            || $this->identity->member_in_committee(COMMISSIE_KANDIBESTUUR)
-            || $this->identity->member_in_committee(COMMISSIE_EASY);
+        return $this->identity->member_in_committee(DataModelCommissie::BOARD)
+            || $this->identity->member_in_committee(DataModelCommissie::CANDY)
+            || $this->identity->member_in_committee(DataModelCommissie::WEBCIE);
     }
 
     public function userCanReview(DataIter $iter): bool
@@ -74,8 +75,8 @@ class PolicyProfilePicture implements PolicyInterface
         if ($iter['reviewed'])
             return false;
 
-        return $this->identity->member_in_committee(COMMISSIE_BESTUUR)
-            || $this->identity->member_in_committee(COMMISSIE_KANDIBESTUUR)
-            || $this->identity->member_in_committee(COMMISSIE_EASY);
+        return $this->identity->member_in_committee(DataModelCommissie::BOARD)
+            || $this->identity->member_in_committee(DataModelCommissie::CANDY)
+            || $this->identity->member_in_committee(DataModelCommissie::WEBCIE);
     }
 }

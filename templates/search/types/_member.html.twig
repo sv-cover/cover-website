@@ -1,11 +1,11 @@
 {% set status = null %}
-{% if result.type  == constant('MEMBER_STATUS_LID') %}
+{% if result.type  == constant('App\\DataModel\\DataModelMember::STATUS_LID') %}
     {% set status = __('Member') %}
-{% elseif result.type == constant('MEMBER_STATUS_LID_AF') %}
-    {% set status = __('Previously a member') %}
-{% elseif result.type == constant('MEMBER_STATUS_ERELID') %}
+{% elseif result.type == constant('App\\DataModel\\DataModelMember::STATUS_LID_AF') %}
+    {% set status = __('Former Member') %}
+{% elseif result.type == constant('App\\DataModel\\DataModelMember::STATUS_ERELID') %}
     {% set status = __('Honorary Member') %}
-{% elseif result.type == constant('MEMBER_STATUS_DONATEUR') %}
+{% elseif result.type == constant('App\\DataModel\\DataModelMember::STATUS_DONATEUR') %}
     {% set status = __('Contributor') %}
 {% endif %}
 

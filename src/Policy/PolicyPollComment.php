@@ -2,6 +2,7 @@
 
 namespace App\Policy;
 
+use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelPollComment;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
@@ -39,8 +40,8 @@ class PolicyPollComment implements PolicyInterface
             return false;
 
         // User owns it or board/acdcee
-        return $this->identity->member_in_committee(COMMISSIE_BESTUUR)
-            || $this->identity->member_in_committee(COMMISSIE_EASY)
+        return $this->identity->member_in_committee(DataModelCommissie::BOARD)
+            || $this->identity->member_in_committee(DataModelCommissie::WEBCIE)
             || $this->identity->get('id') == $comment['member_id']
         ;
     }

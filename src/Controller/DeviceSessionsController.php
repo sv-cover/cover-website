@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelSession;
 use App\Exception\UnauthorizedException;
 use App\Form\DeviceSessionType;
@@ -26,7 +27,7 @@ class DeviceSessionsController extends AbstractController
     #[Route('/sessions/device', name: 'device_sessions.list', methods: ['GET'])]
     public function list(Authentication $auth): Response
     {
-        if (!$auth->getIdentity()->member_in_committee(COMMISSIE_EASY))
+        if (!$auth->getIdentity()->member_in_committee(DataModelCommissie::WEBCIE))
             throw new UnauthorizedException();
 
         $iters = $this->model->find(['type' => 'device']);

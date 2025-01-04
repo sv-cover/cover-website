@@ -34,9 +34,9 @@ class PageController extends AbstractController
     {
         $identity = $auth->getIdentity();
         if (
-            !$identity->member_in_committee(COMMISSIE_BESTUUR)
-            && !$identity->member_in_committee(COMMISSIE_KANDIBESTUUR)
-            && !$identity->member_in_committee(COMMISSIE_EASY)
+            !$identity->member_in_committee(DataModelCommissie::BOARD)
+            && !$identity->member_in_committee(DataModelCommissie::CANDY)
+            && !$identity->member_in_committee(DataModelCommissie::WEBCIE)
         )
             return $this->redirectToRoute('homepage'); // we don't have a public index/sitemap
 
@@ -63,7 +63,7 @@ class PageController extends AbstractController
     public function create(Request $request): Response|RedirectResponse
     {
         $iter = $this->model->new_iter([
-            'committee_id' => COMMISSIE_BESTUUR,
+            'committee_id' => DataModelCommissie::BOARD,
         ]);
 
         if (!$this->policy->userCanCreate($iter))
@@ -132,24 +132,24 @@ class PageController extends AbstractController
             'differences' => $differences,
         ];
 
-        $isInBoard = $identity->member_in_committee(COMMISSIE_BESTUUR);
+        $isInBoard = $identity->member_in_committee(DataModelCommissie::BOARD);
         $isInCommittee = $identity->member_in_committee($iter['committee_id']);
 
         $to = [];
         if (!$isInCommittee && $isInBoard) {
             /* Bestuur changed something, notify commissie */
-            $context['committee_name'] = $this->committeeModel->get_naam(COMMISSIE_BESTUUR);
+            $context['committee_name'] = $this->committeeModel->get_naam(DataModelCommissie::BOARD);
             $to = [$this->committeeModel->get_email($iter['committee_id'])];
         } elseif (!$isInBoard && $isInCommittee) {
             /* Commissie changed something, notify bestuur */
             $context['committee_name'] = $this->committeeModel->get_naam($iter['committee_id']);
-            $to = [$this->committeeModel->get_email(COMMISSIE_BESTUUR)];
+            $to = [$this->committeeModel->get_email(DataModelCommissie::BOARD)];
         } else {
             /* AC/DCee changed something, notify bestuur and commissie */
-            $context['committee_name'] = $this->committeeModel->get_naam(COMMISSIE_EASY);
+            $context['committee_name'] = $this->committeeModel->get_naam(DataModelCommissie::WEBCIE);
             $to = [
                 $this->committeeModel->get_email($iter['committee_id']),
-                $this->committeeModel->get_email(COMMISSIE_BESTUUR)
+                $this->committeeModel->get_email(DataModelCommissie::BOARD)
             ];
         }
 

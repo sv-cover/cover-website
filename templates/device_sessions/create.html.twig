@@ -4,7 +4,7 @@
 
 {% block content %}
 <header class="block">
-    {% if auth.identity.is_member and auth.identity.member_in_committee(constant('COMMISSIE_EASY')) %}
+    {% if auth.identity.is_member and auth.identity.member_in_committee(constant('App\\DataModel\\DataModelCommissie::WEBCIE')) %}
         <nav class="level is-mobile">
             <div class="level-left">
                 <a href="{{ path('device_sessions.list') }}" class="level-item button">
@@ -42,7 +42,7 @@
         <p>
             {{ __("You're currently logged in as a member (%s), so you can't create a device session on this device. Please logout first.")|format(auth.identity.member.full_name) }}
         </p>
-        {% if auth.identity.member_in_committee(constant('COMMISSIE_EASY')) %}
+        {% if auth.identity.member_in_committee(constant('App\\DataModel\\DataModelCommissie::WEBCIE')) %}
             <p>
                 {{ __("Want to create a device session on an other device? Simply open %s on it and follow the instructions.")|e|format('<a href="%s">%1$s</a>'|format(url('device_sessions.create')))|raw }}
             </p>

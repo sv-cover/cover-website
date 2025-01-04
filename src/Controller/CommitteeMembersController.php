@@ -21,8 +21,8 @@ class CommitteeMembersController extends AbstractController
         #[MapQueryParameter] ?string $type = null
     ): Response
     {
-        if (!$auth->getIdentity()->member_in_committee(COMMISSIE_BESTUUR)
-            && !$auth->getIdentity()->member_in_committee(COMMISSIE_KANDIBESTUUR))
+        if (!$auth->getIdentity()->member_in_committee(DataModelCommissie::BOARD)
+            && !$auth->getIdentity()->member_in_committee(DataModelCommissie::CANDY))
             throw new UnauthorizedException();
 
         $type_id = in_array($type, DataModelCommissie::TYPE_OPTIONS)

@@ -5,6 +5,7 @@ namespace App\Policy;
 use App\DataIter\DataIterPhotobook;
 use App\DataIter\DataIterFacesPhotobook;
 use App\DataIter\DataIterRootPhotobook;
+use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelPhotobook;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
@@ -66,7 +67,7 @@ class PolicyPhotobook implements PolicyInterface
 
     public function userCanCreate(DataIter $book): bool
     {
-        return $this->identity->member_in_committee(COMMISSIE_FOTOCIE)
+        return $this->identity->member_in_committee(DataModelCommissie::PHOTOCEE)
             && ctype_digit((string) $book['parent_id']); // no generated photobook
     }
 
@@ -84,7 +85,7 @@ class PolicyPhotobook implements PolicyInterface
 
         // Member-specific albums are forbidden if one of the members has marked their photo* as hidden
         // or if their whole profile has been made inaccessible
-        if ($book instanceof DataIterFacesPhotobook && !$this->identity->member_in_committee(COMMISSIE_BESTUUR))
+        if ($book instanceof DataIterFacesPhotobook && !$this->identity->member_in_committee(DataModelCommissie::BOARD))
             foreach ($book['members'] as $member)
                 if (!$this->policyMember->userCanRead($member) || $member->is_private('foto', true))
                     return false;
@@ -107,7 +108,7 @@ class PolicyPhotobook implements PolicyInterface
 
     public function userCanUpdate(DataIter $book): bool
     {
-        return $this->identity->member_in_committee(COMMISSIE_FOTOCIE)
+        return $this->identity->member_in_committee(DataModelCommissie::PHOTOCEE)
             && ctype_digit((string) $book->get_id()) // test whether this isn't a special book, such as the Favorites or Faces albums which are generated
             && $book->get_id() > 0;
     }
@@ -148,7 +149,7 @@ class PolicyPhotobook implements PolicyInterface
 
     public function getAccessLevel()
     {
-        if ($this->identity->member_in_committee(COMMISSIE_FOTOCIE))
+        if ($this->identity->member_in_committee(DataModelCommissie::PHOTOCEE))
             return DataModelPhotobook::VISIBILITY_PHOTOCEE;
 
         if ($this->identity->member_in_committee())

@@ -2,6 +2,7 @@
 
 namespace App\Policy;
 
+use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelPartner;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
@@ -25,8 +26,8 @@ class PolicyPartner implements PolicyInterface
 
     public function userCanCreate(DataIter $partner): bool
     {
-        return $this->identity->member_in_committee(COMMISSIE_BESTUUR)
-            || $this->identity->member_in_committee(COMMISSIE_COMEXA);
+        return $this->identity->member_in_committee(DataModelCommissie::BOARD)
+            || $this->identity->member_in_committee(DataModelCommissie::COMEXA);
     }
 
     public function userCanRead(DataIter $partner): bool
@@ -36,8 +37,8 @@ class PolicyPartner implements PolicyInterface
 
     public function userCanUpdate(DataIter $partner): bool
     {
-        return $this->identity->member_in_committee(COMMISSIE_BESTUUR)
-            || $this->identity->member_in_committee(COMMISSIE_COMEXA);
+        return $this->identity->member_in_committee(DataModelCommissie::BOARD)
+            || $this->identity->member_in_committee(DataModelCommissie::COMEXA);
     }
 
     public function userCanDelete(DataIter $partner): bool

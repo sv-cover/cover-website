@@ -3,6 +3,7 @@
 namespace App\Policy;
 
 use App\DataModel\DataModelBesturen;
+use App\DataModel\DataModelCommissie;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Policy\PolicyInterface;
@@ -25,7 +26,7 @@ class PolicyBesturen implements PolicyInterface
 
     public function userCanCreate(DataIter $board): bool
     {
-        return $this->identity->member_in_committee(COMMISSIE_BESTUUR);
+        return $this->identity->member_in_committee(DataModelCommissie::BOARD);
     }
 
     public function userCanRead(DataIter $board): bool
@@ -35,7 +36,7 @@ class PolicyBesturen implements PolicyInterface
 
     public function userCanUpdate(DataIter $board): bool
     {
-        return $this->identity->member_in_committee(COMMISSIE_BESTUUR);
+        return $this->identity->member_in_committee(DataModelCommissie::BOARD);
     }
 
     public function userCanDelete(DataIter $board): bool

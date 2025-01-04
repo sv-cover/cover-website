@@ -2,6 +2,7 @@
 
 namespace App\Policy;
 
+use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelSignUpEntry;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
@@ -40,7 +41,10 @@ class PolicySignUpEntry implements PolicyInterface
     public function userCanRead(DataIter $entry): bool
     {
         // Board can read & update them
-        if ($this->identity->member_in_committee(COMMISSIE_BESTUUR) || $this->identity->member_in_committee(COMMISSIE_KANDIBESTUUR))
+        if (
+            $this->identity->member_in_committee(DataModelCommissie::BOARD)
+            || $this->identity->member_in_committee(DataModelCommissie::CANDY)
+        )
             return true;
 
         // and of course the committee of the form can
@@ -57,7 +61,10 @@ class PolicySignUpEntry implements PolicyInterface
     public function userCanUpdate(DataIter $entry): bool
     {
         // Board can read & update them
-        if ($this->identity->member_in_committee(COMMISSIE_BESTUUR) || $this->identity->member_in_committee(COMMISSIE_KANDIBESTUUR))
+        if (
+            $this->identity->member_in_committee(DataModelCommissie::BOARD)
+            || $this->identity->member_in_committee(DataModelCommissie::CANDY)
+        )
             return true;
 
         // and of course the committee of the form can
@@ -77,7 +84,10 @@ class PolicySignUpEntry implements PolicyInterface
         if ($this->identity->member_in_committee($entry['form']['committee_id']))
             return true;
 
-        if ($this->identity->member_in_committee(COMMISSIE_BESTUUR) || $this->identity->member_in_committee(COMMISSIE_KANDIBESTUUR))
+        if (
+            $this->identity->member_in_committee(DataModelCommissie::BOARD)
+            || $this->identity->member_in_committee(DataModelCommissie::CANDY)
+        )
             return true;
 
         return false;

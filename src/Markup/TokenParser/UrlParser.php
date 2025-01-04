@@ -107,7 +107,7 @@ class UrlParser extends AbstractTokenParser implements TagParserInterface, Token
         $host = \parse_url($url, \PHP_URL_HOST);
         $isExternal = (
             $host !== null
-            && $host != \parse_url($this->params->get('default_uri'), \PHP_URL_HOST) // TODO SFY: ROOT_DIR_URI
+            && $host != \parse_url($this->params->get('default_uri'), \PHP_URL_HOST)
         );
         return $this->twig->render('markup/_link.html.twig', [
             'content' => $content,

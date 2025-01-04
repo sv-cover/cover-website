@@ -20,7 +20,6 @@ else
     error_reporting(E_ALL);
 
 require_once 'src/Legacy/proxies.php';
-require_once 'src/Legacy/constants.php';
 
 /* Initialize session */
 // TODO SFY can we do without starting the session?

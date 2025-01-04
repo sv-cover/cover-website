@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelConfiguratie;
 use App\Service\Authentication;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -227,9 +228,9 @@ class Menu
             'items' => []
         ];
 
-        if ($identity->member_in_committee(COMMISSIE_BESTUUR) ||
-            $identity->member_in_committee(COMMISSIE_KANDIBESTUUR) ||
-            $identity->member_in_committee(COMMISSIE_EASY))
+        if ($identity->member_in_committee(DataModelCommissie::BOARD) ||
+            $identity->member_in_committee(DataModelCommissie::CANDY) ||
+            $identity->member_in_committee(DataModelCommissie::WEBCIE))
             $menu['admin']['label'] = __('Admin');
 
         if ($identity->member_in_committee()) { // Member in any committee at all
@@ -287,9 +288,9 @@ class Menu
             ];
         }
 
-        if ($identity->member_in_committee(COMMISSIE_BESTUUR) ||
-            $identity->member_in_committee(COMMISSIE_KANDIBESTUUR) ||
-            $identity->member_in_committee(COMMISSIE_EASY)) {
+        if ($identity->member_in_committee(DataModelCommissie::BOARD) ||
+            $identity->member_in_committee(DataModelCommissie::CANDY) ||
+            $identity->member_in_committee(DataModelCommissie::WEBCIE)) {
             $menu['admin']['items'][] = [
                 'icon' => [
                     'fa' => 'fas fa-file-alt',
@@ -313,8 +314,8 @@ class Menu
             ];
         }
 
-        if ($identity->member_in_committee(COMMISSIE_BESTUUR) ||
-            $identity->member_in_committee(COMMISSIE_KANDIBESTUUR)) {
+        if ($identity->member_in_committee(DataModelCommissie::BOARD) ||
+            $identity->member_in_committee(DataModelCommissie::CANDY)) {
             $menu['admin']['items'][] = [
                 'label' => __('Active members'),
                 'title' => __('All active committee members according to the website.'),
@@ -338,7 +339,7 @@ class Menu
         }
 
 
-        if ($identity->member_in_committee(COMMISSIE_EASY)) {
+        if ($identity->member_in_committee(DataModelCommissie::WEBCIE)) {
             $menu['admin']['items'][] = [
                 'label' => __('Device sessions'),
                 'title' => __('Manage device sessions.'),

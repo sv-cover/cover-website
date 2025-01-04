@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\DataIter\DataIterSignupForm;
+use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelSignUpField;
 use App\DataModel\DataModelSignUpForm;
 use App\Exception\UnauthorizedException;
@@ -38,7 +39,10 @@ class SignUpFormsController extends AbstractController
         if (!$identity->get('committees'))
             throw new UnauthorizedException('Only committee members may create and manage forms.');
 
-        if ($identity->member_in_committee(COMMISSIE_BESTUUR) || $identity->member_in_committee(COMMISSIE_KANDIBESTUUR))
+        if (
+            $identity->member_in_committee(DataModelCommissie::BOARD)
+            || $identity->member_in_committee(DataModelCommissie::CANDY)
+        )
             $forms = $this->model->get();
         else
             $forms = $this->model->find(['committee_id__in' => $identity->get('committees')]);

@@ -2,6 +2,7 @@
 
 namespace App\Policy;
 
+use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelMember;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
@@ -36,12 +37,17 @@ class PolicyMember implements PolicyInterface
             return true;
 
         // You can see members, honourary members and donors
-        if (in_array($iter['type'], [MEMBER_STATUS_LID, MEMBER_STATUS_ERELID, MEMBER_STATUS_DONATEUR]))
+        $allowedStatuses = [
+            DataModelMember::STATUS_LID,
+            DataModelMember::STATUS_ERELID,
+            DataModelMember::STATUS_DONATEUR,
+        ];
+        if (in_array($iter['type'], $allowedStatuses))
             return true;
 
         // And only the board can see the rest.
-        return $this->identity->member_in_committee(COMMISSIE_BESTUUR)
-            || $this->identity->member_in_committee(COMMISSIE_KANDIBESTUUR);
+        return $this->identity->member_in_committee(DataModelCommissie::BOARD)
+            || $this->identity->member_in_committee(DataModelCommissie::CANDY);
     }
 
     public function userCanUpdate(DataIter $iter): bool
@@ -49,9 +55,9 @@ class PolicyMember implements PolicyInterface
         if ($iter['id'] == $this->identity->get('id'))
             return true;
 
-        return $this->identity->member_in_committee(COMMISSIE_BESTUUR)
-            || $this->identity->member_in_committee(COMMISSIE_KANDIBESTUUR)
-            || $this->identity->member_in_committee(COMMISSIE_EASY);
+        return $this->identity->member_in_committee(DataModelCommissie::BOARD)
+            || $this->identity->member_in_committee(DataModelCommissie::CANDY)
+            || $this->identity->member_in_committee(DataModelCommissie::WEBCIE);
     }
 
     public function userCanDelete(DataIter $iter): bool

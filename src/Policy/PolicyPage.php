@@ -2,6 +2,7 @@
 
 namespace App\Policy;
 
+use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelPage;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
@@ -25,9 +26,9 @@ class PolicyPage implements PolicyInterface
 
     public function userCanCreate(DataIter $editable): bool
     {
-        return $this->identity->member_in_committee(COMMISSIE_BESTUUR)
-            || $this->identity->member_in_committee(COMMISSIE_KANDIBESTUUR)
-            || $this->identity->member_in_committee(COMMISSIE_EASY);
+        return $this->identity->member_in_committee(DataModelCommissie::BOARD)
+            || $this->identity->member_in_committee(DataModelCommissie::CANDY)
+            || $this->identity->member_in_committee(DataModelCommissie::WEBCIE);
     }
 
     public function userCanRead(DataIter $editable): bool
@@ -44,15 +45,15 @@ class PolicyPage implements PolicyInterface
         // but pages such as study information could also be editable by members
         // of both the BookCee, StudCee, and other study-related groups?
         return $this->identity->member_in_committee($editable['committee_id'])
-            || $this->identity->member_in_committee(COMMISSIE_BESTUUR)
-            || $this->identity->member_in_committee(COMMISSIE_KANDIBESTUUR)
-            || $this->identity->member_in_committee(COMMISSIE_EASY);
+            || $this->identity->member_in_committee(DataModelCommissie::BOARD)
+            || $this->identity->member_in_committee(DataModelCommissie::CANDY)
+            || $this->identity->member_in_committee(DataModelCommissie::WEBCIE);
     }
 
     public function userCanDelete(DataIter $editable): bool
     {
         // (I don't trust the candidate board enough yet to give them destructive powers!)
-        return $this->identity->member_in_committee(COMMISSIE_BESTUUR)
-            || $this->identity->member_in_committee(COMMISSIE_EASY);
+        return $this->identity->member_in_committee(DataModelCommissie::BOARD)
+            || $this->identity->member_in_committee(DataModelCommissie::WEBCIE);
     }
 }

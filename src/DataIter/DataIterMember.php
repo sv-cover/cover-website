@@ -2,6 +2,7 @@
 
 namespace App\DataIter;
 
+use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelMember;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Database\SearchResultInterface;
@@ -150,8 +151,8 @@ class DataIterMember extends DataIter implements SearchResultInterface
         if (
             !$ignorePrivacy
             && !$isSelf
-            && !$identity->member_in_committee(COMMISSIE_BESTUUR)
-            && !$identity->member_in_committee(COMMISSIE_KANDIBESTUUR)
+            && !$identity->member_in_committee(DataModelCommissie::BOARD)
+            && !$identity->member_in_committee(DataModelCommissie::CANDY)
             && $this->is_private('naam')
         )
             return __('Anonymous');

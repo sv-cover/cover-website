@@ -54,9 +54,9 @@ class CommitteeChoiceLoader implements ChoiceLoaderInterface
 
     public function filterCommittees($value) {
         if (
-            $this->auth->identity->member_in_committee(COMMISSIE_BESTUUR)
-            || $this->auth->identity->member_in_committee(COMMISSIE_KANDIBESTUUR)
-            || $this->auth->identity->member_in_committee(COMMISSIE_EASY)
+            $this->auth->identity->member_in_committee(DataModelCommissie::BOARD)
+            || $this->auth->identity->member_in_committee(DataModelCommissie::CANDY)
+            || $this->auth->identity->member_in_committee(DataModelCommissie::WEBCIE)
         )
             return true;
 

@@ -3,6 +3,7 @@
 namespace App\Policy;
 
 use App\DataModel\DataModelAgenda;
+use App\DataModel\DataModelCommissie;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Policy\PolicyInterface;
@@ -34,8 +35,8 @@ class PolicyAgenda implements PolicyInterface
         // Only board, candidate board, and the creators of new agenda items can
         // read them when they are not yet confirmed by the board.
         if ($event->is_proposal())
-            return $this->identity->member_in_committee(COMMISSIE_BESTUUR)
-                || $this->identity->member_in_committee(COMMISSIE_KANDIBESTUUR)
+            return $this->identity->member_in_committee(DataModelCommissie::BOARD)
+                || $this->identity->member_in_committee(DataModelCommissie::CANDY)
                 || $this->identity->member_in_committee($event->get('committee_id'));
 
         // Private agenda items can only be seen by people who could attend it
@@ -55,7 +56,10 @@ class PolicyAgenda implements PolicyInterface
             return false;
 
         // Board and candidate board can always update agenda items
-        if ($this->identity->member_in_committee(COMMISSIE_BESTUUR) || $this->identity->member_in_committee(COMMISSIE_KANDIBESTUUR))
+        if (
+            $this->identity->member_in_committee(DataModelCommissie::BOARD)
+            || $this->identity->member_in_committee(DataModelCommissie::CANDY)
+        )
             return true;
 
         // And committee members may update their own agenda items of course
@@ -77,7 +81,7 @@ class PolicyAgenda implements PolicyInterface
             return false;
 
         // And only board and candidate board may moderate
-        return $this->identity->member_in_committee(COMMISSIE_BESTUUR)
-            || $this->identity->member_in_committee(COMMISSIE_KANDIBESTUUR);
+        return $this->identity->member_in_committee(DataModelCommissie::BOARD)
+            || $this->identity->member_in_committee(DataModelCommissie::CANDY);
     }
 }

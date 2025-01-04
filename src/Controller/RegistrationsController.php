@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelMember;
 use App\DataModel\DataModelPage;
 use App\Exception\NotFoundException;
@@ -255,9 +256,9 @@ class RegistrationsController extends AbstractController
     #[Route('/registrations', name: 'registrations.pending.list', methods: ['GET', 'POST'])]
     public function pendingList(Authentication $auth, Request $request, Secretary $secretary): Response
     {
-        if (!$auth->getIdentity()->member_in_committee(COMMISSIE_BESTUUR) &&
-            !$auth->getIdentity()->member_in_committee(COMMISSIE_KANDIBESTUUR) &&
-            !$auth->getIdentity()->member_in_committee(COMMISSIE_EASY))
+        if (!$auth->getIdentity()->member_in_committee(DataModelCommissie::BOARD) &&
+            !$auth->getIdentity()->member_in_committee(DataModelCommissie::CANDY) &&
+            !$auth->getIdentity()->member_in_committee(DataModelCommissie::WEBCIE))
             throw new UnauthorizedException();
 
         $registrationsQuery = <<<SQL
@@ -345,9 +346,9 @@ class RegistrationsController extends AbstractController
     #[Route('/registrations/{token}', name: 'registrations.pending.update', methods: ['GET', 'POST'])]
     public function pendingUpdate(string $token, Authentication $auth, Request $request): Response|RedirectResponse
     {
-        if (!$auth->getIdentity()->member_in_committee(COMMISSIE_BESTUUR) &&
-            !$auth->getIdentity()->member_in_committee(COMMISSIE_KANDIBESTUUR) &&
-            !$auth->getIdentity()->member_in_committee(COMMISSIE_EASY))
+        if (!$auth->getIdentity()->member_in_committee(DataModelCommissie::BOARD) &&
+            !$auth->getIdentity()->member_in_committee(DataModelCommissie::CANDY) &&
+            !$auth->getIdentity()->member_in_committee(DataModelCommissie::WEBCIE))
             throw new UnauthorizedException();
 
         // Load data

@@ -137,7 +137,6 @@
                 {% if book.id is same as (0) %}
                     <div class="description">
                         {# introduction to the Photo book page, only visible in the root book #}
-                        {# TODO SFY: configure photocee login. constant('COMMISSIE_FOTOCIE') doesn't cut it anymore #}
                         <p>{{ __('Welcome to Cover’s photo book, which is maintained by the %s. Please inform the PhotoCee when you made photos at an activity so they can add them to the photo book.')|e|format(
                             '<a href="' ~ path('committees.single', {slug: 'photocee'}) ~'">' ~ __('PhotoCee')  ~ '</a>')|raw }}</p>
                     </div>

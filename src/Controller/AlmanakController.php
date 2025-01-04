@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelMember;
 use App\Exception\UnauthorizedException;
 use App\Form\VacancyType;
@@ -31,8 +32,8 @@ class AlmanakController extends AbstractController
         $iters = \array_filter($iters, [$this->policy, 'userCanRead']);
 
         // Filter out everyone that doesn't want to be found by their name
-        if (!$this->auth->getIdentity()->member_in_committee(\COMMISSIE_BESTUUR)
-            && !$this->auth->getIdentity()->member_in_committee(\COMMISSIE_KANDIBESTUUR))
+        if (!$this->auth->getIdentity()->member_in_committee(DataModelCommissie::BOARD)
+            && !$this->auth->getIdentity()->member_in_committee(DataModelCommissie::CANDY))
             $iters = \array_filter($iters, fn($iter) => !$iter->is_private('naam'));
 
         if ($request->getPreferredFormat() === 'json')
@@ -64,8 +65,8 @@ class AlmanakController extends AbstractController
 
     public function almanakStatus($status): Response
     {
-        if (!$this->auth->getIdentity()->member_in_committee(\COMMISSIE_BESTUUR)
-            && !$this->auth->getIdentity()->member_in_committee(\COMMISSIE_KANDIBESTUUR))
+        if (!$this->auth->getIdentity()->member_in_committee(DataModelCommissie::BOARD)
+            && !$this->auth->getIdentity()->member_in_committee(DataModelCommissie::CANDY))
             throw new UnauthorizedException('You are not allowed to search by status');
 
         $iters = $this->model->get_from_status($status);
@@ -146,7 +147,7 @@ class AlmanakController extends AbstractController
     #[Route('/almanak/export/csv', name: 'almanak.export.csv', methods: ['GET'])]
     public function exportCsv(): StreamedResponse
     {
-        if (!$this->auth->getIdentity()->member_in_committee(\COMMISSIE_ALMANAKCIE))
+        if (!$this->auth->getIdentity()->member_in_committee(DataModelCommissie::YEARBOOKCEE))
             throw new UnauthorizedException('Only members of the YearbookCee committee are allowed to download these dumps.');
 
         // TODO: Refactor to not need this function - Martijn Luinstra 2024-11
@@ -218,7 +219,7 @@ class AlmanakController extends AbstractController
     #[Route('/almanak/export/photos', name: 'almanak.export.photos', methods: ['GET'])]
     public function exportPhotos(): StreamedResponse
     {
-        if (!$this->auth->getIdentity()->member_in_committee(\COMMISSIE_ALMANAKCIE))
+        if (!$this->auth->getIdentity()->member_in_committee(DataModelCommissie::YEARBOOKCEE))
             throw new UnauthorizedException('Only members of the YearbookCee committee are allowed to download these dumps.');
 
         // Disable PHP's time limit

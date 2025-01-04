@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelMember;
 use App\DataModel\DataModelSession;
 use App\Legacy\Authentication\CookieSessionProvider;
@@ -62,7 +63,7 @@ class Authentication
         else
             $identity = new MemberIdentityProvider($authenticator, $this->memberModel);
 
-        if ($identity->member_in_committee(COMMISSIE_EASY))
+        if ($identity->member_in_committee(DataModelCommissie::WEBCIE))
             $identity = new ImpersonatingIdentityProvider($authenticator, $this->memberModel);
 
         return $identity;

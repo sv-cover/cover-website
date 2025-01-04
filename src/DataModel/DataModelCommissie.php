@@ -27,6 +27,13 @@ class DataModelCommissie extends DataModel implements SearchProviderInterface
         self::TYPE_OTHER => 'group',
     ];
 
+    const BOARD = 0;
+    const CANDY = 30;
+    const WEBCIE = 1;
+    const PHOTOCEE = 7;
+    const COMEXA = 26;
+    const YEARBOOKCEE = 4;
+
     public string $dataiter = DataIterCommissie::class;
     public string $table = 'commissies';
 
@@ -436,7 +443,7 @@ class DataModelCommissie extends DataModel implements SearchProviderInterface
             $conditions .= sprintf(" AND c.type = %d", $type);
 
         if ($include_board)
-            $conditions = sprintf("(%s) OR c.id = %d", $conditions, COMMISSIE_BESTUUR);
+            $conditions = sprintf("(%s) OR c.id = %d", $conditions, self::BOARD);
 
         $row = $this->db->query_first("SELECT c.*
                 FROM commissies c
@@ -463,9 +470,9 @@ class DataModelCommissie extends DataModel implements SearchProviderInterface
     public function get_committee_choices($show_own = true)
     {
         $is_admin = (
-            $this->auth->identity->member_in_committee(COMMISSIE_BESTUUR)
-            || $this->auth->identity->member_in_committee(COMMISSIE_KANDIBESTUUR)
-            || $this->auth->identity->member_in_committee(COMMISSIE_EASY)
+            $this->auth->identity->member_in_committee(self::BOARD)
+            || $this->auth->identity->member_in_committee(self::CANDY)
+            || $this->auth->identity->member_in_committee(self::WEBCIE)
         );
 
         $iters = $this->get(null, true);

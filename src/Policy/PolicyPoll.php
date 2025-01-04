@@ -2,6 +2,7 @@
 
 namespace App\Policy;
 
+use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelPoll;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
@@ -58,8 +59,8 @@ class PolicyPoll implements PolicyInterface
             return false;
 
         // User owns it or board/acdcee
-        return $this->identity->member_in_committee(COMMISSIE_BESTUUR)
-            || $this->identity->member_in_committee(COMMISSIE_EASY)
+        return $this->identity->member_in_committee(DataModelCommissie::BOARD)
+            || $this->identity->member_in_committee(DataModelCommissie::WEBCIE)
             || ($poll['committee_id'] !== null && $this->identity->member_in_committee($poll['committee_id']))
             || ($poll['committee_id'] === null && $this->identity->get('id') == $poll['member_id'])
         ;
@@ -84,8 +85,8 @@ class PolicyPoll implements PolicyInterface
 
     public function userCanReopen(DataIter $poll): bool
     {
-        return $this->identity->member_in_committee(COMMISSIE_BESTUUR)
-            || $this->identity->member_in_committee(COMMISSIE_EASY);
+        return $this->identity->member_in_committee(DataModelCommissie::BOARD)
+            || $this->identity->member_in_committee(DataModelCommissie::WEBCIE);
     }
 
     public function userCanLike(DataIter $poll): bool

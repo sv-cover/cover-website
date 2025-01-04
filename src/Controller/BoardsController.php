@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\DataModel\DataModelBesturen;
+use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelPage;
 use App\Exception\UnauthorizedException;
 use App\Form\BoardType;
@@ -50,7 +51,7 @@ class BoardsController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $page = $this->pageModel->new_iter([
-                'committee_id' => \COMMISSIE_BESTUUR,
+                'committee_id' => DataModelCommissie::BOARD,
                 'titel' => $iter['naam']
             ]);
 

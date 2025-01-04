@@ -1,6 +1,7 @@
 <?php
 namespace App\Form;
 
+use App\DataModel\DataModelCommissie;
 use App\Form\Type\FilemanagerFileType;
 use App\Form\Type\CommitteeIdType;
 use App\Form\Type\MarkupType;
@@ -74,14 +75,14 @@ class PageType extends AbstractType
 
     public function canSetTitel(DataIter $iter)
     {
-        return !$iter->has_id() || $this->auth->getIdentity()->member_in_committee(COMMISSIE_EASY);
+        return !$iter->has_id() || $this->auth->getIdentity()->member_in_committee(DataModelCommissie::WEBCIE);
     }
 
     public function canSetCommitteeId(DataIter $iter)
     {
         return !$iter->has_id()
-            || $this->auth->getIdentity()->member_in_committee(COMMISSIE_BESTUUR)
-            || $this->auth->getIdentity()->member_in_committee(COMMISSIE_KANDIBESTUUR)
-            || $this->auth->getIdentity()->member_in_committee(COMMISSIE_EASY);
+            || $this->auth->getIdentity()->member_in_committee(DataModelCommissie::BOARD)
+            || $this->auth->getIdentity()->member_in_committee(DataModelCommissie::CANDY)
+            || $this->auth->getIdentity()->member_in_committee(DataModelCommissie::WEBCIE);
     }
 }

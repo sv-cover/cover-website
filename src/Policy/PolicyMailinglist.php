@@ -3,6 +3,7 @@
 namespace App\Policy;
 
 use App\DataIter\DataIterMailinglist;
+use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelMailinglist;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
@@ -27,17 +28,17 @@ class PolicyMailinglist implements PolicyInterface
     public function userCanCreate(DataIter $iter): bool
     {
         // Only AC/DCee members can create a mailing list
-        return $this->identity->member_in_committee(COMMISSIE_EASY);
-        // return $this->identity->member_in_committee(COMMISSIE_BESTUUR)
-        //  || $this->identity->member_in_committee(COMMISSIE_KANDIBESTUUR)
-        //  || $this->identity->member_in_committee(COMMISSIE_EASY);
+        return $this->identity->member_in_committee(DataModelCommissie::WEBCIE);
+        // return $this->identity->member_in_committee(DataModelCommissie::BOARD)
+        //  || $this->identity->member_in_committee(DataModelCommissie::CANDY)
+        //  || $this->identity->member_in_committee(DataModelCommissie::WEBCIE);
     }
 
     public function userCanRead(DataIter $iter): bool
     {
-        return $this->identity->member_in_committee(COMMISSIE_BESTUUR)
-            || $this->identity->member_in_committee(COMMISSIE_KANDIBESTUUR)
-            || $this->identity->member_in_committee(COMMISSIE_EASY)
+        return $this->identity->member_in_committee(DataModelCommissie::BOARD)
+            || $this->identity->member_in_committee(DataModelCommissie::CANDY)
+            || $this->identity->member_in_committee(DataModelCommissie::WEBCIE)
             || $this->identity->member_in_committee($iter['commissie']);
     }
 
@@ -93,7 +94,7 @@ class PolicyMailinglist implements PolicyInterface
         if ($this->identity->member_in_committee($list['commissie']))
             return true;
 
-        if ($this->identity->member_in_committee(COMMISSIE_EASY))
+        if ($this->identity->member_in_committee(DataModelCommissie::WEBCIE))
             return true;
 
         return false;

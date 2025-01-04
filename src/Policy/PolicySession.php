@@ -2,6 +2,7 @@
 
 namespace App\Policy;
 
+use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelSession;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
@@ -36,14 +37,14 @@ class PolicySession implements PolicyInterface
             return true;
 
         // WebCie can see all sessions
-        return $this->identity->member_in_committee(COMMISSIE_EASY);
+        return $this->identity->member_in_committee(DataModelCommissie::WEBCIE);
     }
 
     public function userCanUpdate(DataIter $session): bool
     {
         // Only AC/DCee can update sessions, and only device sessions.
         return $session['type'] === 'device'
-            && $this->identity->member_in_committee(COMMISSIE_EASY);
+            && $this->identity->member_in_committee(DataModelCommissie::WEBCIE);
     }
 
     public function userCanDelete(DataIter $session): bool

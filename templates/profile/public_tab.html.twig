@@ -5,7 +5,7 @@
     {% if
         visibility == constant('App\\DataModel\\DataModelMember::VISIBLE_TO_EVERYONE')
         or (visibility == constant('App\\DataModel\\DataModelMember::VISIBLE_TO_MEMBERS') and auth.identity.is_member)
-        or auth.identity.member_in_committee(constant('COMMISSIE_BESTUUR'))
+        or auth.identity.member_in_committee(constant('App\\DataModel\\DataModelCommissie::BOARD'))
     %}
         <div class="profile-field">
             <div class="field-label">

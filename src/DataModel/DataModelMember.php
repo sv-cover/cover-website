@@ -3,6 +3,7 @@
 namespace App\DataModel;
 
 use App\DataIter\DataIterMember;
+use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelProfilePicture;
 use App\Exception\InactiveMemberException;
 use App\Legacy\Database\DataIter;
@@ -411,8 +412,8 @@ class DataModelMember extends DataModel implements SearchProviderInterface
         // Except when you are the board! The board can do anything!
         // All hail the Board!
         // Hail AC/DCee too!
-        if (!$this->auth->identity->member_in_committee(COMMISSIE_BESTUUR)
-            && !$this->auth->identity->member_in_committee(COMMISSIE_KANDIBESTUUR))
+        if (!$this->auth->identity->member_in_committee(DataModelCommissie::BOARD)
+            && !$this->auth->identity->member_in_committee(DataModelCommissie::CANDY))
             $members = array_filter($members, function($member) {
                 return !$this->is_private($member, 'naam');
             });
@@ -450,8 +451,8 @@ class DataModelMember extends DataModel implements SearchProviderInterface
     {
         if (
             $all
-            || $this->auth->identity->member_in_committee(COMMISSIE_BESTUUR)
-            || $this->auth->identity->member_in_committee(COMMISSIE_KANDIBESTUUR)
+            || $this->auth->identity->member_in_committee(DataModelCommissie::BOARD)
+            || $this->auth->identity->member_in_committee(DataModelCommissie::CANDY)
         )
             $query = "SELECT DISTINCT beginjaar
                     FROM leden

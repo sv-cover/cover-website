@@ -10,7 +10,7 @@
         <h1 class="title">{{ __('Members (Almanac)') }}</h1>
     </div>
     <div class="level-right">
-        {% if iters is null and auth.identity.member_in_committee(constant('COMMISSIE_ALMANAKCIE')) %}
+        {% if iters is null and auth.identity.member_in_committee(constant('App\\DataModel\\DataModelCommissie::YEARBOOKCEE')) %}
             <div class="dropdown is-right">
                 <div class="dropdown-trigger">
                     <button class="button" aria-haspopup="true" aria-controls="export-menu">
@@ -66,21 +66,21 @@
             </div>
         </div>
 
-        {% if auth.identity.member_in_committee(constant('COMMISSIE_BESTUUR')) or auth.identity.member_in_committee(constant('COMMISSIE_KANDIBESTUUR')) %}
+        {% if auth.identity.member_in_committee(constant('App\\DataModel\\DataModelCommissie::BOARD')) or auth.identity.member_in_committee(constant('App\\DataModel\\DataModelCommissie::CANDY')) %}
         {% set status = app.request.query.getInt('status') %}
         <div class="field">
             <div class="control">
                 <div class="is-sr-only">{{ __('Filter membership status') }}</div>
                 <div class="tabs is-toggle" id="status">
                     <ul>
-                        <li class="{% if status == constant('MEMBER_STATUS_LID') %}is-active{% endif %}">
-                            <a href="{{ path('almanak', {status: constant('MEMBER_STATUS_LID')}) }}">{{ __('Member') }}</a>
+                        <li class="{% if status == constant('App\\DataModel\\DataModelMember::STATUS_LID') %}is-active{% endif %}">
+                            <a href="{{ path('almanak', {status: constant('App\\DataModel\\DataModelMember::STATUS_LID')}) }}">{{ __('Member') }}</a>
                         </li>
-                        <li class="{% if status == constant('MEMBER_STATUS_LID_AF') %}is-active{% endif %}">
-                            <a href="{{ path('almanak', {status: constant('MEMBER_STATUS_LID_AF')}) }}">{{ __('Former member') }}</a>
+                        <li class="{% if status == constant('App\\DataModel\\DataModelMember::STATUS_LID_AF') %}is-active{% endif %}">
+                            <a href="{{ path('almanak', {status: constant('App\\DataModel\\DataModelMember::STATUS_LID_AF')}) }}">{{ __('Former Member') }}</a>
                         </li>
-                        <li class="{% if status == constant('MEMBER_STATUS_DONATEUR') %}is-active{% endif %}">
-                            <a href="{{ path('almanak', {status: constant('MEMBER_STATUS_DONATEUR')}) }}">{{ __('Contributor') }}</a>
+                        <li class="{% if status == constant('App\\DataModel\\DataModelMember::STATUS_DONATEUR') %}is-active{% endif %}">
+                            <a href="{{ path('almanak', {status: constant('App\\DataModel\\DataModelMember::STATUS_DONATEUR')}) }}">{{ __('Contributor') }}</a>
                         </li>
                     </ul>
                 </div>
@@ -133,7 +133,7 @@
                     </figure>
                     <div class="profile-info">
                         <span class="name">{{ iter.get_full_name(bePersonal: true) }}</span>
-                        {% if iter.type != constant('MEMBER_STATUS_LID') %} {# No need to specify member #}
+                        {% if iter.type != constant('App\\DataModel\\DataModelMember::STATUS_LID') %} {# No need to specify member #}
                             <span class="status">{{ iter.status }}</span>
                         {% endif %}
                     </div>

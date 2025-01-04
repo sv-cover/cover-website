@@ -3,6 +3,7 @@
 namespace App\Policy;
 
 use App\DataModel\DataModelAnnouncement;
+use App\DataModel\DataModelCommissie;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
 use App\Legacy\Policy\PolicyInterface;
@@ -27,7 +28,7 @@ class PolicyAnnouncement implements PolicyInterface
     {
         if (isset($announcement['committee_id']))
             return $this->identity->member_in_committee($announcement['committee_id'])
-                || $this->identity->member_in_committee(COMMISSIE_BESTUUR);
+                || $this->identity->member_in_committee(DataModelCommissie::BOARD);
 
         return $this->identity->member_in_committee();
     }
@@ -52,7 +53,7 @@ class PolicyAnnouncement implements PolicyInterface
 
     public function userCanUpdate(DataIter $announcement): bool
     {
-        return $this->identity->member_in_committee(COMMISSIE_BESTUUR)
+        return $this->identity->member_in_committee(DataModelCommissie::BOARD)
             || $this->identity->member_in_committee($announcement['committee_id']);
     }
 

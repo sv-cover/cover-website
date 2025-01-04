@@ -2,6 +2,7 @@
 
 namespace App\Policy;
 
+use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelSticker;
 use App\Legacy\Authentication\IdentityProviderInterface;
 use App\Legacy\Database\DataIter;
@@ -37,7 +38,7 @@ class PolicySticker implements PolicyInterface
     public function userCanUpdate(DataIter $sticker): bool
     {
         // Board can admin the stickers
-        if ($this->identity->member_in_committee(COMMISSIE_BESTUUR))
+        if ($this->identity->member_in_committee(DataModelCommissie::BOARD))
             return true;
 
         // Only the owner can update their stickers

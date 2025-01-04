@@ -28,7 +28,7 @@ class PolicyCommissie implements PolicyInterface
 
     public function userCanCreate(DataIter $committee): bool
     {
-        return $this->identity->member_in_committee(COMMISSIE_BESTUUR);
+        return $this->identity->member_in_committee(DataModelCommissie::BOARD);
     }
 
     public function userCanRead(DataIter $committee): bool
@@ -38,12 +38,12 @@ class PolicyCommissie implements PolicyInterface
 
     public function userCanUpdate(DataIter $committee): bool
     {
-        return $this->identity->member_in_committee(COMMISSIE_BESTUUR)
-            || $this->identity->member_in_committee(COMMISSIE_KANDIBESTUUR);
+        return $this->identity->member_in_committee(DataModelCommissie::BOARD)
+            || $this->identity->member_in_committee(DataModelCommissie::CANDY);
     }
 
     public function userCanDelete(DataIter $committee): bool
     {
-        return $this->identity->member_in_committee(COMMISSIE_BESTUUR);
+        return $this->identity->member_in_committee(DataModelCommissie::BOARD);
     }
 }
