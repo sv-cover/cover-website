@@ -3,7 +3,6 @@
 namespace App\Tests\Markup;
 
 use App\DataModel\DataModelSession;
-use function App\Legacy\init;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\Cookie;
@@ -12,13 +11,12 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 // see https://github.com/symfony/symfony/tree/7.2/src/Symfony/Component/DomCrawler/Test/Constraint
 
 class MailingListTest extends WebTestCase
-{]
+{
     protected ?AbstractBrowser $client;
 
     protected function setUp(): void
     {
         $this->client = static::createClient();
-        init(self::$kernel);
     }
 
     protected function login(): void

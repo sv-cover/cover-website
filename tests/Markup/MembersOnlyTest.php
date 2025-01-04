@@ -6,7 +6,6 @@ use App\DataModel\DataModelSession;
 use App\Markup\Markup;
 use App\Legacy\Authentication\ConstantSessionProvider;
 use App\Service\Authentication;
-use function App\Legacy\init;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Test\Constraint as CC;
@@ -20,7 +19,6 @@ class MembersOnlyTest extends KernelTestCase
     protected function setUp(): void
     {
         self::bootKernel();
-        init(self::$kernel);
         $this->markup = static::getContainer()->get(Markup::class);
         $this->auth = static::getContainer()->get(Authentication::class);
     }

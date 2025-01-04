@@ -3,7 +3,6 @@
 namespace App\Tests\Markup;
 
 use App\Markup\Markup;
-use function App\Legacy\init;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Test\Constraint as CC;
@@ -17,7 +16,6 @@ class MacroTest extends KernelTestCase
     protected function setUp(): void
     {
         self::bootKernel();
-        init(self::$kernel);
         $this->markup = static::getContainer()->get(Markup::class);
     }
 

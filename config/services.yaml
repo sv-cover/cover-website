@@ -64,11 +64,8 @@ services:
             - '../src/DataIter'
             - '../src/functions.php'
 
-    App\Service\Authentication:
-        public: true
-
-    App\Service\Database:
-        public: true
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
 
     App\Service\Filemanager:
         arguments:
@@ -107,13 +104,10 @@ services:
             $track_history: '%db.showQueries%'
 
     App\Legacy\Database\DataModel:
-        abstract:  true
+        abstract: true
         calls:
             - setDb: ['@App\Legacy\Database\DatabasePDO']
 
     App\DataModel\:
         resource: '../src/DataModel'
         parent: App\Legacy\Database\DataModel
-
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones

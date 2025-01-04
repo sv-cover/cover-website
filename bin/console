@@ -14,18 +14,7 @@ if (!is_file(dirname(__DIR__).'/vendor/autoload_runtime.php')) {
 
 require_once dirname(__DIR__).'/vendor/autoload_runtime.php';
 
-//> Old Cover stuff
-
-require_once dirname(__DIR__).'/src/Legacy/init.php';
-
-//< Old Cover stuff
-
-// Make kernel globally available for legacy compatibility
-global $kernel;
-
 return function (array $context) {
-    global $kernel;
-
     $kernel = new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
 
     return new Application($kernel);
