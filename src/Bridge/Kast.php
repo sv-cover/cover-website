@@ -2,6 +2,7 @@
 
 namespace App\Bridge;
 
+use App\DataIter\DataIterMember;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -9,32 +10,39 @@ use Symfony\Component\HttpClient\ScopingHttpClient;
 
 class Kast
 {
-    private HttpClientInterface $client;
+    private HttpClientInterface $_client;
 
     public function __construct(
-        CacheInterface $cache,
-        HttpClientInterface $client,
-        string $url,
-        string $user,
-        string $password,
+        private CacheInterface $cache,
+        private HttpClientInterface $baseClient,
+        private string $url,
+        private string $user,
+        private string $password,
     ) {
-        $token = $cache->get('kast_token', function (ItemInterface $item) use ($client, $url, $user, $password): string {
-            $token = $this->getToken($client, $url, $user, $password);
-            $item->expiresAt(new \DateTime($token['expiry']));
-            return $token['token'];
-        });
-
-        $this->client = ScopingHttpClient::forBaseUri($client, $url, [
-            'headers' => [
-                'Authorization' => 'Token ' . $token,
-            ],
-        ]);
     }
 
-    private function getToken(HttpClientInterface $client, string $url, string $user, string $password): array
+    private function getClient(): HttpClientInterface
     {
-        $response = $client->request('POST', $url . 'auth/login/', [
-            'auth_basic' => [$user, $password],
+        if (!isset($this->_client)) {
+            $token = $this->cache->get('kast_token', function (ItemInterface $item): string {
+                $token = $this->getToken();
+                $item->expiresAt(new \DateTime($token['expiry']));
+                return $token['token'];
+            });
+
+            $this->_client = ScopingHttpClient::forBaseUri($this->baseClient, $this->url, [
+                'headers' => [
+                    'Authorization' => 'Token ' . $token,
+                ],
+            ]);
+        }
+        return $this->_client;
+    }
+
+    private function getToken(): array
+    {
+        $response = $this->baseClient->request('POST', $this->url . 'auth/login/', [
+            'auth_basic' => [$this->user, $this->password],
         ]);
 
         $data = $response->toArray();
@@ -45,21 +53,21 @@ class Kast
         return $data;
     }
 
-    public function getAccount(\DataIterMember $member): array
+    public function getAccount(DataIterMember $member): array
     {
-        $response = $this->client->request('GET', sprintf('users/%d/', $member['id']));
+        $response = $this->getClient()->request('GET', sprintf('users/%d/', $member['id']));
         return $response->toArray();
     }
 
-    public function getStatus(\DataIterMember $member): array
+    public function getStatus(DataIterMember $member): array
     {
-        $response = $this->client->request('GET', sprintf('users/%d/status/', $member['id']));
+        $response = $this->getClient()->request('GET', sprintf('users/%d/status/', $member['id']));
         return $response->toArray();
     }
 
-    public function getHistory(\DataIterMember $member, int $limit = 10): array
+    public function getHistory(DataIterMember $member, int $limit = 10): array
     {
-        $response = $this->client->request('GET', sprintf('users/%d/history/?limit=%d', $member['id'], $limit));
+        $response = $this->getClient()->request('GET', sprintf('users/%d/history/?limit=%d', $member['id'], $limit));
         return $response->toArray();
     }
 }

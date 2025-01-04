@@ -10,7 +10,7 @@ use Symfony\Component\HttpClient\ScopingHttpClient;
 
 class Secretary
 {
-    private HttpClientInterface $client;
+    private HttpClientInterface $_client;
 
     const FIELDS_MAP = [
         'id' => 'id',
@@ -34,41 +34,46 @@ class Secretary
     ];
 
     public function __construct(
-        CacheInterface $cache,
-        HttpClientInterface $client,
+        private CacheInterface $cache,
+        private HttpClientInterface $baseClient,
         private string $url,
-        string $user,
-        string $password,
+        private string $user,
+        private string $password,
     ) {
-        // TODO SFY: reenable
-        // $callback = function (ItemInterface $item) use ($client, $user, $password): string {
-        //     return $this->getToken($client, $user, $password);
-        // };
-
-        // $token = $cache->get('secretary_token', $callback);
-
-        // if (!$this->isValidToken($client, $token)) {
-        //     $cache->delete('secretary_token');
-        //     $token = $cache->get('secretary_token', $callback);
-        // }
-
-        // list($usr, $tkn) = explode(':', $token, 2);
-
-        // $this->client = ScopingHttpClient::forBaseUri($client, $this->url, [
-        //     // 'auth_basic' => explode(':', $token, 2),
-        //     'query' => [
-        //         'user' => $usr,
-        //         'token' => $tkn,
-        //     ],
-        // ]);
     }
 
-    private function getToken(HttpClientInterface $client, string $user, string $password): string
+    private function getClient(): HttpClientInterface
     {
-        $response = $client->request('POST', $this->url . 'token/new.json', [
+        if (!isset($this->_client)) {
+            $callback = function (ItemInterface $item): string {
+                return $this->getToken();
+            };
+
+            $token = $this->cache->get('secretary_token', $callback);
+
+            if (!$this->isValidToken($token)) {
+                $this->cache->delete('secretary_token');
+                $token = $this->cache->get('secretary_token', $callback);
+            }
+
+            [$usr, $tkn] = explode(':', $token, 2);
+
+            $this->_client = ScopingHttpClient::forBaseUri($this->baseClient, $this->url, [
+                'query' => [
+                    'user' => $usr,
+                    'token' => $tkn,
+                ],
+            ]);
+        }
+        return $this->_client;
+    }
+
+    private function getToken(): string
+    {
+        $response = $this->baseClient->request('POST', $this->url . 'token/new.json', [
             'body' => [
-                'username' => $user,
-                'password' => $password
+                'username' => $this->user,
+                'password' => $this->password
             ],
         ]);
 
@@ -80,22 +85,21 @@ class Secretary
         return sprintf('%d:%s', $data['user'], $data['token']);
     }
 
-    private function isValidToken(HttpClientInterface $client, string $userTokenPair): bool
+    private function isValidToken(string $userTokenPair): bool
     {
         if (empty($userTokenPair) || strpos($userTokenPair, ':') === false)
             return false;
 
-        list($user, $token) = explode(':', $userTokenPair, 2);
+        [$user, $token] = explode(':', $userTokenPair, 2);
 
-
-        $response = $client->request('GET', sprintf('%stoken/%s/%d.json', $this->url, $token, $user));
+        $response = $this->baseClient->request('GET', sprintf('%stoken/%s/%d.json', $this->url, $token, $user));
 
         return (bool) $response->toArray()['success'];
     }
 
     public function createPerson(array $data): array
     {
-        $response = $this->client->request('POST', 'persons/new.json', [
+        $response = $this->getClient()->request('POST', 'persons/new.json', [
             'json' => $data,
         ]);
         return $response->toArray();
@@ -103,13 +107,13 @@ class Secretary
 
     public function findPerson(int $person_id): array
     {
-        $response = $this->client->request('GET', 'persons/all.json?id=' . $person_id);
+        $response = $this->getClient()->request('GET', 'persons/all.json?id=' . $person_id);
         return $response->toArray();
     }
 
     public function updatePerson(int $person_id, array $data): array
     {
-        $response = $this->client->request('POST', sprintf('persons/%d.json', $person_id), [
+        $response = $this->getClient()->request('POST', sprintf('persons/%d.json', $person_id), [
             'json' => $data,
         ]);
         return $response->toArray();
