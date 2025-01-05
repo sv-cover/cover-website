@@ -49,8 +49,6 @@
                     <td>{{ session.last_active_on|date('d-m-Y H:i:s') }}</td>
                     <td class="is-sticky is-right has-text-right is-nowrap">
                         <ul class="controls">
-                        {# TODO SFY: spaceless deprecated #}
-                        {% apply spaceless %}
                             {% if policy.userCanDelete(session) %}
                                 <li>
                                     <a href="{{ path('device_sessions.delete', {id: session.id}) }}" title="{{ __('Delete session') }}" aria-label="{{ __('Delete session') }}" data-popup="modal">
@@ -69,7 +67,6 @@
                                     </a>
                                 </li>
                             {% endif %}
-                        {% endapply %}
                         </ul>
                     </td>
                 </tr>

@@ -64,33 +64,30 @@
                 </td>
                 <td class="is-sticky is-right has-text-right is-nowrap">
                     <ul class="controls">
-                        {# TODO SFY: spaceless deprecated #}
-                        {% apply spaceless %}
-                            {% if policy.userCanDelete(partner) %}
-                                <li>
-                                    <a href="{{ path('partners.delete', {id: partner.id}) }}" title="{{ __('Delete partner') }}"  data-popup="modal">
-                                        <span class="icon is-small">
-                                            <i class="fas fa-trash" aria-hidden="true"></i>
-                                        </span>
-                                        <span class="is-sr-only">
-                                            {{ __('Delete partner') }}
-                                        </span>
-                                    </a>
-                                </li>
-                            {% endif %}
-                            {% if policy.userCanUpdate(partner) %}
-                                <li>
-                                    <a href="{{ path('partners.update', {id: partner.id}) }}" title="{{ __('Modify partner') }}">
-                                        <span class="icon is-small">
-                                            <i class="fas fa-pencil-alt" aria-hidden="true"></i>
-                                        </span>
-                                        <span class="is-sr-only">
-                                            {{ __('Modify partner') }}
-                                        </span>
-                                    </a>
-                                </li>
-                            {% endif %}
-                        {% endapply %}
+                        {% if policy.userCanDelete(partner) %}
+                            <li>
+                                <a href="{{ path('partners.delete', {id: partner.id}) }}" title="{{ __('Delete partner') }}"  data-popup="modal">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-trash" aria-hidden="true"></i>
+                                    </span>
+                                    <span class="is-sr-only">
+                                        {{ __('Delete partner') }}
+                                    </span>
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% if policy.userCanUpdate(partner) %}
+                            <li>
+                                <a href="{{ path('partners.update', {id: partner.id}) }}" title="{{ __('Modify partner') }}">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                                    </span>
+                                    <span class="is-sr-only">
+                                        {{ __('Modify partner') }}
+                                    </span>
+                                </a>
+                            </li>
+                        {% endif %}
                     </ul>
                 </td>
             </tr>

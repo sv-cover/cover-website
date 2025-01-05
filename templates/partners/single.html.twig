@@ -91,8 +91,6 @@
                                     <a href="{{ path('vacancies.single', {id: vacancy.id}) }}">
                                         <h4 class="title">{{ vacancy.title }}</h4>
                                         <ul class="properties is-size-7">
-                                        {# TODO SFY: spaceless deprecated #}
-                                        {% apply spaceless %}
                                             <li class="property" title="{{ __('Job type') }}">
                                                 <span class="icon is-small">
                                                     <i class="fas fa-hourglass-half" aria-hidden="true"></i>
@@ -108,7 +106,6 @@
                                                 </span>
                                                 {{ constant('App\\DataModel\\DataModelVacancy::STUDY_PHASE_OPTIONS')[vacancy.study_phase] }}
                                             </li>
-                                        {% endapply %}
                                         </ul>
                                     </a>
                                 </li>

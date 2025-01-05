@@ -8,7 +8,7 @@
 <span class="face-label">
     {%- if face.lid_id is not null -%}
         <a href="{{ path('profile.member', {member_id:  face.lid.id}) }}" data-face-id="{{ face.id }}">
-            {{ face.lid.get_full_name(bePersonal: true) }}
+            {{- face.lid.get_full_name(bePersonal: true) -}}
         </a>
     {%- elseif face.custom_label != '' -%}
         <span class="custom-label" data-face-id="{{ face.id }}">{{ face.custom_label }}</span>
@@ -148,21 +148,18 @@
                 <span class="face-list" data-glue="{{ __('and') }}">
                     {{ _self.format_face_labels(readable_faces, _self) }}
                 </span>
-                {# TODO SFY spaceless deprecated #}
-                {% apply spaceless %}
-                    <template class="face-template">
-                        <span class="face-label">
-                            <a data-label-url hidden></a>
-                            <span data-label-text hidden></span>
-                            <span data-label-other hidden>{{ __('Unknown') }}</span>
-                            <span data-label-unknown hidden>
-                                <span data-count></span>
-                                <span data-singular>&nbsp;{{ __('Unknown') }}</span>
-                                <span data-plural>&nbsp;{{ __('Unknown') }}</span>
-                            </span>
-                        </span>
-                    </template>
-                {% endapply %}
+                <template class="face-template">
+                    <span class="face-label">
+                        <a data-label-url hidden></a>{# whitespace control
+                        #}<span data-label-text hidden></span>{# whitespace control
+                        #}<span data-label-other hidden>{{ __('Unknown') }}</span>{# whitespace control
+                        #}<span data-label-unknown hidden>
+                            <span data-count></span>{# whitespace control
+                            #}<span data-singular>&nbsp;{{ __('Unknown') }}</span>{# whitespace control
+                            #}<span data-plural>&nbsp;{{ __('Unknown') }}</span>
+                        </span>{# whitespace control
+                    #}</span>
+                </template>
             </div>
         {% endif %}
 

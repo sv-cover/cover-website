@@ -40,10 +40,14 @@ body
 
 
 +tablet
-    .footer-main ul li,
-    .footer-main ul li.divider // override default devider margin
-        display: inline-block
-        margin: 0 $column-gap
+    .footer-main ul
+        display: flex
+        flex-flow: row nowrap
+        justify-content: center
+        li,
+        li.divider // override default devider margin
+            display: inline-block
+            margin: 0 $column-gap
 
 .barchart
     width: 100%
@@ -126,10 +130,11 @@ button.card-header-icon
     margin-left: auto
     margin-right: auto
 
-ul.controls li
-    display: inline-block
-    &:not(:last-child)
-        margin-right: 0.75rem
+ul.controls
+    display: flex
+    flex-flow: row nowrap
+    li:not(:last-child)
+            margin-right: 0.75rem
 
 .modal.filemanager
     .modal-card

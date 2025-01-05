@@ -14,7 +14,6 @@
     {% endif %}
 </p>
 <ul class="search-result-meta is-size-7">
-{% apply spaceless %}
     <li class="property" title="{{ __('Job type') }}">
         <span class="icon is-small">
             <i class="fas fa-hourglass-half" aria-hidden="true"></i>
@@ -30,18 +29,15 @@
         </span>
         {{ constant('App\\DataModel\\DataModelVacancy::STUDY_PHASE_OPTIONS')[result.study_phase] }}
     </li>
-{% endapply %}
 </ul>
 <div class="content">
     {% set content = search_utils.excerpt(result.description|strip_markup, resultset.query_parts, 50) %}
     {% if content %}
         {{ content|raw }}
     {% else %}
-        {% apply spaceless %}
-            {{ result.description|strip_markup|slice(0, 150) }}
-            {% if result.description|strip_markup|length > 150 %}
-                <span class="glue">…</span>
-            {% endif %}
-        {% endapply %}
+        {{- result.description|strip_markup|slice(0, 150) -}}
+        {%- if result.description|strip_markup|length > 150 -%}
+            <span class="glue">…</span>
+        {%- endif -%}
     {% endif %}
 </div>

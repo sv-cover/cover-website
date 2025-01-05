@@ -57,7 +57,6 @@
                     </td>
                     <td class="is-sticky is-right has-text-right is-nowrap">
                         <ul class="controls">
-                        {% apply spaceless %}
                             {% if policy.userCanUpdate(form) %}
                                 <li>
                                     <a href="{{ path('sign_up_forms.update', {'id': form.id}) }}" title="{{ __('Modify form') }}">
@@ -80,7 +79,6 @@
                                     </span>
                                 </a>
                             </li>
-                        {% endapply %}
                         </ul>
                     </td>
                 </tr>

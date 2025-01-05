@@ -4,8 +4,6 @@
     {% endif %}
     <div class="footer footer-main">
         <ul>
-        {# TODO SFY: Spaceless deprecated #}
-        {% apply spaceless %}
             <li>
                 <a href="{{ path('slug', {'slug': 'contact'}) }}">{{ __('Contact') }}</a>
             </li>
@@ -23,7 +21,6 @@
                     {{ __('Cancellation Policy')}}
                 </a>
             </li>
-        {% endapply %}
         </ul>
     </div>
 </footer>

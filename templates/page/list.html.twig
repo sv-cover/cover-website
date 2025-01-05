@@ -56,7 +56,6 @@
                 </td>
                 <td class="is-sticky is-right has-text-right is-nowrap">
                     <ul class="controls">
-                    {% apply spaceless %}
                         {% if policy.userCanUpdate(page) %}
                             <li>
                                 <a href="{{ path('page.update', {id: page.id}) }}" title="{{ __('Modify page') }}">
@@ -69,7 +68,6 @@
                                 </a>
                             </li>
                         {% endif %}
-                    {% endapply %}
                     </ul>
                 </td>
             </tr>

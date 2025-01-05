@@ -49,9 +49,9 @@ $vacancy-list-description-max-lines: 3
             color: $text
         ul.properties
             @extend %block
+            display: flex
+            flex-flow: row nowrap
             margin-top: $subtitle-negative-margin
-            li
-                display: inline-block
         .description
             margin-top: $subtitle-negative-margin
             max-height: 1em * $body-line-height * $vacancy-list-description-max-lines
