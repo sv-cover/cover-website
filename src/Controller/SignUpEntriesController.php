@@ -124,11 +124,7 @@ class SignUpEntriesController extends AbstractController
         if (!$this->policy->userCanRead($iter))
             throw new UnauthorizedException('You cannot access this form.');
 
-        $entry = $iter->new_entry();
-        if ($prefill) {
-            $entry['member_id'] = $auth->identity->get('id');
-            $this->manager->prefillEntry($entry);
-        }
+        $entry = $iter->new_entry($prefill);
 
         if (!$this->policy->userCanCreate($entry))
             throw new UnauthorizedException('You cannot create new entries for this form.');

@@ -16,7 +16,6 @@
                 <div class="field">
                     <p>{{ __('Are you sure you want to delete %d photos from the <em>%s</em> photo book?')|format(photos|length, book.titel|e)|raw }}</p>
                 </div>
-                {# TODO SFY? gallery was disabled before #}
                 <div class="delete-photos">
                     {{ gallery(photos, {'book': book}) }}
                 </div>

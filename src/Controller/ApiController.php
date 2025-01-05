@@ -92,12 +92,10 @@ class ApiController extends AbstractController
 
             // GET api.php?method=session_get_member&session_id={session}
             case 'session_get_member':
-                // For legacy reasons a post session id is still accepted but this method should be accessed using a GET request.
                 return $this->sessionGetMember();
 
             // GET api.php?method=session_test_committee&session_id={session}&committee=webcie
             case 'session_test_committee':
-                // Again, legacy reasons.
                 return $this->sessionTestCommittee();
         }
 
@@ -247,9 +245,10 @@ class ApiController extends AbstractController
      * Session
      **************************************************************************/
 
-    // TODO SFY: Deprecate
     private function sessionCreate(): Response
     {
+        trigger_error('The session_create method is deprecated and will be removed in the future.', E_USER_DEPRECATED);
+
         $email = $this->request->getPayload()->get('email');
         $password = $this->request->getPayload()->get('password');
         $application = $this->request->getPayload()->get('application', 'api');
@@ -265,9 +264,10 @@ class ApiController extends AbstractController
         ]]);
     }
 
-    // TODO SFY: Deprecate
     private function sessionDestroy(): Response
     {
+        trigger_error('The session_destroy method is deprecated and will be removed in the future.', E_USER_DEPRECATED);
+
         $sessionId = $this->request->getPayload()->get('session_id');
 
         $session = $this->sessionModel->resume($sessionId);
@@ -278,7 +278,6 @@ class ApiController extends AbstractController
 
     private function sessionGetMember(): Response
     {
-        // TODO SFY: POST data was supported for legacy
         $sessionId = $this->request->query->get('session_id');
 
         $session = $this->sessionModel->resume($sessionId);
@@ -319,7 +318,6 @@ class ApiController extends AbstractController
 
     private function sessionTestCommittee(): Response
     {
-        // TODO SFY: POST data was supported for legacy
         $sessionId = $this->request->query->get('session_id');
 
         try {

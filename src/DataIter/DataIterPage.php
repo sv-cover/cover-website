@@ -26,11 +26,15 @@ class DataIterPage extends DataIter implements SearchResultInterface
 
     public function get_cover_image($width=null)
     {
+        if (empty($this['cover_image_url']))
+            return '';
         return $this->model->filemanager->getFileUrl($this['cover_image_url'], $width);
     }
 
     public function get_cover_image_orientation()
     {
+        if (empty($this['cover_image_url']))
+            return false;
         $size = $this->model->filemanager->getImageSize($this['cover_image_url']);
 
         if (!isset($size))

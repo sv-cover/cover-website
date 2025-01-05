@@ -63,9 +63,9 @@ class DataIterSignUpForm extends DataIter
         return true;
     }
 
-    public function new_entry()
+    public function new_entry(bool $prefill = false)
     {
-        return $this->model->new_entry_for_iter($this);
+        return $this->model->new_entry_for_iter($this, $prefill);
     }
 
     public function get_entries_for_member(DataIterMember $member)

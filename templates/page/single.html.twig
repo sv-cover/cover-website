@@ -2,7 +2,7 @@
 
 {% block title iter.get_title ~ ' – ' ~ parent() %}
 
-{% block ogimage iter.get_cover_image(1200) %}
+{% block ogimage iter.get_cover_image(1200) ?: parent() %}
 
 {% macro render_controls(iter, container_class='') %}
     {% if policy.userCanUpdate(iter) %}

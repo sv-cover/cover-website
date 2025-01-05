@@ -70,8 +70,7 @@
     <div class="profile-information">
         {{ _self.profile_field(iter, 'full_name', __('Name')) }}
         {{ _self.profile_field(iter, 'geboortedatum', __('Birthdate')) }}
-        {# TODO SFY #}
-        {{ _self.profile_field(iter, 'beginjaar', __('Starting year')) }}{# , path('almanak', {'search_year': iter.beginjaar})) }} #}
+        {{ _self.profile_field(iter, 'beginjaar', __('Starting year'), path('almanak', {'year': iter.beginjaar})) }}
         {{ _self.profile_field(iter, 'adres', __('Address'), 'https://www.google.com/maps/search/%s %s/'|format(iter.adres|e('html_attr'), iter.woonplaats|e('html_attr')), true) }}
         {{ _self.profile_field(iter, 'postcode', __('Postal code')) }}
         {{ _self.profile_field(iter, 'woonplaats', __('Town')) }}

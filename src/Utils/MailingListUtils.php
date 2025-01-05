@@ -103,7 +103,6 @@ final class MailingListUtils
         return false;
     }
 
-    // TODO SFY: support Message
     public function sendMessage(Message $message, string $email): void
     {
         $message->setRawHeader('X-Mailing-List-Destination', $email);

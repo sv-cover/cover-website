@@ -7,7 +7,9 @@ use App\DataIter\DataIterSignUpForm;
 use App\DataModel\DataModelAgenda;
 use App\DataModel\DataModelSignUpEntry;
 use App\DataModel\DataModelSignUpField;
+use App\Legacy\Authentication\Authentication;
 use App\Legacy\Database\DataModel;
+use App\SignUp\SignUpFormManager;
 use Symfony\Component\DependencyInjection\Attribute\Lazy;
 
 class DataModelSignUpForm extends DataModel
@@ -16,9 +18,11 @@ class DataModelSignUpForm extends DataModel
     public string $table = 'sign_up_forms';
 
     public function __construct(
+        protected Authentication $auth,
         #[Lazy] private DataModelAgenda $eventModel, // Lazy to prevent circular dependencies
         #[Lazy] private DataModelSignUpEntry $entryModel, // Lazy to prevent circular dependencies
         #[Lazy] private DataModelSignUpField $fieldModel, // Lazy to prevent circular dependencies
+        #[Lazy] private SignUpFormManager $manager,
     ) {
     }
 
@@ -62,12 +66,19 @@ class DataModelSignUpForm extends DataModel
         return $this->eventModel->get_iter($iter['agenda_id']);
     }
 
-    public function new_entry_for_iter(DataIterSignUpForm $iter)
+    public function new_entry_for_iter(DataIterSignUpForm $iter, bool $prefill = false)
     {
-        return $this->entryModel->new_iter([
+        $entry = $this->entryModel->new_iter([
             'form_id' => $iter['id'],
             'created_on' => date('Y-m-d H:i:s')
         ]);
+
+        if ($prefill) {
+            $entry->set('member_id', $this->identity->get('id'));
+            $this->manager->prefillEntry($entry);
+        }
+
+        return $entry;
     }
 
     public function get_entries_for_member(DataIterSignUpForm $iter, DataIterMember $member)

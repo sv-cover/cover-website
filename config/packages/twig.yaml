@@ -12,6 +12,7 @@ twig:
         sign_up_utils: '@App\SignUp\SignUpFormManager'
         config:
             filemanager_url: '%app.filemanager_root%'
+            email_support: '%app.email_support%'
     form_themes:
         - '@layout/form/bulma_layout.html.twig'
         - '@layout/form/custom_types.html.twig'

@@ -14,16 +14,6 @@ class DataModelConfiguratie extends DataModel
 
     private $_cache = [];
 
-    // TODO SFY: does it work without this?
-    // public $dataiter = 'DataIterConfiguratie';
-
-    // public function __construct($db)
-    // {
-    //     parent::__construct($db, 'configuratie', 'key');
-
-    //     $this->_populate_cache();
-    // }
-
     private function _populate_cache()
     {
         if (!empty($this->_cache))

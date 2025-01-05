@@ -1,5 +1,9 @@
 {% extends '@layout/layout.html.twig' %}
 
+{% macro email(email) %}
+    <a href="mailto:{{ email|e('html_attr') }}">{{ email }}</a>
+{% endmacro %}
+
 {% block title __('Confirm email') ~ ' – ' ~ parent() %}
 
 {% block content %}
@@ -10,8 +14,7 @@
     {% else %}
         <p>{{ __('Oh dear, this link is no longer valid.') }}</p>
         <p>{{ __('It might be the case that you’ve already confirmed your email. Try to log in with your new email. It that doesn’t work, try to use your previous email once again. Did you forget your password? You might want to try both your previous and current email when asking for password recovery.') }}</p>
-        {# TODO SFY #}
-        {# <p>{{ __('Still having trouble? Send an email to %s and we’ll help you.')|e|format(html_email(global.config.email_support))|raw }}</p> #}
+        <p>{{ __('Still having trouble? Send an email to %s and we’ll help you.')|e|format(_self.email(config.email_support))|raw }}</p>
     {% endif %}
     <a href="{{ path('homepage') }}" class="button">{{ __('Back to the homepage') }}</a>
 </article>

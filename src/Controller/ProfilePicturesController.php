@@ -34,6 +34,8 @@ class ProfilePicturesController extends AbstractController
 
     const MAX_WIDTH = 2000;
 
+    const CACHE_EXPIRES = 24*3600; // 24 hours
+
     public function __construct(
         private DataModelProfilePicture $model,
         private ImageUtils $imageUtils,
@@ -47,16 +49,10 @@ class ProfilePicturesController extends AbstractController
      */
     private function sendImage(string $image, ?string $last_modified = null): Response
     {
-        // TODO SFY: modern caching
-        $response = new Response(
-            $image,
-            Response::HTTP_OK,
-            [
-                'Pragma' => 'public',
-                'Cache-Control' => 'max-age=86400',
-                'Expires' => gmdate('D, d M Y H:i:s \G\M\T', time() + 86400),
-            ],
-        );
+        $response = new Response($image);
+
+        $response->setPublic();
+        $response->setMaxAge(self::CACHE_EXPIRES);
 
         // Set more headers
         $type = (new \finfo(\FILEINFO_MIME_TYPE))->buffer($image);
@@ -74,14 +70,10 @@ class ProfilePicturesController extends AbstractController
      */
     private function sendNotModified(): response
     {
-        return new Response(
-            '',
-            Response::HTTP_NOT_MODIFIED,
-            [
-                'Pragma' => 'public',
-                'Cache-Control' => 'max-age=86400',
-            ],
-        );
+        $response = new Response($image);
+        $response->setPublic();
+        $response->setMaxAge(self::CACHE_EXPIRES);
+        return $response;
     }
 
     private function _generateOriginal(DataIterProfilePicture $iter): string

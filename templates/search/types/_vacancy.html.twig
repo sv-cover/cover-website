@@ -20,7 +20,7 @@
             <i class="fas fa-hourglass-half" aria-hidden="true"></i>
             <span class="is-sr-only">{{ __('Job type') }}:</span>    
         </span>
-        {{ constant('DataModelVacancy::TYPE_OPTIONS')[result.type] }}
+        {{ constant('App\\DataModel\\DataModelVacancy::TYPE_OPTIONS')[result.type] }}
     </li>
     <li class="divider" role="separator"></li>
     <li class="property" title="{{ __('Skill level') }}">
@@ -28,7 +28,7 @@
             <i class="fas fa-user-graduate" aria-hidden="true"></i>
             <span class="is-sr-only">{{ __('Skill level') }}:</span>    
         </span>
-        {{ constant('DataModelVacancy::STUDY_PHASE_OPTIONS')[result.study_phase] }}
+        {{ constant('App\\DataModel\\DataModelVacancy::STUDY_PHASE_OPTIONS')[result.study_phase] }}
     </li>
 {% endapply %}
 </ul>
