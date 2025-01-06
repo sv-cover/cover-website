@@ -2,9 +2,16 @@ when@prod:
     sentry:
         dsn: '%env(SENTRY_DSN)%'
         options:
+            before_send: "sentry.callback.before_send"
             ignore_exceptions:
                 - 'Symfony\Component\ErrorHandler\Error\FatalError'
                 - 'Symfony\Component\Debug\Exception\FatalErrorException'
+
+    services:
+        sentry.callback.before_send:
+            class: 'App\Bridge\Sentry'
+            factory: ['@App\Bridge\Sentry', "getBeforeSend"]
+
 
 #        If you are using Monolog, you also need this additional configuration to log the errors correctly:
 #        https://docs.sentry.io/platforms/php/guides/symfony/#monolog-integration

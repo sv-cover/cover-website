@@ -13,6 +13,7 @@ twig:
         config:
             filemanager_url: '%app.filemanager_root%'
             email_support: '%app.email_support%'
+            sentry_dsn: '%env(SENTRY_DSN)%'
     form_themes:
         - '@layout/form/bulma_layout.html.twig'
         - '@layout/form/custom_types.html.twig'

@@ -29,22 +29,22 @@
         <h2 class="title is-5">{{ __('Are you perhaps looking for information about…') }}</h2>
         <ul class="columns-vertical has-2-tablet is-gapless">
             <li>
-                <a href="{{ path('calendar') }}">{{ __('Events') }}</a>
+                <a href="{{ path('events.list') }}">{{ __('Events') }}</a>
             </li>
             <li>
                 <a href="{{ path('photos') }}">{{ __('Photos') }}</a>
             </li>
             <li>
-                <a href="{{ path('committees') }}">{{ __('Committees') }}</a>
+                <a href="{{ path('committees.list') }}">{{ __('Committees') }}</a>
             </li>
             <li>
-                <a href="{{ path('committees', {commissie: 'board'}) }}">{{ __('Board') }}</a>
+                <a href="{{ path('committees.single', {slug: 'board'}) }}">{{ __('Board') }}</a>
             </li>
             <li>
                 <a href="{{ path('homepage') }}">{{ __('Homepage') }}</a>
             </li>
             <li>
-                <a href="{{ path('contact') }}">{{ __('Contact') }}</a>
+                <a href="{{ path('slug', {slug: 'contact'}) }}">{{ __('Contact') }}</a>
             </li>
         </ul>
         <div class="content">

@@ -25,6 +25,8 @@ Encore
     .addEntry('app', './assets/js/main/index.js')
     .addEntry('images', './assets/js/images/index.js')
     .addEntry('maps', './assets/js/maps/index.js')
+    // Avoid content blockers that don't like Sentry. We're hosting everything ourselves, there should be no privacy concerns.
+    .addEntry('sentry', './assets/js/sentry.js')
     .addEntry('theme_light', './assets/sass/light/theme.js')
     .addEntry('theme_dark', './assets/sass/dark/theme.js')
     .addEntry('theme_slide', './assets/sass/slide/theme.js')

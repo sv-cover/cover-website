@@ -56,22 +56,6 @@
         {% endfor %}
     {% endfor %}
 
-    <!-- Sentry -->
-    {# TODO SFY
-    {% if global.config.sentry_public_url %}
-        <script src="https://browser.sentry-cdn.com/7.60.0/bundle.min.js" crossorigin="anonymous"></script>
-        <script>
-            Sentry.init({
-                dsn: {{ global.config.sentry_public_url|json_encode()|raw }},
-            });
-            {% if global.auth.logged_in %}
-                Sentry.setContext("user", {
-                    id: {{ global.identity.member.id|json_encode()|raw }},
-                });
-            {% endif %}
-        </script>
-    {% endif %} #}
-
     {# TODO SFY
     {% if global.db.history|length > 0 %}
         <script>

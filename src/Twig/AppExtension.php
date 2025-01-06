@@ -45,6 +45,7 @@ class AppExtension extends AbstractExtension
         return [
             new TwigFunction('committee_member', [$this, 'getCommitteeMember']),
             new TwigFunction('get_page', [$this, 'getPageFromSlug']),
+            new TwigFunction('get_sentry_id', fn() => \Sentry\SentrySdk::getCurrentHub()->getLastEventId()),
         ];
     }
 
