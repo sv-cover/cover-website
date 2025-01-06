@@ -106,14 +106,10 @@
             </h1>
             <div class="content block">
                 {{ iter.description|parse_markup }}
-            </div>
-
-            {% if iter.url %}
-                {# TODO: markup doesn't render <p>'s, so this can be included in the content block as soon as we've fixed that #}
-                <p>
+                {% if iter.url %}
                     <a href="{{ iter.url }}">{{ __('More information…') }}</a>
-                </p>
-            {% endif %}
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>

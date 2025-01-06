@@ -55,17 +55,5 @@
             <script>alert({{ message|json_encode|raw }});</script>
         {% endfor %}
     {% endfor %}
-
-    {# TODO SFY
-    {% if global.db.history|length > 0 %}
-        <script>
-            console.info('Total number of queries run: %d (%0.1fms)', {{ global.db.history|length }}, {{ global.db.history|select('duration')|sum * 1000 }});
-            console.groupCollapsed("Queries");
-            {% for query in global.db.history %}
-            console.info("Duration: %0.3fms: %s", {{query.duration * 1000}}, {{query.query|json_encode()|raw}}, {{ query.backtrace|json_encode()|raw }});
-            {% endfor %}
-            console.groupEnd();
-        </script>
-    {% endif %} #}
 </body>
 </html>

@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 final class SearchUtils
 {
-    const HIGHLIGHT_FORMAT = '<mark>$1</mark>'; // TODO SFY: use <mark> element
+    const HIGHLIGHT_FORMAT = '<mark>$1</mark>';
     const GLUE = '<span class="glue">...</span>';
 
     private array $providers = [];
