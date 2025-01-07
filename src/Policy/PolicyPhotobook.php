@@ -39,7 +39,7 @@ class PolicyPhotobook implements PolicyInterface
         if (!preg_match('/^(?P<year>\d{4})-\d{1,2}-\d{1,2}$/', $book['date'], $match))
             return false;
 
-        $book_date = new DateTime($book['date']);
+        $book_date = new \DateTime($book['date']);
         $book_year_end = intval($book_date->format('Y'));
         if (intval($book_date->format('n')) >= 8)
             $book_year_end++;
@@ -51,7 +51,7 @@ class PolicyPhotobook implements PolicyInterface
          * September, and sometimes the first activities of the year are still in August.
          */
         return $this->identity->member()->is_member_on($book_date)
-            || $this->identity->member()->is_member_on(new DateTime($book_year_end . '-08-01'));
+            || $this->identity->member()->is_member_on(new \DateTime($book_year_end . '-08-01'));
     }
 
     private function _insidePublicPeriod(DataIter $book)

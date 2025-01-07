@@ -59,7 +59,7 @@ class AppExtension extends AbstractExtension
                 if (!$date)
                     return false;
 
-                if (!($date instanceof DateTime))
+                if (!($date instanceof \DateTime))
                     $date = new \DateTime($date);
 
                 return $date < new \DateTime();
@@ -68,7 +68,7 @@ class AppExtension extends AbstractExtension
                 if (!$date)
                     return false;
 
-                if (!($date instanceof DateTime))
+                if (!($date instanceof \DateTime))
                     $date = new \DateTime($date);
 
                 return $date > new \DateTime();

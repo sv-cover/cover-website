@@ -38,7 +38,7 @@ class DataModelPartner extends DataModel implements SearchProviderInterface
 
     public function update(DataIter $iter)
     {
-        $iter['last_modified'] = new DateTime();
+        $iter['last_modified'] = new \DateTime();
 
         return parent::update($iter);
     }

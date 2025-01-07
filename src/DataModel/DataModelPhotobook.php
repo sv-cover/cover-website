@@ -503,7 +503,7 @@ class DataModelPhotobook extends DataModel implements SearchProviderInterface
             $iter->set('created_on', $iter->compute_created_on_timestamp());
 
         if (!$iter->has_value('added_on'))
-            $iter['added_on'] = new DateTime();
+            $iter['added_on'] = new \DateTime();
 
         return parent::insert($iter);
     }
