@@ -128,6 +128,9 @@ class DataIterPhoto extends DataIter
 
         $exif_data = $this->get_exif_data();
 
+        if (!$exif_data)
+            return new \DateTime();
+
         return date('Y-m-d H:i:s', isset($exif_data['DateTimeOriginal'])
             ? strtotime($exif_data['DateTimeOriginal'])
             : $exif_data['FileDateTime']);
@@ -151,97 +154,6 @@ class DataIterPhoto extends DataIter
     public function file_exists()
     {
         return file_exists($this->get_full_path());
-    }
-
-    /**
-     * @param null $width
-     * @param null $height
-     * @param bool $skip_cache
-     * @param null $cache_status
-     * @return bool|resource
-     * @throws ImagickException
-     * @throws NotFoundException
-     */
-    public function get_resource($width = null, $height = null, $skip_cache = false, &$cache_status = null)
-    {
-        if (!$this->file_exists())
-            throw new NotFoundException("Could not find original file ({$this->get('filepath')}) of photo {$this->get_id()}.");
-
-        $cache_status = 'hit';
-
-        list($scaled_width, $scaled_height, $scale) = $this->get_scaled_size($width, $height);
-        $scaled_path = sprintf($this->model->params->get('app.photos_scaled_dir'), $this->get_id(), $width, $height);
-
-        // Create cache directory if needed
-        $scaled_dir = dirname($scaled_path);
-        if (!is_dir($scaled_dir))
-            mkdir($scaled_dir, 0770, true);
-
-        // If we are upscaling, just use the original image
-        // But do cache original (only once), makes it easier to serve.
-        if ($scale > 1.0 || (!$width && !$height)) {
-            $scaled_path = sprintf($this->model->params->get('app.photos_scaled_dir'), $this->get_id(), $this->get('width'), $this->get('height'));
-
-            if (!file_exists($scaled_path) || filesize($scaled_path) === 0 || $skip_cache) {
-                $cache_status = 'miss';
-                copy($this->get_full_path(), $scaled_path);
-            }
-        }
-
-        // If we are using a scaled image but it doesn't exist, create it :D
-        elseif (!file_exists($scaled_path) || filesize($scaled_path) === 0 || $skip_cache) {
-            $cache_status = 'miss';
-
-            if (!file_exists(dirname($scaled_path)))
-                mkdir(dirname($scaled_path), 0777, true);
-
-            $fhandle = fopen($scaled_path, 'wb');
-            $imagick = new \Imagick();
-            $imagick->readImage($this->get_full_path());
-
-            // Is it a GIF image? Scale each frame individually
-            if ($imagick->getImageFormat() == 'GIF') {
-                $gifmagick = $imagick->coalesceImages();
-
-                do {
-                    $gifmagick->resizeImage($scaled_width, $scaled_height, Imagick::FILTER_BOX, 1);
-                } while ($gifmagick->nextImage());
-
-                $imagick = $gifmagick->deconstructImages();
-                $imagick->writeImagesFile($fhandle);
-            } else {
-                // Rotate the image according to the EXIF data
-                switch($imagick->getImageOrientation()) {
-                    case Imagick::ORIENTATION_BOTTOMRIGHT:
-                        $imagick->rotateImage('#000', 180); // rotate 180 degrees
-                        break;
-
-                    case Imagick::ORIENTATION_RIGHTTOP:
-                        $imagick->rotateImage('#000', 90); // rotate 90 degrees CW
-                        break;
-
-                    case Imagick::ORIENTATION_LEFTBOTTOM:
-                        $imagick->rotateImage('#000', -90); // rotate 90 degrees CCW
-                        break;
-                }
-
-                // Scale the image
-                $imagick->scaleImage($scaled_width, $scaled_height);
-
-                // Strip EXIF data
-                $imagick->stripImage();
-
-                // Write the image as a progressive JPEG
-                $imagick->setImageFormat('jpg');
-                $imagick->setInterlaceScheme(Imagick::INTERLACE_PLANE);
-                $imagick->writeImageFile($fhandle);
-            }
-
-            $imagick->destroy();
-            fclose($fhandle);
-        }
-
-        return $scaled_path;
     }
 
     public function get_exif_data()

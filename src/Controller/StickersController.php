@@ -194,17 +194,7 @@ class StickersController extends AbstractController
             return $this->_generatePhotoThumbnail($this->model->getPhoto($sticker));
         });
 
-        $response = new Response($image);
-
-        $cacheExpires = 24*3600;
-        $response->setPublic();
-        $response->setMaxAge($cacheExpires);
-
-        $type = (new \finfo(\FILEINFO_MIME_TYPE))->buffer($image);
-        if ($type !== null)
-            $response->headers->set('Content-Type', $type);
-
-        return $response;
+        return $this->imageUtils->getCachedImageResponse($image);
     }
 
     // Currently not used. But let's keep it for courtesy :)
@@ -218,17 +208,7 @@ class StickersController extends AbstractController
 
         $image = \stream_get_contents($this->model->getPhoto($sticker));
 
-        $response = new Response($image);
-
-        $cacheExpires = 24*3600;
-        $response->setPublic();
-        $response->setMaxAge($cacheExpires);
-
-        $type = (new \finfo(\FILEINFO_MIME_TYPE))->buffer($image);
-        if ($type !== null)
-            $response->headers->set('Content-Type', $type);
-
-        return $response;
+        return $this->imageUtils->getCachedImageResponse($image);
     }
 
     #[Route('/stickers/{id<\d+>}/add_photo', name: 'stickers.add_photo', methods: ['GET', 'POST'])]

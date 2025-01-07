@@ -34,46 +34,12 @@ class ProfilePicturesController extends AbstractController
 
     const MAX_WIDTH = 2000;
 
-    const CACHE_EXPIRES = 24*3600; // 24 hours
-
     public function __construct(
         private DataModelProfilePicture $model,
         private ImageUtils $imageUtils,
         private Policy $policy,
         private TagAwareCacheInterface $profilePicturesCache,
     ) {
-    }
-
-    /**
-     * Serve an image with the correct headers to make caching possible.
-     */
-    private function sendImage(string $image, ?string $last_modified = null): Response
-    {
-        $response = new Response($image);
-
-        $response->setPublic();
-        $response->setMaxAge(self::CACHE_EXPIRES);
-
-        // Set more headers
-        $type = (new \finfo(\FILEINFO_MIME_TYPE))->buffer($image);
-        if ($type !== null)
-            $response->headers->set('Content-Type', $type);
-
-        if ($last_modified !== null)
-            $response->headers->set('Last-Modified', $last_modified);
-
-        return $response;
-    }
-
-    /**
-     * Inform the browser nothing has changed since last time.
-     */
-    private function sendNotModified(): response
-    {
-        $response = new Response($image);
-        $response->setPublic();
-        $response->setMaxAge(self::CACHE_EXPIRES);
-        return $response;
     }
 
     private function _generateOriginal(DataIterProfilePicture $iter): string
@@ -177,7 +143,7 @@ class ProfilePicturesController extends AbstractController
 
         // Create text layer
         $draw->setFillColor($foreground);
-        $draw->setFont(realpath('assets/fonts/FiraSans-Regular.ttf'));
+        $draw->setFont(realpath('../assets/fonts/FiraSans-Regular.ttf'));
         $draw->setFontSize($width / 2);
         $draw->setTextAntialias(true);
 
@@ -206,9 +172,9 @@ class ProfilePicturesController extends AbstractController
         $key = sprintf('%d_original', $iter->get_id());
 
         // Return not modified if no changes since the client last checked
-        $last_modified = gmdate(DATE_RFC1123, $iter->get_mtime());
-        if ($cache->hasItem($key) && $request->headers->get('if-modified-since') == $last_modified)
-            return $this->sendNotModified();
+        $lastModified = gmdate(DATE_RFC1123, $iter->get_mtime());
+        if ($cache->hasItem($key) && $request->headers->get('if-modified-since') == $lastModified)
+            return $this->imageUtils->getNotModifiedResponse();
 
         // Get image and serve
         $image = $cache->get($key, function (ItemInterface $item) use ($iter): string {
@@ -216,7 +182,7 @@ class ProfilePicturesController extends AbstractController
             return $this->_generateOriginal($iter);
         });
 
-        return $this->sendImage($image, $last_modified);
+        return $this->imageUtils->getCachedImageResponse($image, $lastModified);
     }
 
     /**
@@ -229,9 +195,9 @@ class ProfilePicturesController extends AbstractController
         $key = sprintf('%d_%s_%d', $iter->get_id(), $format, $width);
 
         // Return not modified if no changes since the client last checked
-        $last_modified = gmdate(DATE_RFC1123, $iter->get_mtime());
-        if ($cache->hasItem($key) && $request->headers->get('if-modified-since') == $last_modified)
-            return $this->sendNotModified();
+        $lastModified = gmdate(DATE_RFC1123, $iter->get_mtime());
+        if ($cache->hasItem($key) && $request->headers->get('if-modified-since') == $lastModified)
+            return $this->imageUtils->getNotModifiedResponse();
 
         // Get image and serve
         $image = $cache->get($key, function (ItemInterface $item) use ($iter, $format, $width): string {
@@ -239,7 +205,7 @@ class ProfilePicturesController extends AbstractController
             return $this->_generateScaled($iter, $format, $width);
         });
 
-        return $this->sendImage($image, $last_modified);
+        return $this->imageUtils->getCachedImageResponse($image, $lastModified);
     }
 
     /**
@@ -271,14 +237,14 @@ class ProfilePicturesController extends AbstractController
             $cache->invalidateTags([$tag]);
 
         // Cache last modified as metadata
-        $last_modified = $cache->get($meta_key, function (ItemInterface $item) use ($tag): string {
+        $lastModified = $cache->get($meta_key, function (ItemInterface $item) use ($tag): string {
             $item->tag($tag);
             return gmdate(DATE_RFC1123);
         });
 
         // Return not modified if no changes since the client last checked
-        if ($cache->hasItem($key) && $request->headers->get('if-modified-since') == $last_modified)
-            return $this->sendNotModified();
+        if ($cache->hasItem($key) && $request->headers->get('if-modified-since') == $lastModified)
+            return $this->imageUtils->getNotModifiedResponse();
 
         // Get image and serve
         $image = $cache->get($key, function (ItemInterface $item) use ($tag, $member, $format, $width, $private): string {
@@ -286,7 +252,7 @@ class ProfilePicturesController extends AbstractController
             return $this->_generatePlaceholder($member, $format, $width, $private);
         });
 
-        return $this->sendImage($image, $last_modified);
+        return $this->imageUtils->getCachedImageResponse($image, $lastModified);
     }
 
     /**

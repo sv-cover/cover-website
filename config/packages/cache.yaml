@@ -22,6 +22,10 @@ framework:
         app: cache.adapter.filesystem
 
         pools:
+            photos.cache:
+                adapter: cache.adapter.filesystem
+                tags: true
+
             profile_pictures.cache:
                 adapter: cache.adapter.filesystem
                 tags: true

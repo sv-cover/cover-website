@@ -217,7 +217,8 @@ class PhotoBooksController extends AbstractController
                     $id = $this->model->insert($iter);
 
                     $photos[] = new DataIterPhoto($this->model, $id, $iter->data);
-                } catch (\Exception $e) {
+                } catch (\Exception $exception) {
+                    \Sentry\captureException($exception);
                     $errors[] = $e->getMessage();
                 }
             }

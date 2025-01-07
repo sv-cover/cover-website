@@ -2,8 +2,12 @@
 
 namespace App\Utils;
 
+use Symfony\Component\HttpFoundation\Response;
+
 final class ImageUtils
 {
+    const CACHE_EXPIRES = 24*3600; // 24 hours
+
     public function reorient(\Imagick $image, string $backgroundColor = '#000'): void
     {
         // Copied from https://stackoverflow.com/a/31943940/770911
@@ -59,4 +63,39 @@ final class ImageUtils
             $image->profileImage('icc', $profiles['icc']);
     }
 
+    /**
+     * Serve an image with the correct headers to make caching possible.
+     */
+    public function getCachedImageResponse(
+        string $image,
+        ?string $lastModified = null,
+        int $expires = self::CACHE_EXPIRES
+    ): Response
+    {
+        $response = new Response($image);
+
+        $response->setPublic();
+        $response->setMaxAge($expires);
+
+        // Set more headers
+        $type = (new \finfo(\FILEINFO_MIME_TYPE))->buffer($image);
+        if ($type !== null)
+            $response->headers->set('Content-Type', $type);
+
+        if ($lastModified !== null)
+            $response->headers->set('Last-Modified', $lastModified);
+
+        return $response;
+    }
+
+    /**
+     * Inform the browser nothing has changed since last time.
+     */
+    public function getNotModifiedResponse(int $expires = self::CACHE_EXPIRES): response
+    {
+        $response = new Response();
+        $response->setPublic();
+        $response->setMaxAge($expires);
+        return $response;
+    }
 }
