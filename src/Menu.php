@@ -28,12 +28,12 @@ class Menu
                 [
                     'url' => $this->router->generate('events.list'),
                     'label' => __('Calendar'),
-                    'title' => __('Upcoming activities')
+                    'title' => __('Upcoming activities'),
                 ],
                 [
                     'url' => $this->router->generate('photos'),
                     'label' => __('Photos'),
-                    'title' => __('Photos of Cover\'s activities.')
+                    'title' => __('Photos of Cover\'s activities.'),
                 ]
             ]
         ];
@@ -41,13 +41,36 @@ class Menu
         $menu['studie'] = [
             'label' => __('Education'),
             'submenu' => [
-                ['url' => $this->router->generate('page.single', ['id' => 149]), 'label' => __('Degree Programmes')],
-                ['url' => $this->router->generate('page.single', ['id' => 24]),  'label' => __('Alumni')],
-                ['url' => $this->router->generate('page.single', ['id' => 27]),  'label' => __('Student info')],
-                ['url' => $this->router->generate('page.single', ['id' => 118]), 'label' => __('Student representation')],
-                ['url' => 'https://studysupport.svcover.nl/', 'target' => '_blank', 'label' => __('Exams & Summaries')],
-                ['url' => $this->router->generate('slug', ['slug' => 'books']), 'label' => __('Book Store')],
-                ['url' => 'https://tutoring.svcover.nl/', 'target' => '_blank', 'label' => __('Tutoring')]
+                [
+                    'url' => $this->router->generate('slug', ['slug' => 'degree-programmes']),
+                    'label' => __('Degree Programmes'),
+                ],
+                [
+                    'url' => $this->router->generate('slug', ['slug' => 'alumni']),
+                    'label' => __('Alumni'),
+                ],
+                [
+                    'url' => $this->router->generate('slug', ['slug' => 'student-info']),
+                    'label' => __('Student Info'),
+                ],
+                [
+                    'url' => $this->router->generate('slug', ['slug' => 'student-representation']),
+                    'label' => __('Student Representation'),
+                ],
+                [
+                    'url' => 'https://studysupport.svcover.nl/',
+                    'target' => '_blank',
+                    'label' => __('Exams & Summaries'),
+                ],
+                [
+                    'url' => $this->router->generate('slug', ['slug' => 'books']),
+                    'label' => __('Book Store'),
+                ],
+                [
+                    'url' => 'https://tutoring.svcover.nl/',
+                    'target' => '_blank',
+                    'label' => __('Tutoring'),
+                ],
             ]
         ];
 
@@ -61,39 +84,39 @@ class Menu
             'submenu' => [
                 [
                     'url' => $this->router->generate('committees.single', ['slug' => 'board']),
-                    'label' => __('Board')
+                    'label' => __('Board'),
                 ],
                 [
                     'url' => $this->router->generate('boards.list'),
-                    'label' => __('Former Boards')
+                    'label' => __('Former Boards'),
                 ],
                 [
                     'url' => $this->router->generate('committees.list'),
-                    'label' => __('Committees')
+                    'label' => __('Committees'),
                 ],
                 [
                     'url' => $this->router->generate('societies.list'),
-                    'label' => __('Societies')
+                    'label' => __('Societies'),
                 ],
                 [
-                    'url' => $this->router->generate('page.single', ['id' => 28]),
-                    'label' => __('Sister Associations')
+                    'url' => $this->router->generate('slug', ['slug' => 'sisters']),
+                    'label' => __('Sister Associations'),
                 ],
                 [
-                    'url' => $this->router->generate('page.single', ['id' => 215]),
-                    'label' => __('History')
+                    'url' => $this->router->generate('slug', ['slug' => 'history']),
+                    'label' => __('History'),
                 ],
                 [
-                    'url' => $this->router->generate('page.single', ['id' => 18]),
-                    'label' => __('Become a member/contributor')
+                    'url' => $this->router->generate('slug', ['slug' => 'new-members-and-contributors']),
+                    'label' => __('Become a member/contributor'),
                 ],
                 [
-                    'url' => $this->router->generate('page.single', ['id' => 214]),
-                    'label' => __('Information for companies')
+                    'url' => $this->router->generate('slug', ['slug' => 'sponsoring']),
+                    'label' => __('Information for companies'),
                 ],
                 [
+                    'url' => $this->router->generate('slug', ['slug' => 'wellbeing']),
                     'label' => __('Well-being'),
-                    'url' => $this->router->generate('page.single', ['id' => 213]),
                 ],
             ]
         ];
