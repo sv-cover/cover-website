@@ -455,10 +455,9 @@ class MailingListsController extends AbstractController
     }
 
     /**
-     * TODO SFY: Legacy PHP routes
-     * TODO SFY: Do we need to support more routes?
-     * TODO SFY: the conflict with mailing_lists.list is annoying.
+     * TODO: Remove after 2025-06-01 (nobody's clicking a 6-month old unsubscribe link)
      */
+     #[Route('/mailinglijsten.php', methods: ['GET'], priority: 2)]
      #[Route('/mailing_lists', methods: ['GET'], priority: 2)]
     public function legacy(
         #[MapQueryParameter] ?string $abonnement_id = null,

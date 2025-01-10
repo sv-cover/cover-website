@@ -42,13 +42,11 @@ class SessionsController extends AbstractController
         string $id,
     ): Response|RedirectResponse
     {
-        // TODO SFY: test
         if (!$auth->loggedIn)
             throw new UnauthorizedException('You need to log in to manage your sessions');
 
         $member = $auth->getIdentity()->member();
 
-        // TODO SFY: What if ID is empty?
         $session = $model->get_iter($id);
 
         $form = $this->createFormBuilder($session, ['csrf_token_id' => 'session_delete_' . $session['id']])
@@ -166,8 +164,7 @@ class SessionsController extends AbstractController
             $external_domain = null;
 
         // Prevent returning to the logout link
-        // TODO SFY: sessions?view=logout url?
-        if ($external_domain === null && in_array($referrer, ['/sessions.php?view=logout', $this->generateUrl('logout')])) //, $this->generateUrl('sessions', ['view' => 'logout'])]))
+        if ($external_domain === null && $referrer == $this->generateUrl('logout'))
             $referrer = null;
 
         if ($auth->loggedIn)

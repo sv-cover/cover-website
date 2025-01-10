@@ -484,10 +484,9 @@ class EventsController extends AbstractController
     }
 
     /**
-     * TODO SFY: Legacy PHP routes
-     * TODO SFY: Do we need to support more routes?
      * TODO: Phase out legacy webcal urls. But phase out legacy Auth first.
      */
+     #[Route('/agenda.php', methods: ['GET'], schemes: ['http', 'https', 'webcal'])]
      #[Route('/calendar', methods: ['GET'], schemes: ['http', 'https', 'webcal'])]
     public function legacy(
         #[MapQueryParameter] ?string $format = null,
