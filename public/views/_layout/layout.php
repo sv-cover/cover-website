@@ -42,6 +42,7 @@ class LayoutViewHelper
                 ['url' => $this->router->generate('page', ['id' => 27]),  'label' => __('Student info')],
                 ['url' => $this->router->generate('page', ['id' => 118]), 'label' => __('Student representation')],
                 ['url' => 'https://studysupport.svcover.nl/', 'target' => '_blank', 'label' => __('Exams & Summaries')],
+                ['url' => $this->router->generate('slug', ['slug' => 'books']), 'label' => __('Book Store')],
                 ['url' => 'https://tutoring.svcover.nl/', 'target' => '_blank', 'label' => __('Tutoring')]
             ]
         ];
