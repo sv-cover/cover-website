@@ -24,6 +24,7 @@ class SignUpFieldType extends AbstractType
             ->add('field_type', ChoiceType::class, [
                 'choices' => $typeChoices,
             ])
-            ->add('submit', SubmitType::class, ['label' => 'Add field']);
+            ->add('submit', SubmitType::class, ['label' => 'Add field'])
+        ;
     }
 }

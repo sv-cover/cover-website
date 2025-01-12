@@ -12,7 +12,6 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 class Policy
 {
-    const asdf = 10;
     const string MODEL_NAMESPACE = 'App\DataModel\\';
     const string MODEL_PREFIX = 'App\DataModel\DataModel';
 

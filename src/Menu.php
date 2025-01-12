@@ -9,8 +9,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class Menu
 {
-    private $identity;
-
     public function __construct(
         private Authentication $auth,
         private DataModelConfiguratie $settingsModel,
