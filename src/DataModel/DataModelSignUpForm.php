@@ -74,7 +74,7 @@ class DataModelSignUpForm extends DataModel
         ]);
 
         if ($prefill) {
-            $entry->set('member_id', $this->identity->get('id'));
+            $entry->set('member_id', $this->auth->identity->get('id'));
             $this->manager->prefillEntry($entry);
         }
 
