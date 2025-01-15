@@ -1,13 +1,13 @@
 # Forms
 
-Forms are defined and rendered using the Symfony Form component (as of November 2024 we're using version 7.1). This document outlines available documentation, specifics on our implementation, additional notes, and some examples (recipes) of ways to tackle problems.
+Forms are defined and rendered using the Symfony Form component (as of January 2025 we're using version 7.2). This document outlines available documentation, specifics on our implementation, additional notes, and some examples (recipes) of ways to tackle problems.
 
 
 ## Documentation
 The Symfony Form component is reasonably well documented by Symfony.
 
 - [Integrated documentation](https://symfony.com/doc/current/forms.html) This documentation is most applicable to our current situation.
-- [Stand-alone documentation](https://symfony.com/doc/current/components/form.html) Documentation on stand-alone forms component for use outside of Symfony. Not as useful to us as the stand-alone version, but might be interesting nonetheless.
+- [Stand-alone documentation](https://symfony.com/doc/current/components/form.html) Documentation on stand-alone forms component for use outside of Symfony. Not as useful to us as the integrated version, but might be interesting nonetheless.
 - [Built-in form types](https://symfony.com/doc/current/reference/forms/types.html) List of form types provided by Symfony. These are used to define fields.
 - [Built-in constraints](https://symfony.com/doc/current/reference/constraints.html) List of validation constraints provided by Symfony.
 - [Symfony Form GitHub](https://github.com/symfony/Form) Not for the faint of heart, but sometimes necessary as Symfony doesn't provide much documentation for very specific situations.
@@ -37,7 +37,7 @@ Forms can be rendered using the form-related functions in [Twig](https://twig.sy
 - [`MemberIdType`](/src/Form/Type/MemberIdType.php): Renders an autocomplete field for picking members.
 - [`PresentationType`](/src/Form/Type/PresentationType.php): Renders markup in form for presentation. Mainly intended for use in the SignUp form system. Question yourself if you think you need it anywhere else.
 
-### Contraints
+### Constraints
 - [`FilemanagerFile`](/src/Validator/FilemanagerFile.php): Validates whether the chosen file has an extension allowed by the `filemanager_image_extensions` config value.
 - [`Member`](/src/Validator/Member.php):  Validates whether an integer is a Member ID.
 
