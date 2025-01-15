@@ -118,6 +118,9 @@ class AppExtension extends AbstractExtension
      */
     public function safePhoneNumberFormat(?string $phoneNumber, string $format, string $defaultCountry = 'NL'): string
     {
+        if (empty($phoneNumber))
+            return '';
+
         try {
             $format = \constant('\libphonenumber\PhoneNumberFormat::' . $format);
             $phoneUtil = PhoneNumberUtil::getInstance();
