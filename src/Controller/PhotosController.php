@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -260,7 +261,7 @@ class PhotosController extends AbstractController
 
         try {
             return $this->_serveCachedScaled($request, $photo, $width, $height);
-        } catch (NotFoundException $e) {
+        } catch (NotFoundHttpException $e) {
             // Allow fallback only in debug mode.
             if ($this->getParameter('kernel.debug') && $this->getParameter('app.photos_scaled_url')) {
                 return $this->redirect(strtr(
