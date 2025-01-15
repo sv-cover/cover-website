@@ -93,7 +93,7 @@ CREATE TABLE public.agenda (
 	extern smallint DEFAULT 0 NOT NULL,
 	facebook_id character varying(20),
 	replacement_for integer,
-    category character varying(255) DEFAULT NULL
+	category character varying(255) DEFAULT NULL
 );
 
 
@@ -599,10 +599,10 @@ ALTER TABLE public.profile_pictures_id_seq OWNER TO webcie;
 
 CREATE TABLE public.profile_pictures (
 	id integer DEFAULT nextval('public.profile_pictures_id_seq'::regclass) NOT NULL,
-    member_id integer,
-    photo bytea,
-    created_on timestamp without time zone NOT NULL DEFAULT ('now'::text)::timestamp(6) without time zone,
-    reviewed boolean NOT NULL DEFAULT FALSE
+	member_id integer,
+	photo bytea,
+	created_on timestamp without time zone NOT NULL DEFAULT ('now'::text)::timestamp(6) without time zone,
+	reviewed boolean NOT NULL DEFAULT FALSE
 );
 
 ALTER TABLE public.profile_pictures OWNER TO webcie;
@@ -3703,13 +3703,13 @@ COPY public.leden (id, voornaam, tussenvoegsel, achternaam, adres, postcode, woo
 1	First	\N	Last name	Nijenborgh 9	9711AM	Groningen	test@svcover.nl	1993-09-20	o	0	1	\N	2017	\N	\N	\N	\N	\N	en	2010-01-01	\N	\N	\N
 \.
 
-
 --
 -- Data for Name: profile_pictures; Type: TABLE DATA; Schema: public; Owner: webcie
 --
 
 COPY public.profile_pictures (id, member_id, photo, created_on, reviewed) FROM stdin;
 \.
+
 
 
 --
@@ -3963,6 +3963,26 @@ COPY public.password_reset_tokens (key, member_id, created_on) FROM stdin;
 
 COPY public.passwords (lid_id, password) FROM stdin;
 \.
+
+
+--
+-- Data for Name: profile_pictures; Type: TABLE DATA; Schema: public; Owner: webcie
+--
+
+COPY public.polls (id, member_id, committee_id, question) FROM stdin;
+1	1	\N	What do you think?
+\.
+
+
+--
+-- Data for Name: profile_pictures; Type: TABLE DATA; Schema: public; Owner: webcie
+--
+
+COPY public.poll_options (id, poll_id, option) FROM stdin;
+1	1	Answer 1
+2	1	Answer 2
+\.
+
 
 
 --
@@ -4849,7 +4869,7 @@ ALTER TABLE ONLY public.passwords
 --
 
 ALTER TABLE ONLY public.profile_pictures
-    ADD CONSTRAINT profile_pictures_member_id_fkey FOREIGN KEY (member_id)  REFERENCES public.leden (id) ON UPDATE CASCADE ON DELETE CASCADE;
+	ADD CONSTRAINT profile_pictures_member_id_fkey FOREIGN KEY (member_id)  REFERENCES public.leden (id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 --
 -- Name: sessions sessions_member_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: webcie
