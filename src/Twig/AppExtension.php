@@ -116,7 +116,7 @@ class AppExtension extends AbstractExtension
      * Ultimately, we should make sure the DB only contains valid phone numbers,
      * but this will take care of issues in the mean time.
      */
-    public function safePhoneNumberFormat(string $phoneNumber, string $format, string $defaultCountry = 'NL'): string
+    public function safePhoneNumberFormat(?string $phoneNumber, string $format, string $defaultCountry = 'NL'): string
     {
         try {
             $format = \constant('\libphonenumber\PhoneNumberFormat::' . $format);
