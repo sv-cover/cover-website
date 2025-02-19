@@ -289,8 +289,8 @@ class DataIterMember extends DataIter implements SearchResultInterface
      */
     public function get_committees()
     {
-        if (!empty($this->data['committees']))
-            return $this->data['committees'];
+        // if (!empty($this->data['committees']))
+        //     return $this->data['committees'];
         return $this->model->get_commissies($this->get_id());
     }
 
