@@ -80,7 +80,7 @@ final class MailingListUtils
                 return "The message is not addressed to the committee mailing list.";
 
             default:
-                return "(code $self::value)";
+                return "(code $code)";
         }
     }
 
@@ -217,8 +217,6 @@ final class MailingListUtils
             return $output;
         };
 
-        $copy = clone $message;
-
         for ($idx = 0; $idx < $message->getPartCount(); $idx ++) {
             $part = $message->getPart($idx);
             $part->setContent(
@@ -226,12 +224,12 @@ final class MailingListUtils
             );
         }
 
-        $copy->setRawHeader('Subject', $changeChecker($message->getSubject(), null));
+        $message->setRawHeader('Subject', $changeChecker($message->getSubject(), null));
 
         if ($changed)
-            $copy->removeSingleHeader('DKIM-Signature');
+            $message->removeSingleHeader('DKIM-Signature');
 
-        return $copy;
+        return $message;
     }
 
     public function parseEmailAddress(string $email): ?string

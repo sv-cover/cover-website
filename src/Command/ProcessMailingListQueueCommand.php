@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\DataIter\DataIterCommissie;
 use App\DataIter\DataIterMailinglist;
+use App\DataIter\DataIterMailinglistQueue;
 use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelMailinglistQueue;
 use App\Utils\MailingListUtils;
@@ -14,7 +15,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use ZBateson\MailMimeParser\MailMimeParser;
-use ZBateson\MailMimeParser\Message;
 use ZBateson\MailMimeParser\Header\HeaderConsts;
 
 #[AsCommand(name: 'app:process-mailing-list-queue')]
@@ -24,6 +24,7 @@ class ProcessMailingListQueueCommand extends Command
     const COOLDOWN = 10;
 
     private SymfonyStyle $io;
+    private MailMimeParser $parser;
 
     public function __construct(
         private DataModelCommissie $committeeModel,
@@ -32,6 +33,7 @@ class ProcessMailingListQueueCommand extends Command
         private UrlGeneratorInterface $urlGenerator,
     ){
         parent::__construct();
+        $this->parser = new MailMimeParser();
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output): void
@@ -49,18 +51,13 @@ class ProcessMailingListQueueCommand extends Command
             $queuedMessage->set('processing_on', new \DateTime());
             $queuedMessage->update();
 
-            $parser = new MailMimeParser();
-            $message = $parser->parse($queuedMessage->get('message'), false);
-
-            $from = $message->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getEmail();
-
             if ($queuedMessage->get('destination_type') === 'all_committees') {
-                $result = $this->sendToAllCommittees($message, $queuedMessage->get('destination'), $from);
+                $result = $this->sendToAllCommittees($queuedMessage);
             } elseif ($queuedMessage->get('destination_type') === 'committee') {
-                $result = $this->sendToCommittee($message, $queuedMessage->get('destination'));
+                $result = $this->sendToCommittee($queuedMessage);
             } elseif ($queuedMessage->get('destination_type') === 'mailinglist') {
                 $mailinglist = $queuedMessage->get('mailinglist');
-                $result = $this->sendToMailinglist($message, $queuedMessage->get('destination'), $from, $mailinglist);
+                $result = $this->sendToMailinglist($queuedMessage, $mailinglist);
             } else {
                 $result = self::RETURN_UNKNOWN_LIST_TYPE;
             }
@@ -91,8 +88,13 @@ class ProcessMailingListQueueCommand extends Command
         }
     }
 
-    private function sendToAllCommittees(Message $message, string $to, string $from): int
+    private function sendToAllCommittees(DataIterMailinglistQueue $queuedMessage): int
     {
+        $message = $this->parser->parse($queuedMessage->get('message'), false);
+
+        $to = $queuedMessage->get('destination');
+        $from = $message->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getEmail();
+
         $destinations = null;
         $loopId = null;
 
@@ -101,11 +103,13 @@ class ProcessMailingListQueueCommand extends Command
         if ($result !== 0)
             return $result;
 
-        $message->setRawHeader('X-Loop', $loopId);
-
         $committees = $this->committeeModel->get($destinations[$to]); // Get all committees of that type, not including hidden committees (such as board)
 
         foreach ($committees as $committee) {
+            // Reparse message as we can't deep clone.
+            $message = $this->parser->parse($queuedMessage->get('message'), false);
+            $message->setRawHeader('X-Loop', $loopId);
+
             $email = $committee['login'] . '@svcover.nl';
 
             // writing 1 line in 2 parts. This way, the logs show the message that caused the problem
@@ -131,8 +135,12 @@ class ProcessMailingListQueueCommand extends Command
         return 0;
     }
 
-    private function sendToCommittee(Message $message, string $to, DataIterCommissie &$committee=null): int
+    private function sendToCommittee(DataIterMailinglistQueue $queuedMessage): int
     {
+        $message = $this->parser->parse($queuedMessage->get('message'), false);
+
+        $to = $queuedMessage->get('destination');
+
         $committee = null;
         $loopId = null;
 
@@ -142,11 +150,13 @@ class ProcessMailingListQueueCommand extends Command
         if ($result !== 0)
             return $result;
 
-        $message->setRawHeader('X-Loop', $loopId);
-
         $members = $committee->get_members();
 
         foreach ($members as $member) {
+            // Reparse message as we can't deep clone.
+            $message = $this->parser->parse($queuedMessage->get('message'), false);
+            $message->setRawHeader('X-Loop', $loopId);
+
             $this->io->write(date("Y-m-d H:i:s") . " - Sending mail for $to to {$member['voornaam']} <{$member['email']}>: ");
 
             $variables = array(
@@ -171,8 +181,13 @@ class ProcessMailingListQueueCommand extends Command
         return 0;
     }
 
-    private function sendToMailinglist(Message $message, string $to, string $from, DataIterMailinglist &$list = null): int
+    private function sendToMailinglist(DataIterMailinglistQueue $queuedMessage, DataIterMailinglist &$list = null): int
     {
+        $message = $this->parser->parse($queuedMessage->get('message'), false);
+
+        $to = $queuedMessage->get('destination');
+        $from = $message->getHeader(HeaderConsts::FROM)->getAddresses()[0]->getEmail();
+
         $list = null;
         $subscriptions = null;
         $loopId = null;
@@ -182,17 +197,17 @@ class ProcessMailingListQueueCommand extends Command
         if ($result !== 0)
             return $result;
 
-        $message->setRawHeader('X-Loop', $loopId);
-
         // Append '[Cover]' or whatever tag is defined for this list to the subject
         // but do so only if it is set.
         if (!empty($list['tag']))
-            $message->setRawHeader('Subject', \preg_replace(
+            $subject = \preg_replace(
                 '/^(?!(?:Re:\s*)?\[' . \preg_quote($list['tag'], '/') . '\])(.+?)$/im',
                 '[' . $list['tag'] . '] $1',
                 $message->getSubject(),
                 1
-            ));
+            );
+        else
+            $subject = $message->getSubject();
 
         if ($list->sends_email_on_first_email() && !$list['archive']->contains_email_from($from))
             $this->mailingListUtils->sendWelcomeMail($list, $from);
@@ -202,6 +217,11 @@ class ProcessMailingListQueueCommand extends Command
             if (\trim($subscription['email']) == '')
                 continue;
 
+            // Reparse message as we can't deep clone.
+            $message = $this->parser->parse($queuedMessage->get('message'), false);
+            $message->setRawHeader('X-Loop', $loopId);
+            $message->setRawHeader('Subject', $subject);
+
             $this->io->write(date("Y-m-d H:i:s") . " - Sending mail for $to to {$subscription['naam']} <{$subscription['email']}>: ");
 
             $unsubscribeUrl = $this->urlGenerator->generate(
@@ -209,7 +229,7 @@ class ProcessMailingListQueueCommand extends Command
                 ['id' => $subscription['abonnement_id']],
                 UrlGeneratorInterface::ABSOLUTE_URL,
             );
-            $archiveUrl =  $this->urlGenerator->generate(
+            $archiveUrl = $this->urlGenerator->generate(
                 'mailing_lists.archive.list',
                 ['id'=> $list['id']],
                 UrlGeneratorInterface::ABSOLUTE_URL,
