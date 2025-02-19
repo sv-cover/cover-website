@@ -95,8 +95,8 @@
                                     {{ change[0] }}
                                     (<em>{{ __('was') }}</em> {{ change[1] }})
                                 {% elseif field == 'committee_id' %}
-                                    <a href="{{ path('committees.single', {commissie: change[0].login}) }}">{{ change[0].name }}</a>
-                                    (<em>{{ __('was') }}</em> <a href="{{ path('committees.single', {commissie: change[1].login}) }}">{{ change[1].name }}</a>)
+                                    <a href="{{ path('committees.single', {slug: change[0].login}) }}">{{ change[0].name }}</a>
+                                    (<em>{{ __('was') }}</em> <a href="{{ path('committees.single', {slug: change[1].login}) }}">{{ change[1].name }}</a>)
                                 {% elseif field == 'private' %}
                                     {% if change[0] %}
                                         {{ __('members only (<em>was</em> everyone)')|raw }}
