@@ -4,9 +4,9 @@ when@prod:
         options:
             before_send: "sentry.callback.before_send"
             ignore_exceptions:
-                - 'Symfony\Component\ErrorHandler\Error\FatalError'
-                - 'Symfony\Component\Debug\Exception\FatalErrorException'
-                - 'Symfony\Component\HttpKernel\Exception\NotFoundHttpException'
+                - 'Symfony\\Component\\ErrorHandler\\Error\\FatalError'
+                - 'Symfony\\Component\\Debug\\Exception\\FatalErrorException'
+                - 'Symfony\\Component\\HttpKernel\\Exception\\NotFoundHttpException'
 
     services:
         sentry.callback.before_send:
