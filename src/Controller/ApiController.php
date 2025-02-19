@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Bridge\Secretary;
+use App\DataIter\DataIterMember;
 use App\DataModel\DataModelAgenda;
 use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelMailinglist;
@@ -293,7 +294,7 @@ class ApiController extends AbstractController
         if (is_a($ident, DeviceIdentityProvider::class))
             return [];
 
-        $fields = \array_merge(\DataIterMember::fields(), ['type']);
+        $fields = \array_merge(DataIterMember::fields(), ['type']);
 
         // Prepare data for member
         $member = $ident->member();
@@ -400,8 +401,8 @@ class ApiController extends AbstractController
             if ($payload->has($field))
                 $data[$prop] = $payload->get($field);
 
-        $member = new \DataIterMember($this->memberModel, $data['id'], $data);
-        $member['privacy'] = \DataModelMember::PRIVACY_DEFAULT;
+        $member = new DataIterMember($this->memberModel, $data['id'], $data);
+        $member['privacy'] = DataModelMember::PRIVACY_DEFAULT;
 
         // Create profile for this member
         $nick = $member['voornaam'];
@@ -474,7 +475,7 @@ class ApiController extends AbstractController
         return $this->json(['success' => $this->memberModel->delete($member)]);
     }
 
-    private function secretarySendWelcomeMail(?\DataIterMember $member = null): Response
+    private function secretarySendWelcomeMail(?DataIterMember $member = null): Response
     {
         if (!$this->request->isMethod('POST'))
             // Do nothing if not post
