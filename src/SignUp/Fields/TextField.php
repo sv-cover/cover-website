@@ -8,7 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextAreaType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -74,7 +74,7 @@ class TextField implements SignUpFieldInterface
     {
         if ($this->multiline)
             $builder
-                ->add($this->name, TextAreaType::class, [
+                ->add($this->name, TextareaType::class, [
                     'label' => $this->label,
                     'required' => $this->required,
                     'constraints' => $this->required ? new Assert\NotBlank() : [],
