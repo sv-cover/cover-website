@@ -1,0 +1,70 @@
+{% from 'photos/macros.html.twig' import get_srcset %}
+
+{% if books|length > 0 %}
+<article>
+<ul class="book-gallery columns is-multiline">
+{% for book in books %}
+    <li id="book_{{ book.id }}" class="book column is-half-tablet is-one-third-desktop is-one-quarter-fullhd {{ book.read_status }}" data-id="{{ book.id }}">
+        <a href="{{ path('photo_books.single', {book_id: book.id}) }}">
+            <div class="overlay">
+                <h2 class="title">{{ book.titel }}</h2>
+                {% if policy.userCanUpdate(book) and book.visibility is not same as(null) %}
+                    {% if book.visibility == constant('App\\DataModel\\DataModelPhotobook::VISIBILITY_PUBLIC') %}
+                        <span class="visibility" title="{{ __('Public') }}">
+                            <span class="icon">
+                                <i class="fas fa-globe fa-fw" aria-hidden="true"></i>
+                                <span class="is-sr-only">{{ __('Public') }}</span>
+                            </span>
+                        </span>
+                    {% elseif book.visibility == constant('App\\DataModel\\DataModelPhotobook::VISIBILITY_MEMBERS') %}
+                        <span class="visibility" title="{{ __('Only logged in members') }}">
+                            <span class="icon">
+                                <i class="fas fa-user fa-fw" aria-hidden="true"></i>
+                                <span class="is-sr-only">{{ __('Only logged in members') }}</span>
+                            </span>
+                        </span>
+                    {% elseif book.visibility == constant('App\\DataModel\\DataModelPhotobook::VISIBILITY_ACTIVE_MEMBERS') %}
+                        <span class="visibility" title="{{ __('Only logged in active members') }}">
+                            <span class="icon">
+                                <i class="fas fa-user-check fa-fw" aria-hidden="true"></i>
+                                <span class="is-sr-only">{{ __('Only logged in active members') }}</span>
+                            </span>
+                        </span>
+                    {% elseif book.visibility == constant('App\\DataModel\\DataModelPhotobook::VISIBILITY_PHOTOCEE') %}
+                        <span class="visibility" title="{{ __('Only logged in members of the PhotoCee') }}">
+                            <span class="icon">
+                                <i class="fas fa-lock fa-fw" aria-hidden="true"></i>
+                                <span class="is-sr-only">{{ __('Only logged in members of the PhotoCee') }}</span>
+                            </span>
+                        </span>
+                    {% endif %}
+                {% endif %}
+            </div>
+            {% if book.read_status == 'unread' %}
+                <div class="new-badge">{{ __('New!') }}</div>
+            {% endif %}
+            <div class="thumbnail-images columns is-gapless is-mobile" aria-hidden="true">
+                {% for photo in photo_book_utils.getBookThumbnails(book, 3) %}
+                    {% set size = photo.get_scaled_size(null, 300) %}
+                    <div class="column image {{ loop.first ? 'active' : '' }}">
+                        <figure>
+                            <picture>
+                                <source srcset="{{ get_srcset(photo, 450) }}" media="(max-width: 450px)">
+                                <source srcset="{{ get_srcset(photo, 600) }}" media="(max-width: 600px)">
+                                <source srcset="{{ get_srcset(photo, 300) }}">
+                                <img
+                                    loading="lazy"
+                                    src="{{ path('photos.scaled', {photo_id: photo.id, width: 0, height: 300}) }}"
+                                    {% if size %}width="{{ size[0] }}" height="{{ size[1] }}"{% endif %}
+                                >
+                            </picture>
+                        </figure>
+                    </div>
+                {% endfor %}
+            </div>
+        </a>
+    </li>
+{% endfor %}
+</ul>
+</article>
+{% endif %}

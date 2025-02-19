@@ -1,0 +1,27 @@
+<article class="recent-comments container is-content-optimized is-centered">
+    <h2 class="title is-4">{{ __('Recent comments') }}</h2>
+    {% for comment_group in comments %}
+        {% if policy.userCanRead(comment_group|first.photo) %}
+            <div class="media">
+                <figure class="media-left">
+                    <a href="{{ path('photos.single', {photo_id: (comment_group|first).photo.id, book_id: (comment_group|first).photo.boek}) }}" class="thumbnail image">
+                        <img
+                            loading="lazy"
+                            src="{{ path('photos.scaled', {photo_id: (comment_group|first).photo.id, width: 0, height: 400}) }}"
+                            height="100"
+                            title="{{ '%s / %s'|format(
+                                (comment_group|first).photobook.titel,
+                                (comment_group|first).beschrijving is defined ? (comment_group|first).beschrijving : __('no title')
+                            )|e('html_attr') }}"
+                        >
+                    </a>
+                </figure>
+                <div class="media-content">
+                    {% for comment in comment_group|reverse %}
+                        {{ include('photos/comments/_comment.html.twig', {iter:comment, photo:(comment_group|first).photo, book:(comment_group|first).photo.scope}) }}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+</article>

@@ -1,24 +1,25 @@
 <?php
 namespace App\Form\ChoiceList;
 
+use App\DataModel\DataModelCommissie;
+use App\Legacy\Authentication\Authentication;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 
 class CommitteeChoiceLoader implements ChoiceLoaderInterface
 {
-    private $showAll;
-    private $showOwn;
-
-    public function __construct(bool $showAll = false, bool $showOwn = true)
-    {
-        $this->showAll = $showAll;
-        $this->showOwn = $showOwn;
+    public function __construct(
+        private Authentication $auth,
+        private DataModelCommissie $committeeModel,
+        private bool $showAll = false,
+        private bool $showOwn = true,
+    ) {
     }
 
     public function loadChoiceList(callable $value = null): ChoiceListInterface
     {
-        $choices = \get_model('DataModelCommissie')->get_committee_choices($this->showOwn);
+        $choices = $this->committeeModel->get_committee_choices($this->showOwn);
 
         $factory = new DefaultChoiceListFactory();
         return $factory->createListFromChoices($choices, $value, [$this, 'filterCommittees']);
@@ -53,12 +54,12 @@ class CommitteeChoiceLoader implements ChoiceLoaderInterface
 
     public function filterCommittees($value) {
         if (
-            \get_identity()->member_in_committee(COMMISSIE_BESTUUR)
-            || \get_identity()->member_in_committee(COMMISSIE_KANDIBESTUUR)
-            || \get_identity()->member_in_committee(COMMISSIE_EASY)
+            $this->auth->identity->member_in_committee(DataModelCommissie::BOARD)
+            || $this->auth->identity->member_in_committee(DataModelCommissie::CANDY)
+            || $this->auth->identity->member_in_committee(DataModelCommissie::WEBCIE)
         )
             return true;
 
-        return $this->showAll || \get_identity()->member_in_committee($value);
+        return $this->showAll || $this->auth->identity->member_in_committee($value);
     }
 }

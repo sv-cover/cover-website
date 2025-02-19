@@ -1,0 +1,24 @@
+{% from 'photos/macros.html.twig' import gallery %}
+
+{# Prepare context: make sure the hard things are done only once #}
+{% set meta = photo_book_utils.getPhotoMeta(photos, book) %}
+
+{% set unread_photos = photos|filter(p => p.read_status == 'unread') %}
+{% set read_photos = photos|filter(p => p.read_status == 'read') %}
+
+{# Actually render albums #}
+{% if unread_photos is not empty %}
+    <article class="block">
+        <h2 class="title is-4">{{ __('New since your last visit') }}</h2>
+        {{ gallery(unread_photos, _context) }}
+    </article>
+{% endif %}
+
+{% if read_photos is not empty %}
+    <article class="block">
+        {% if unread_photos is not empty %}
+            <h2 class="title is-4">{{ __('Older photos') }}</h2>
+        {% endif %}
+        {{ gallery(read_photos, _context) }}
+    </article>
+{% endif %}

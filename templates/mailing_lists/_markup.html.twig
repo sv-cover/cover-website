@@ -1,0 +1,32 @@
+<div class="box">
+    <h2>{{ __("Mailing list")}}: {{ list.naam }}</h2>
+    {{ form_start(form, {action: path('mailing_lists.subsciption.create', {id: list.id, referrer: referrer}) }) }}
+        <div class="field">
+            <div class="control">
+                <p><em>{{ list.adres }}:</em> {{ list.omschrijving|parse_markup }}</p>
+            </div>
+        </div>
+        {% if not auth.loggedIn %}
+            <div class="field">
+                <div class="control">
+                    <p>{{ __('Sign in to subscribe to this mailing list.') }}</p>
+                </div>
+            </div>
+        {% elseif form.do_unsubscribe is defined %}
+            <div class="field">
+                <div class="control">
+                    <p>{{ __('You are subscribed to this mailinglist.') }}</p>
+                </div>
+            </div>
+            {{ form_row(form.do_unsubscribe, {label: __('Unsubscribe'), color: 'default'}) }}
+        {% elseif form.do_subscribe is defined %}
+            {{ form_row(form.do_subscribe, {label: __('Subscribe'), color: 'default'}) }}
+        {% else %}
+            <div class="field">
+                <div class="control">
+                    <p>{{ __('You can’t manage your subscription to this mailinglist.') }}</p>
+                </div>
+            </div>
+        {% endif %}
+    {{ form_end(form) }}
+</div>

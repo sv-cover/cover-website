@@ -1,9 +1,12 @@
 <?php
 namespace App\Form;
 
+use App\DataModel\DataModelCommissie;
 use App\Form\Type\FilemanagerFileType;
 use App\Form\Type\CommitteeIdType;
 use App\Form\Type\MarkupType;
+use App\Legacy\Authentication\Authentication;
+use App\Legacy\Database\DataIter;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -14,10 +17,15 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 
 /**
- * Form type for DataModelEditable (aka "Page")
+ * Form type for DataModelPage
  */
 class PageType extends AbstractType
 {
+    public function __construct(
+        private Authentication $auth,
+    ){
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -65,16 +73,16 @@ class PageType extends AbstractType
         });
     }
 
-    public static function canSetTitel(\DataIter $iter)
+    public function canSetTitel(DataIter $iter)
     {
-        return !$iter->has_id() || \get_identity()->member_in_committee(COMMISSIE_EASY);
+        return !$iter->has_id() || $this->auth->getIdentity()->member_in_committee(DataModelCommissie::WEBCIE);
     }
 
-    public static function canSetCommitteeId(\DataIter $iter)
+    public function canSetCommitteeId(DataIter $iter)
     {
         return !$iter->has_id()
-            || \get_identity()->member_in_committee(COMMISSIE_BESTUUR)
-            || \get_identity()->member_in_committee(COMMISSIE_KANDIBESTUUR)
-            || \get_identity()->member_in_committee(COMMISSIE_EASY);
+            || $this->auth->getIdentity()->member_in_committee(DataModelCommissie::BOARD)
+            || $this->auth->getIdentity()->member_in_committee(DataModelCommissie::CANDY)
+            || $this->auth->getIdentity()->member_in_committee(DataModelCommissie::WEBCIE);
     }
 }

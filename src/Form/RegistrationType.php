@@ -3,6 +3,7 @@ namespace App\Form;
 
 use App\Form\DataTransformer\StringToDateTimeTransformer;
 use Misd\PhoneNumberBundle\Validator\Constraints\PhoneNumber as AssertPhoneNumber;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -19,6 +20,11 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class RegistrationType extends AbstractType
 {
+    public function __construct(
+        private ContainerBagInterface $params,
+    ) {
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -219,7 +225,7 @@ class RegistrationType extends AbstractType
                 'constraints' => new Assert\AtLeastOneOf([
                     'constraints' => [
                         new Assert\Iban(),
-                        new Assert\EqualTo(get_config_value('no_iban_string')),
+                        new Assert\EqualTo($this->params->get('app.no_iban_string')),
                     ],
                     // We don't want a message suggesting the existence of a no_iban_string. Just show it's an invalid IBAN.
                     'message' => __('This is not a valid International Bank Account Number (IBAN).'),

@@ -1,0 +1,16 @@
+<h2 class="title is-5">
+    <a href="{{ path('polls.single', {id: result.poll_id}) }}" data-search-main-link>{{ __('Poll') }}</a>
+</h2>
+<p class="subtitle is-7">
+    {% if result.member %}
+        {% set member_link = '<a href="%s">%s</a>'|format(
+            path('profile.member', {id: result.member.id}),
+            result.member.full_name|e('html')) %}
+        {{ __('%s commented on %s')|format(member_link, result.created_on|date('F j, Y')|e('html'))|raw }}
+    {% else %}
+        {{ __('Anonymous commented on %s'|format(result.created_on|date('F j, Y'))) }}
+    {% endif %}
+</p>
+<div class="content">
+    {{ search_utils.excerpt(result.comment|strip_markup, resultset.query_parts, 50)|raw }}
+</div>

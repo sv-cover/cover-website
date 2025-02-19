@@ -1,0 +1,35 @@
+{% extends '@layout/layout.html.twig' %}
+
+{% block title __('Photo visibility') ~ ' – ' ~ parent() %}
+
+{% block content %}
+<div class="modal is-static">
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">{{ __('Photo visibility') }}</p>
+        </header>
+        <section class="modal-card-body">
+            {{ form_start(form, {id: 'photo-visibility-form', action: path('photos.privacy', {book_id: book.id, photo_id: photo.id})}) }}
+                {# Not .image, because of scaling #}
+                <figure>
+                    {% set size = photo.get_scaled_size(400, 400) %}
+                    <img
+                        src="{{ path('photos.scaled', {photo_id: photo.id, width: 0, height: 400}) }}"
+                        width="{{ size[0] }}"
+                        height="{{ size[1] }}"
+                    >
+                </figure>
+                {# Global errors #}
+                {{ form_errors(form) }}
+                {# Fields #}
+                {{ form_row(form.visibility) }}
+                {% set submit_button = form_widget(form.submit, {attr: {form: 'photo-visibility-form'}}) %}
+            {{ form_end(form) }}
+        </section>
+        <footer class="modal-card-foot">
+            <a href="{{ path('photos.single', {book_id: book.id, photo_id: photo.id}) }}" class="button" data-dismiss="modal">{{ __('Cancel') }}</a>
+            {{ submit_button|raw }}
+        </footer>
+    </div>
+</div>
+{% endblock %}

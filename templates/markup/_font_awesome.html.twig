@@ -1,0 +1,8 @@
+<i
+    class="fas {{ class|e('html_attr') }}"
+    {% if label is defined and label is not empty %}
+        aria-label="{{ label }}"
+    {% else %}
+        aria-hidden="true"
+    {% endif %}
+></i>{# Comment for whitespace control #}

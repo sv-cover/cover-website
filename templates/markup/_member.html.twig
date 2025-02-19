@@ -1,0 +1,26 @@
+<div class="member-block">
+    <div class="cover-thumbnail">
+        <div class="overlay is-bottom">
+            <div class="name boxed-title-wrapper">
+                <h3 class="boxed-title is-size-5-mobile">
+                    {{ name }}
+                </h3>
+            </div>
+            {% if position is defined %}
+                <div class="boxed-title-wrapper">
+                    <span class="boxed-title has-text-weight-normal is-italic is-size-6">
+                        {{ position }}
+                    </span>
+                </div>
+            {% endif %}
+        </div>
+        <figure class="image">
+            {% if image is defined %}
+                <img src="{{ image|e('html_attr') }}" alt="Picture of {{ name|e('html_attr') }}" />
+            {% endif %}
+        </figure>
+    </div>
+    <div class="member-block-details column">
+        {{ content|trim|raw }}
+    </div>
+</div>

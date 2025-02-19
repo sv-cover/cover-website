@@ -1,6 +1,7 @@
 <?php
 namespace App\Form;
 
+use App\DataIter\DataIterAgenda;
 use App\Form\DataTransformer\IntToBooleanTransformer;
 use App\Form\DataTransformer\StringToDateTimeTransformer;
 use App\Form\Type\CommitteeIdType;
@@ -164,7 +165,7 @@ class EventType extends AbstractType
         ]);
     }
 
-    public function validate_iter(\DataIterAgenda $iter, ExecutionContextInterface $context): void
+    public function validate_iter(DataIterAgenda $iter, ExecutionContextInterface $context): void
     {
         if (!empty($iter['tot']) && new \DateTime($iter['van']) > new \DateTime($iter['tot'])) {
             $context->buildViolation(__("Time travel is not allowed: your event can't end before it starts."))

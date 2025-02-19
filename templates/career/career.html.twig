@@ -1,0 +1,163 @@
+{% extends '@layout/layout.html.twig' %}
+
+{% block title __('Career') ~ ' – ' ~ parent() %}
+
+{% block page %}
+{% set header = get_page('career_header') %}
+<div class="career">
+    <header class="hero has-image is-medium is-thumbnail">
+        <figure class="hero-image">
+            {% if header.cover_image_url %}
+                <img
+                    srcset="{{ header.get_cover_image(480) }} 480w,
+                            {{ header.get_cover_image(960) }} 960w,
+                            {{ header.get_cover_image(1200) }} 1200w,
+                            {{ header.get_cover_image(1920) }} 1920w"
+                    sizes="100vw"
+                    src="{{ header.get_cover_image(1920) }}"
+                >
+            {% endif %}
+        </figure>
+        <div class="hero-body">
+            <div class="container is-content-optimized">
+                {% if header and policy.userCanUpdate(header) %}
+                    <div class="dropdown is-right is-pulled-right">
+                        <div class="dropdown-trigger">
+                            <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+                                <span class="icon is-small">
+                                    <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                    <span class="is-sr-only">{{ __('Manage') }}</span>
+                                </span>
+                            </button>
+                        </div>
+                        <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                            <div class="dropdown-content">
+                                <a href="{{ path('page.update', {id: header.id}) }}" class="dropdown-item">
+                                    {{ __('Modify header') }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="boxed-title-wrapper">
+                    <h1 class="boxed-title is-4-mobile is-3-tablet">{{ __('Career') }}</h1>
+                </div>
+                {% if header %}
+                    <div class="boxed-title-wrapper">
+                        <div class="boxed-title is-6-mobile is-5-tablet">
+                            {{ header.locale_content|strip_markup }}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+    <article class="section vacancies-section" id="vacancies">
+        {% set vacancies_page = get_page('vacancies_header') %}
+        <div class="container is-content-optimized">
+            <div class="level">
+                <div class="level-left">
+                    <h2 class="title is-4">{{ __('Jobs & Internships') }}</h2>
+                </div>
+                <div class="level-right">
+                    {% if (vacancies_page and policy.userCanUpdate(vacancies_page)) or policy.userCanCreate('DataModelVacancy') %}
+                        <div class="dropdown is-right">
+                            <div class="dropdown-trigger">
+                                <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                        <span class="is-sr-only">{{ __('Manage') }}</span>
+                                    </span>
+                                </button>
+                            </div>
+                            <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                                <div class="dropdown-content">
+                                    {% if vacancies_page and policy.userCanUpdate(vacancies_page) %}
+                                        <a href="{{ path('page.update', {id: vacancies_page.id}) }}" class="dropdown-item">
+                                            {{ __('Modify description') }}
+                                        </a>
+                                    {% endif %}
+                                    {% if policy.userCanCreate('DataModelVacancy') %}
+                                        <a href="{{ path('vacancies.create') }}" class="dropdown-item">
+                                            {{ __('New vacancy') }}
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% if vacancies_page %}
+                <div class="content">
+                    {{ vacancies_page.locale_content|parse_markup }}
+                </div>
+            {% endif %}
+            <div>
+                {{ include('vacancies/_filter_form.html.twig', {
+                    'partners': vacancy_partners,
+                    'filters': {},
+                    'show_all_button': true,
+                }) }}
+            </div>
+        </div>
+    </article>
+    <article class="section" id="profiles">
+        {% set partners_page = get_page('partners_header') %}
+        <div class="container is-content-optimized">
+            <div class="level">
+                <div class="level-left">
+                    <h2 class="title is-4">{{ __('Company Profiles') }}</h2>
+                </div>
+                <div class="level-right">
+                    {% if (partners_page and policy.userCanUpdate(partners_page)) or policy.userCanCreate('DataModelPartner') %}
+                        <div class="dropdown is-right">
+                            <div class="dropdown-trigger">
+                                <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                        <span class="is-sr-only">{{ __('Manage') }}</span>
+                                    </span>
+                                </button>
+                            </div>
+                            <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                                <div class="dropdown-content">
+                                    {% if partners_page and policy.userCanUpdate(partners_page) %}
+                                        <a href="{{ path('page.update', {id: partners_page.id}) }}" class="dropdown-item">
+                                            {{ __('Modify description') }}
+                                        </a>
+                                    {% endif %}
+                                    {% if policy.userCanCreate('DataModelPartner') %}
+                                        <a href="{{ path('partners.list') }}" class="dropdown-item">
+                                            {{ __('Manage partners') }}
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% if partners_page %}
+                <div class="content">
+                    {{ partners_page.locale_content|parse_markup }}
+                </div>
+            {% endif %}
+            <ul class="columns is-mobile is-multiline">
+                {% for partner in partners %}
+                    <li class="column is-half-mobile is-one-third-tablet">
+                        <a href="{{ path('partners.single', {id: partner.id}) }}" class="partner-profile" alt="{{ partner.name }}">
+                            <figure class="image is-3by2">
+                                {% if partner.logo_dark_url %}
+                                    <img class="darkmode" src="{{ partner.get_logo_dark(700) }}">
+                                {% endif %}
+                                <img class="default" src="{{ partner.get_logo(700) }}">
+                            </figure>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </article>
+</div>
+{% endblock %}

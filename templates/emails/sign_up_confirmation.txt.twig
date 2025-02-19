@@ -1,0 +1,28 @@
+Dear {{ entry.member.voornaam }},
+
+You’ve signed up for {{ entry.form.agenda_item.kop}}.
+
+Just as a reminder, this is what you entered:
+
+{% set data = sign_up_utils.exportEntry(entry) %}
+{# Mind the careful whitespace control! #}
+{% for id, field in entry.form.fields -%}
+    {%- for key, label in sign_up_utils.getColumnLabels(field) -%}
+        {%- if field.type == 'checkbox' %}
+            {%- if data[key] is not empty -%}
+                ✓ {{ label }}
+            {%- endif -%}
+        {%- else -%}
+            {{- label }}: {# Whitespace control
+            #}{% if data[key] == '' or data[key] is null -%}
+                left blank
+            {%- else -%}
+                {{ data[key] }}
+            {%- endif -%}
+        {%- endif ~%}
+    {%~ endfor %}
+{%- endfor %}
+
+Kind regards,
+
+{{ entry.form.agenda_item.committee.naam }}

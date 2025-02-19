@@ -1,0 +1,77 @@
+<?php
+
+namespace App\DataModel;
+
+use App\DataIter\DataIterConfiguratie;
+use App\Legacy\Database\DataIter;
+use App\Legacy\Database\DataModel;
+
+class DataModelConfiguratie extends DataModel
+{
+    public string $dataiter = DataIterConfiguratie::class;
+    public string $table = 'configuratie';
+    public string $id = 'key';
+
+    private $_cache = [];
+
+    private function _populate_cache()
+    {
+        if (!empty($this->_cache))
+            return;
+
+        $rows = $this->db->query("SELECT key, value FROM configuratie");
+
+        foreach ($rows as $row)
+            $this->_cache[$row['key']] = $row['value'];
+    }
+
+    /**
+     * Get a configuration value
+     * @key the name of the configuration value
+     *
+     * @result the configuration value
+     */
+    public function get_value($key, $default = null)
+    {
+        $this->_populate_cache();
+
+        if (array_key_exists($key, $this->_cache))
+            $value = $this->_cache[$key];
+        else
+            $value = null;
+
+        return $value === null ? $default : $value;
+    }
+
+    /**
+     * Override DataModel::_insert because that implementation relies on
+     * Database::get_last_insert_id, which won't work on a non-numerical
+     * non-automatic primary key used by the configuratie table.
+     */
+    protected function _insert($table, DataIter $iter, $get_id = false)
+    {
+        parent::_insert($table, $iter, false);
+
+        return $get_id ? $iter['key'] : -1;
+    }
+
+    /**
+     * Set the value of a configuration parameter
+     * @key the name of the configuration parameter
+     * @value the new value of the parameter
+     *
+     * @result void
+     */
+    public function set_value($key, $value)
+    {
+        $this->_populate_cache();
+
+        // Todo: You cannot set a value to null using this set-up
+        if (!is_null($this->get_value($key)))
+            $resp = $this->db->update('configuratie', ['value' => $value], 'key = \'' . $this->db->escape_string($key) . '\';');
+        else
+            $resp = $this->db->insert('configuratie', ['key' => $key, 'value' => $value]);
+
+        $this->_cache[$key] = $value;
+    }
+}

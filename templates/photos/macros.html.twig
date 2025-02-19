@@ -1,0 +1,87 @@
+{% macro get_srcset(photo, width=0, height=0, scales=[1, 2]) -%}
+    {%- for scale in scales -%}
+        {{- path('photos.scaled', {photo_id: photo.id, width: width, height: height}) }} {{ scale }}x
+        {%- if not loop.last -%}
+            ,
+        {%- endif -%}
+    {%- endfor -%}
+{%- endmacro %}
+
+{% macro classnames(photo, meta) %}
+    {%- if meta.my_likes[photo.id] is defined %}liked{% endif -%}
+    {%- if meta.visibility[photo.id] is defined and meta.visibility[photo.id] == false %} privacy-hidden{% endif -%}
+{% endmacro %}
+
+{% macro gallery(photos, context) %}
+    {% import _self as macros %}
+
+    {# Get metadata if not provided #}
+    {% if context.meta is defined %}
+        {% set meta = context.meta %}
+    {% else %}
+        {% set meta = photo_book_utils.getPhotoMeta(photos, context.book) %}
+    {% endif %}
+
+    {# Now render #}
+    <ul class="photo-gallery columns is-multiline is-mobile">
+    {% for photo in photos %}
+        {% set size = photo.get_scaled_size(null, 300) %}
+
+        {# Set flex-basis to bins close to their scaled width, with a min of 200 and a max of 1000 #}
+        {% set basis = ((size[0] / 50)|round) * 50 %}
+        {% set visibility_hidden = meta.visibility[photo.id] is defined and meta.visibility[photo.id] == false %}
+        <li class="photo column has-basis-{{ min(max(basis, 200), 1000) }} {{ macros.classnames(photo, meta) }}" data-id="{{ photo.id }}" id="photo-{{ photo.id }}">
+            <a
+                href="{{ path('photos.single', {book_id: context.book.id, photo_id: photo.id}) }}"
+                {% if photo.beschrijving %}title="{{ photo.beschrijving }}"{% endif %}
+            >
+                <img
+                    loading="lazy"
+                    srcset="{{ _self.get_srcset(photo, 0, 300) }}"
+                    src="{{ path('photos.scaled', {photo_id: photo.id, width: 0, height: 300}) }}"
+                    {% if size %}width="{{ size[0] }}" height="{{ size[1] }}"{% endif %}
+                >
+                {% if photo.beschrijving %}
+                    <span class="title">{{ photo.beschrijving }}</span>
+                {% endif %}
+
+                {% set num_likes = meta.likes[photo.id] is defined ? meta.likes[photo.id] : 0 %}
+                {% if photo.num_reacties > 0 or num_likes > 0  or visibility_hidden %}
+                    <ul class="controls">
+                        {% if photo.num_reacties > 0 %}
+                            <li class="comments" title="{{ __N('%d comment', '%d comments', photo.num_reacties) }}">
+                                <i class="fas fa-comment" aria-hidden="true"></i>
+                                {{ photo.num_reacties }}
+                                <span class="is-sr-only">{{ __N('comment', 'comments', photo.num_reacties) }}</span>
+                            </li>
+                        {% endif %}
+
+                        {% set liked = meta.my_likes[photo.id] is defined %}
+                        {% if num_likes > 0 %}
+                            <li class="likes" title="{{ __N('%d person liked this photo.', '%d people liked this photo.', num_likes) }} {% if liked %}{{ __('You liked this photo.')}}{% endif %}">
+                                <i
+                                    class="fas fa-heart {% if liked %}has-text-cover{% endif %}"
+                                    aria-hidden="true"
+                                ></i>
+                                {{ num_likes }}
+                                <span class="is-sr-only">
+                                    {{ __N('like.', 'likes.', num_likes) }}
+                                    {% if liked %}{{ __('You liked this photo.')}}{% endif %}
+                                </span>
+                            </li>
+                        {% endif %}
+                        {% if visibility_hidden %}
+                            <li title="{{ __('Hidden from your personal album for other people') }}">
+                                <i class="fas fa-eye-slash" aria-hidden="true"></i>
+                                <span class="is-sr-only">
+                                    {{ __('Hidden from your personal album for other people')}}
+                                </span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+            </a>
+        </li>
+    {% endfor %}
+    </ul>
+{% endmacro gallery %}

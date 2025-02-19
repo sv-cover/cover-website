@@ -1,0 +1,93 @@
+{% extends 'profile/base.html.twig' %}
+
+{% set active_tab = 'mailing_lists' %}
+
+{% block tab_content %}
+<article>
+    <h2 class="title is-4">{{ __('Mailing lists') }}</h2>
+    {% for mailing_list in mailing_lists %}
+        <div class="media">
+            <div class="media-content">
+                <h3 class="title is-6 is-marginless">
+                    {{ mailing_list.naam }}
+                    <small class="has-text-weight-normal">({{ mailing_list.adres }})</small>
+                </h3>
+                <div class="content">
+                    <p>{{ mailing_list.omschrijving|parse_markup }}</p>
+                </div>
+            </div>
+            <div class="media-right">
+            {% if policy.userCanSubscribe(mailing_list) or policy.userCanUnsubscribe(mailing_list) %}
+                <form
+                    id="mailinglijst-{{ mailing_list.id|e('url') }}-toggle"
+                    class="list-group-item-action toggle-action-button {{ mailing_list.subscribed ? 'toggle-state-active' : '' }}"
+                    method="post"
+                    action="{{ path('mailing_lists.subsciption.create', {id: mailing_list.id}) }}"
+                    data-auto-submit
+                >
+                    <input type="hidden" name="form[_token]" value="{{ csrf_token('mailinglist_subscription_' ~ mailing_list.id) }}">
+
+                    <div class="field">
+                        <label class="checkbox" for="field-subscribe-{{ mailing_list.id }}">
+                            <input
+                                id="field-subscribe-{{ mailing_list.id }}"
+                                type="checkbox"
+                                name="form[subscribe]"
+                                value="1"
+                                {% if mailing_list.subscribed %}checked{% endif %}
+                                data-auto-submit-visible
+                                hidden
+                                aria-label="{{ __('Subscribe to mailinglist') }}"
+                            >
+                            &ZeroWidthSpace;{# space for proper height #}
+                        </label>
+                    </div>
+
+                    {# Fallback for no JS #}
+                    {% if mailing_list.subscribed %}
+                        <button
+                            type="submit"
+                            name="form[do_unsubscribe]"
+                            class="button"
+                            title="{{ __('You are subscribed to this list. Click to unsubscribe.')|e('html_attr') }}"
+                            data-auto-submit-hidden
+                        >{{ __('Unsubscribe') }}</button>
+                    {% else %}
+                        <button
+                            type="submit"
+                            name="form[do_subscribe]"
+                            class="button"
+                            title="{{ __('Click to subscribe.')|e('html_attr') }}"
+                            data-auto-submit-hidden
+                        >{{ __('Subscribe') }}</button>
+                    {% endif %}
+                </form>
+            {% else %}
+                {# This is still a form to make things consistent whether JS is applied or not #}
+                <form data-auto-submit>
+                    <label class="checkbox" title="{{ __('You are subscribed to this list. You can ask the committee to unsubscribe you.')|e('html_attr') }}">
+                        <input
+                            type="checkbox"
+                            {% if mailing_list.subscribed %}checked{% endif %}
+                            data-auto-submit-visible
+                            hidden
+                            aria-label="{{ __('Subscribe to mailinglist') }}"
+                            disabled
+                        >
+                        &ZeroWidthSpace;{# space for proper height #}
+                    </label>
+
+                    {# Fallback for no JS #}
+                    <button
+                        disabled="disabled"
+                        class="button"
+                        title="{{ __('You are subscribed to this list. You can ask the committee to unsubscribe you.')|e('html_attr') }}"
+                        data-auto-submit-hidden
+                    >{{ __('Unsubscribe') }}</button>
+                </form>
+            {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</article>
+{% endblock %}
