@@ -48,7 +48,7 @@ class I18n
     public static function translateParts($message, $separators = ',')
     {
         $pattern = '/(\s*[' . preg_quote($separators, '/') . ']+\s*)/';
-        $parts = preg_split($pattern, $message, -1, PREG_SPLIT_DELIM_CAPTURE);
+        $parts = preg_split($pattern, $message ?? '', -1, PREG_SPLIT_DELIM_CAPTURE);
 
         foreach ($parts as &$part)
             if (!preg_match($pattern, $part))
