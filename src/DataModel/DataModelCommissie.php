@@ -196,7 +196,7 @@ class DataModelCommissie extends DataModel implements SearchProviderInterface
     protected function _split_functie($functie)
     {
         $pattern = '/\s*[,\/&]|and\s*/';
-        return preg_split($pattern, $functie);
+        return preg_split($pattern, $functie ?? '');
     }
 
     protected function _sort_leden($a, $b)
