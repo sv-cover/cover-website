@@ -306,7 +306,7 @@ class ApiController extends AbstractController
         $committeeData = [];
 
         // $committee_ids = $ident->get_override_committees() ?? $member['committees'];
-        $committees = $this->committeeModel->find(['id__in' => $member->get_committees()]);
+        $committees = $this->committeeModel->find(['id__in' => $member['committees']]);
 
         // For now just return login and committee name
         foreach ($committees as $committee)
