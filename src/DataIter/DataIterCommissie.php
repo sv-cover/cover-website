@@ -49,7 +49,7 @@ class DataIterCommissie extends DataIter implements SearchResultInterface
         if (!isset($this->mascots))
         {
             try {
-                $data = \file_get_contents('public/images/mascots/data.json');
+                $data = \file_get_contents('../public/images/mascots/data.json');
                 $this->mascots = \json_decode($data, true);
             } catch (\Exception $e) {
                 $this->mascots = [];
