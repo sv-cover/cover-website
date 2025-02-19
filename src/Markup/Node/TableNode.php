@@ -13,10 +13,13 @@ class TableNode extends BlockRendererNode
             return;
         }
 
-        $rowLength = max(array_map(
-            fn($n) => count($n->getChildren()),
-            $this->getChildren() ?? []
-        ));
+        if (!empty($this->getChildren()))
+            $rowLength = max(array_map(
+                fn($n) => count($n->getChildren()),
+                $this->getChildren() ?? []
+            ));
+        else
+            $rowLength = 0;
 
         foreach ($this->getChildren() as $child)
             while (count($child->getChildren()) < $rowLength)
