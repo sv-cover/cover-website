@@ -120,7 +120,7 @@ class EventsController extends AbstractController
         return $this->render('events/list.html.twig', [
             'iters' => $iters,
             'navigation' => $this->getNavigation($year),
-            'calendar_session' => $sessionModel->getForApplication($auth->identity->get('id'), 'calendar'),
+            'calendar_session' => $auth->loggedIn ? $sessionModel->getForApplication($auth->identity->get('id'), 'calendar') : null,
         ]);
     }
 
@@ -393,7 +393,7 @@ class EventsController extends AbstractController
     ): Response
     {
         return $this->render('events/subscribe.html.twig', [
-            'calendar_session' => $sessionModel->getForApplication($auth->identity->get('id'), 'calendar'),
+            'calendar_session' => $auth->loggedIn ? $sessionModel->getForApplication($auth->identity->get('id'), 'calendar') : null,
         ]);
     }
 
