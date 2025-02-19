@@ -12,7 +12,7 @@ class ConstantSessionProvider implements SessionProviderInterface
      */
     private $session;
 
-    public function __construc(DataIterSession $session = null)
+    public function __construct(DataIterSession $session = null)
     {
         $this->session = $session;
     }
