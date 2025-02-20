@@ -1,4 +1,5 @@
 twig:
+    auto_reload: true
     file_name_pattern: '*.twig'
     paths:
         'templates/_layout': 'layout'
