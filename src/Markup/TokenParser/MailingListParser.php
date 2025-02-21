@@ -26,6 +26,10 @@ class MailingListParser extends AbstractTokenParser implements TagParserInterfac
     public function render(?string $content, string $tag, string $token): string
     {
         preg_match('/\[mailinglist=(?P<list_id>.*?)\]/i', $token, $match);
+
+        if (empty($match))
+            return '';
+
         return $this->twig->render('markup/_mailing_list.html.twig', [
             'list_id' => $match['list_id'],
         ]);

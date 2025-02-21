@@ -101,6 +101,9 @@ class CommitteesController extends AbstractController
     {
         $iter = $this->model->find_one(['login' => $slug]);
 
+        if (!isset($iter))
+            throw $this->createNotFoundException('Committee/group not found.');
+
         if ($iter['hidden'])
             throw $this->createNotFoundException('This committee/group is no longer active.');
 

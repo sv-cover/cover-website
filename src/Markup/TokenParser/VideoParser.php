@@ -26,6 +26,10 @@ class VideoParser extends AbstractTokenParser implements TagParserInterface
     public function render(?string $content, string $tag, string $token): string
     {
         preg_match('/\[video=(?P<url>.+?)( thumbnail=(?P<thumbnail>.+?))?\]/i', $token, $match);
+
+        if (empty($match))
+            return '';
+
         return $this->twig->render('markup/_video.html.twig', $match);
     }
 

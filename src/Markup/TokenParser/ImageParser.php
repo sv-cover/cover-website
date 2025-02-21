@@ -26,6 +26,10 @@ class ImageParser extends AbstractTokenParser implements TagParserInterface
     public function render(?string $content, string $tag, string $token): string
     {
         preg_match('/\[img(?P<class>(\.[a-z-\d]+)*)=(?P<url>.+?)\]/i', $token, $match);
+
+        if (empty($match))
+            return '';
+
         return $this->twig->render('markup/_image.html.twig', [
             'class' => str_replace('.', ' ', $match['class']),
             'url' => $match['url'],

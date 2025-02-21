@@ -1,6 +1,7 @@
 <?php
 namespace App\Form;
 
+use App\DataModel\DataModelPhotobook;
 use App\Form\DataTransformer\StringToDateTimeTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -37,10 +38,10 @@ class PhotoBookType extends AbstractType
             ->add('visibility', ChoiceType::class, [
                 'label' => __('Visible to'),
                 'choices'  => [
-                    __('Public') => \DataModelPhotobook::VISIBILITY_PUBLIC,
-                    __('Only members') => \DataModelPhotobook::VISIBILITY_MEMBERS,
-                    __('Only committee members') => \DataModelPhotobook::VISIBILITY_ACTIVE_MEMBERS,
-                    __('Only PhotoCee') => \DataModelPhotobook::VISIBILITY_PHOTOCEE,
+                    __('Public') => DataModelPhotobook::VISIBILITY_PUBLIC,
+                    __('Only members') => DataModelPhotobook::VISIBILITY_MEMBERS,
+                    __('Only committee members') => DataModelPhotobook::VISIBILITY_ACTIVE_MEMBERS,
+                    __('Only PhotoCee') => DataModelPhotobook::VISIBILITY_PHOTOCEE,
                 ],
                 'expanded' => true,
                 'chips' => true,

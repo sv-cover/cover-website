@@ -292,7 +292,7 @@ class ApiController extends AbstractController
 
         // Can't do anything with a device session
         if (is_a($ident, DeviceIdentityProvider::class))
-            return [];
+            return $this->json([]);
 
         $fields = \array_merge(DataIterMember::fields(), ['type']);
 

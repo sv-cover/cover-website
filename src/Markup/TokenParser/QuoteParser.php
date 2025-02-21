@@ -25,6 +25,10 @@ class QuoteParser extends AbstractTokenParser implements TagParserInterface
     public function render(?string $content, string $tag, string $token): string
     {
         preg_match('/\[quote(=(?P<author>.+?))?\]/i', $token, $match);
+
+        if (empty($match))
+            return '';
+
         return $this->twig->render('markup/_quote.html.twig', [
             'content' => $content,
             'author' => $match['author'] ?? null,

@@ -26,6 +26,10 @@ class YouTubeParser extends AbstractTokenParser implements TagParserInterface
     public function render(?string $content, string $tag, string $token): string
     {
         preg_match('/\[youtube=(?P<youtube_id>.+?)\]/i', $token, $match);
+
+        if (empty($match))
+            return '';
+
         return $this->twig->render('markup/_youtube.html.twig', $match);
     }
 

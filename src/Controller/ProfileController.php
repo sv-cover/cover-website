@@ -264,6 +264,9 @@ class ProfileController extends AbstractController
         else
             $iter = $this->auth->getIdentity()->member();
 
+        if (!isset($iter))
+            throw new UnauthorizedException('Log in to update your profile.');
+
         if (!$this->policy->userCanUpdate($iter))
             throw new UnauthorizedException();
 
@@ -321,6 +324,9 @@ class ProfileController extends AbstractController
         else
             $iter = $this->auth->getIdentity()->member();
 
+        if (!isset($iter))
+            throw new UnauthorizedException('Log in to update your profile.');
+
         if (!$this->policy->userCanUpdate($iter))
             throw new UnauthorizedException();
 
@@ -358,7 +364,10 @@ class ProfileController extends AbstractController
         else
             $iter = $this->auth->getIdentity()->member();
 
-        if (!$this->policy->userCanUpdate($iter))
+        if (!isset($iter))
+            throw new UnauthorizedException('Log in to update your profile.');
+
+        if (!isset($iter) || !$this->policy->userCanUpdate($iter))
             throw new UnauthorizedException();
 
         $form = $this->getPrivacyForm($iter);
@@ -395,7 +404,10 @@ class ProfileController extends AbstractController
         else
             $iter = $this->auth->getIdentity()->member();
 
-        if (!$this->policy->userCanUpdate($iter))
+        if (!isset($iter))
+            throw new UnauthorizedException('Log in to manage your mailinglist subscriptions.');
+
+        if (!isset($iter) || !$this->policy->userCanUpdate($iter))
             throw new UnauthorizedException();
 
         $lists = $mailinglistModel->get_for_member($iter);
@@ -418,6 +430,9 @@ class ProfileController extends AbstractController
         else
             $iter = $this->auth->getIdentity()->member();
 
+        if (!isset($iter))
+            throw new UnauthorizedException('Log in to manage your sessions.');
+
         if (!$this->policy->userCanUpdate($iter))
             throw new UnauthorizedException();
 
@@ -435,6 +450,9 @@ class ProfileController extends AbstractController
             $iter = $this->model->get_iter($member_id);
         else
             $iter = $this->auth->getIdentity()->member();
+
+        if (!isset($iter))
+            throw new UnauthorizedException('Log in to view your purchases.');
 
         if (!$this->policy->userCanUpdate($iter))
             throw new UnauthorizedException();
@@ -462,6 +480,9 @@ class ProfileController extends AbstractController
             $iter = $this->model->get_iter($member_id);
         else
             $iter = $this->auth->getIdentity()->member();
+
+        if (!isset($iter))
+            throw new UnauthorizedException('Log in to view your payments.');
 
         if (!$this->policy->userCanUpdate($iter))
             throw new UnauthorizedException();
