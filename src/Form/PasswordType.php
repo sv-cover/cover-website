@@ -1,6 +1,7 @@
 <?php
 namespace App\Form;
 
+use App\DataIter\DataIterMember;
 use App\DataModel\DataModelMember;
 use App\Legacy\Authentication\Authentication;
 use Symfony\Component\Form\AbstractType;
@@ -20,7 +21,7 @@ class PasswordType extends AbstractType
     ){
     }
 
-    private function getMember(): \DataIterMember
+    private function getMember(): DataIterMember
     {
         if (!empty($options['member']))
             return $options['member'];
