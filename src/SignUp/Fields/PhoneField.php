@@ -89,7 +89,7 @@ class PhoneField implements SignUpFieldInterface
 
     public function buildConfigurationForm(FormBuilderInterface $builder): void
     {
-        $builer
+        $builder
             ->add('required', CheckboxType::class, [
                 'label' => __('Filling in phone number is mandatory.'),
                 'required' => false,
