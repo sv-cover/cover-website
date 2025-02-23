@@ -21,6 +21,8 @@ use App\Utils\MailingListUtils;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\UriSigner;
@@ -140,7 +142,7 @@ class ApiController extends AbstractController
             }
         }
 
-        throw new \InvalidArgumentException("Unknown method \"$method\".");
+        throw new NotFoundHttpException("Unknown method \"$method\".");
     }
 
     /***************************************************************************
@@ -183,7 +185,7 @@ class ApiController extends AbstractController
         $id = $this->request->query->getInt('id');
 
         if ($id === 0)
-            throw new \InvalidArgumentException('Missing id parameter');
+            throw new BadRequestHttpException('Missing id parameter');
 
         $event = $this->eventModel->get_iter($id);
 
@@ -255,7 +257,7 @@ class ApiController extends AbstractController
         $application = $this->request->getPayload()->get('application', 'api');
 
         if (!($member = $this->memberModel->login($email, $password)))
-            throw new \InvalidArgumentException('Invalid username or password');
+            throw new BadRequestHttpException('Invalid username or password');
 
         $session = $this->sessionModel->create($member->get_id(), $application);
 
@@ -284,7 +286,7 @@ class ApiController extends AbstractController
         $session = $this->sessionModel->resume($sessionId);
 
         if (!$session)
-            throw new \InvalidArgumentException('Invalid session id');
+            throw new BadRequestHttpException('Invalid session id');
 
         $auth = new ConstantSessionProvider($session);
 
@@ -383,7 +385,7 @@ class ApiController extends AbstractController
         $id = $payload->get('id');
 
         if (empty($id))
-            throw new \InvalidArgumentException('Missing id field in POST');
+            throw new BadRequestHttpException('Missing id field in POST');
 
         $data = [
             'id' => $id
@@ -392,7 +394,7 @@ class ApiController extends AbstractController
         try {
             $existing = $this->memberModel->get_iter($data['id']);
             if ($existing)
-                throw new \InvalidArgumentException(sprintf('Member with ID %s already exists', $data['id']));
+                throw new BadRequestHttpException(sprintf('Member with ID %s already exists', $data['id']));
         } catch (NotFoundException $e) {
             // all good
         }
@@ -441,7 +443,7 @@ class ApiController extends AbstractController
         $payload = $this->request->getPayload();
 
         if ($memberId != $payload->get('id'))
-            throw new \InvalidArgumentException('Person ids in GET and POST do not match up');
+            throw new BadRequestHttpException('Person ids in GET and POST do not match up');
 
         $member = $this->memberModel->get_iter($memberId);
 
@@ -468,7 +470,7 @@ class ApiController extends AbstractController
         $payload = $this->request->getPayload();
 
         if ($memberId != $payload->get('id'))
-            throw new \InvalidArgumentException('Person ids in GET and POST do not match up');
+            throw new BadRequestHttpException('Person ids in GET and POST do not match up');
 
         $member = $this->memberModel->get_iter($memberId);
 
