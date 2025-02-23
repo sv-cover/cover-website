@@ -220,7 +220,7 @@ class SignUpEntriesController extends AbstractController
             // Redirect admins back to the entry index
             if (!$this->policy->userCanUpdate($iter))
                 return $this->redirectToRoute('sign_up_entries.list', [
-                    'form_id' => $form_id,
+                    'form_id' => $entry['form_id'],
                 ]);
 
             return $this->render('sign_ups/entries/form_success.html.twig', [
