@@ -15,6 +15,8 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class PasswordType extends AbstractType
 {
+    private DataIterMember $_member;
+
     public function __construct(
         private Authentication $auth,
         private DataModelMember $memberModel,
@@ -23,14 +25,16 @@ class PasswordType extends AbstractType
 
     private function getMember(): DataIterMember
     {
-        if (!empty($options['member']))
-            return $options['member'];
+        if (isset($this->_member))
+            return $this->_member;
         else
             return $this->auth->getIdentity()->member();
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        if (!empty($options['member']))
+            $this->_member = $options['member'];
 
         if (!empty($options['confirm_current'])) {
             $builder->add('current', PasswordFieldType::class, [
