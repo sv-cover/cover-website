@@ -150,7 +150,7 @@ class DataModelPhotobookFace extends DataModel
             ]);
 
         return $suggestion
-            ? $memberModel->get_iter($suggestion['lid_id'])
+            ? $this->memberModel->get_iter($suggestion['lid_id'])
             : null;
     }
 
