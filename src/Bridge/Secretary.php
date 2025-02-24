@@ -100,7 +100,7 @@ class Secretary
     public function createPerson(array $data): array
     {
         $response = $this->getClient()->request('POST', 'persons/new.json', [
-            'json' => $data,
+            'body' => $data,
         ]);
         return $response->toArray();
     }
@@ -114,7 +114,7 @@ class Secretary
     public function updatePerson(int $person_id, array $data): array
     {
         $response = $this->getClient()->request('POST', sprintf('persons/%d.json', $person_id), [
-            'json' => $data,
+            'body' => $data,
         ]);
         return $response->toArray();
     }
