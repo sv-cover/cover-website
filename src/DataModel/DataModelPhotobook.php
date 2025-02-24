@@ -17,6 +17,7 @@ use App\Policy\PolicyPhotobook;
 use App\Utils\SearchUtils;
 use Symfony\Component\DependencyInjection\Attribute\Lazy;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 /**
  * A class implementing photo data
@@ -46,6 +47,7 @@ class DataModelPhotobook extends DataModel implements SearchProviderInterface
     public function __construct(
         public Authentication $auth,
         public ContainerBagInterface $params,
+        private TagAwareCacheInterface $photosCache,
         #[Lazy] private DataModelPhotobookFace $faceModel, // Lazy to prevent circular dependencies
         #[Lazy] private DataModelPhotobookReactie $commentModel, // Lazy to prevent circular dependencies
         #[Lazy] private DataModelPhotobookLike $likeModel, // Lazy to prevent circular dependencies
@@ -472,12 +474,7 @@ class DataModelPhotobook extends DataModel implements SearchProviderInterface
     {
         $result = parent::delete($iter);
 
-        // Remove scaled versions of the image from the scaled image cache
-        $filled_in_filter = preg_replace('/%d/', $iter->get_id(), $this->params->get('app.photos_scaled_dir'), 1);
-
-        $filter = str_replace('%d', '*', $filled_in_filter);
-        foreach (glob($filter) as $scaled_image_path)
-            unlink($scaled_image_path);
+        $this->photosCache->invalidateTags([sprintf('photo_%d', $iter->get_id())]);
 
         return $result;
     }

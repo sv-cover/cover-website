@@ -30,7 +30,6 @@ parameters:
     env(APP_FACE_DETECT_LOG_PATH): /dev/null
     app.no_iban_string: OUTSIDE_SEPA_AREA
     app.photos_dir: '%env(APP_PHOTOS_DIR)%'
-    app.photos_scaled_dir: '%env(APP_PHOTOS_SCALED_DIR)%'
     app.photos_scaled_url: '%env(default::APP_PHOTOS_SCALED_URL)%'
     app.timezone: '%env(APP_TIMEZONE)%'
     env(APP_TIMEZONE): Europe/Amsterdam
