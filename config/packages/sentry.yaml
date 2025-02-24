@@ -4,10 +4,11 @@ when@prod:
         options:
             before_send: "sentry.callback.before_send"
             ignore_exceptions:
+                - 'Symfony\Component\Console\Exception\ExceptionInterface'
                 - 'Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException'
                 - 'Symfony\Component\HttpKernel\Exception\BadRequestHttpException'
+                - 'Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException'
                 - 'Symfony\Component\HttpKernel\Exception\NotFoundHttpException'
-                - 'Symfony\Component\Console\Exception\ExceptionInterface'
 
     services:
         sentry.callback.before_send:
