@@ -101,6 +101,6 @@ class ApiSubscriber implements EventSubscriberInterface
         ];
 
         $event->allowCustomResponseCode();
-        $event->setResponse(new JsonResponse($responseData, $code, $headers));
+        $event->setResponse(new JsonResponse($responseData, 200, $headers));
     }
 }
