@@ -155,7 +155,7 @@ class SessionsController extends AbstractController
         Request $request
     ): Response|RedirectResponse
     {
-        $referrer = $request->query->get('page', $this->generateUrl('homepage'));
+        $referrer = $request->query->get('referrer', $this->generateUrl('homepage'));
 
         $referrer_host = parse_url($referrer, PHP_URL_HOST);
         if ($referrer_host && !$this->urlUtils->isSameDomain($referrer_host, $request->getHttpHost(), 3))
