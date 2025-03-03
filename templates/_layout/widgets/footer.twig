@@ -4,23 +4,21 @@
     {% endif %}
     <div class="footer footer-main">
         <ul>
-            <li>
-                <a href="{{ path('slug', {'slug': 'contact'}) }}">{{ __('Contact') }}</a>
-            </li>
-            <li class="divider" role="separator"></li>
-            <li>
-                <a href="//sd.svcover.nl/Privacy%20Statement/Privacy%20statement.pdf">{{ __('Privacy statement') }}</a>
-            </li>
-            <li class="divider" role="separator"></li>
-            <li>
-                <a href="https://bitbucket.org/cover-webcie/cover-php/issues">{{ __('Report a bug')}}</a>
-            </li>
-            <li class="divider" role="separator"></li>
-            <li>
-                <a href="{{ path('slug', {'slug': 'cancellation-policy'}) }}">
-                    {{ __('Cancellation Policy')}}
-                </a>
-            </li>
+            {% for item in menu.footer -%}
+                <li>
+                    <a
+                        href="{{ item.url|e('html_attr') }}"
+                        target="{{ item.target|default('') }}"
+                        class="{{ item.class|default('') }}"
+                        {% if item.title is defined %} title="{{ item.title }}"{% endif %}
+                    >
+                        {{- item.label -}}
+                    </a>
+                </li>
+                {%- if not loop.last -%}
+                    <li class="divider" role="separator"></li>
+                {%- endif -%}
+            {%- endfor %}
         </ul>
     </div>
 </footer>

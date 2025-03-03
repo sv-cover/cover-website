@@ -390,4 +390,33 @@ class Menu
 
         return $menu;
     }
+
+    public function footer()
+    {
+        $menu = [];
+
+        $menu[] = [
+            'url' => $this->router->generate('slug', ['slug' => 'contact']),
+            'label' => __('Contact'),
+        ];
+
+        $menu[] = [
+            'url' => '//sd.svcover.nl/Privacy%20Statement/Privacy%20statement.pdf',
+            'label' => __('Privacy Statement'),
+            'target' => '_blank',
+        ];
+
+        $menu[] = [
+            'url' => $this->router->generate('slug', ['slug' => 'cancellation-policy']),
+            'label' => __('Cancellation Policy'),
+        ];
+
+        $menu[] = [
+            'url' => 'https://bitbucket.org/cover-webcie/cover-php/issues',
+            'label' => __('Report A Bug'),
+            'target' => '_blank',
+        ];
+
+        return $menu;
+    }
 }
