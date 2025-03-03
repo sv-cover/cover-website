@@ -541,12 +541,8 @@ class PhotoBooksController extends AbstractController
             )
                 $ancestors[] = $books[end($ancestors)->get('parent_id')];
 
-
             $bookPath = \implode('/', \array_map(
-                fn($b): string => (
-                    (isset($b['date']) ? (new \DateTime($b['date']))->format('Y-m-d') . '_' : '')
-                    . $this->slugger->slug($b['titel'])
-                ),
+                fn($b): string => (new \DateTime($b['date'] ?? 'now'))->format('Y-m-d') . '_' . $this->slugger->slug($b['titel']),
                 \array_reverse($ancestors)
             ));
 
