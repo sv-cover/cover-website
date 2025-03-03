@@ -109,7 +109,10 @@ class DataIterPhotobook extends DataIter implements SearchResultInterface
 
     public function get_search_relevance(): float
     {
-        $date = \DateTime::createFromFormat('d-m-Y', $this->get('date'));
+        if (empty($this['date']))
+            return 0.5;
+
+        $date = \DateTime::createFromFormat('d-m-Y', $this['date']);
 
         $recency = $date
             ? (1.0 / (time() - $date->getTimestamp()))
