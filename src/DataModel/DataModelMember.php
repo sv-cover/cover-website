@@ -99,7 +99,10 @@ class DataModelMember extends DataModel implements SearchProviderInterface
 
     public function test_password(DataIterMember $member, $password)
     {
-        $stored_password = $this->db->query_value(sprintf('SELECT password FROM passwords WHERE lid_id = %d', $member->get_id()));
+        $stored_password = $this->db->query_value(
+            'SELECT password FROM passwords WHERE lid_id = :member_id',
+            [':member_id' => $member->get_id()],
+        ) ?? password_hash('', PASSWORD_DEFAULT);
 
         // Old md5 password
         if (preg_match('/^[a-z0-9]{32}$/', $stored_password)) {
