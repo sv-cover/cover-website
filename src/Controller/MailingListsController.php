@@ -26,6 +26,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -285,14 +286,30 @@ class MailingListsController extends AbstractController
 
     /**
      * Endpoint to allow people to unsubscribe through an unsubscribe link.
+     *
+     * Compatible with RFC 8058 One-Click unsubscribe requests
+     * (https://datatracker.ietf.org/doc/html/rfc8058).
      */
     #[Route('/mailing_lists/subscription/{id}/unsubscribe', name: 'mailing_lists.subscription.unsubscribe', methods: ['GET', 'POST'])]
     public function subscriptionDelete(
         DataModelMailinglistSubscription $model,
+        UriSigner $uriSigner,
         Request $request,
         string $id,
     ): Response|RedirectResponse
     {
+        $isOneClick = (
+            $request->getMethod() == Request::METHOD_POST
+            && (
+                strtolower($request->headers->get('List-Unsubscribe')) == 'one-click'
+                || strtolower($request->request->get('List-Unsubscribe')) == 'one-click'
+            )
+        );
+
+        // OneClick can only use signed responses (see: https://datatracker.ietf.org/doc/html/rfc8058#section-3.1)
+        if ($isOneClick && !$uriSigner->checkRequest($request))
+            throw $this->createNotFoundException();
+
         try {
             $subscription = $model->get_iter($id);
         } catch (NotFoundException $e) {
@@ -308,13 +325,18 @@ class MailingListsController extends AbstractController
 
         $list = $subscription['mailinglist'];
 
-        $form = $this->createFormBuilder()
+        // Disable CSRF protection for RFC 8058 One-Click unsubscribe requests
+        $form = $this->createFormBuilder(['csrf_protection' => !$isOneClick])
             ->add('submit', SubmitType::class, ['label' => 'Unsubscribe'])
             ->getForm();
         $form->handleRequest($request);
 
-        if ($subscription->is_active() && $form->isSubmitted() && $form->isValid())
+        $doUnsubscribe = $isOneClick || ($form->isSubmitted() && $form->isValid());
+        if ($doUnsubscribe && $subscription->is_active())
             $subscription->cancel();
+
+        if ($isOneClick)
+            return new Response();
 
         return $this->render('mailing_lists/unsubscribe_form.html.twig', [
             'list' => $list,
