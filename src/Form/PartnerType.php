@@ -1,6 +1,7 @@
 <?php
 namespace App\Form;
 
+use App\DataModel\DataModelPartner;
 use App\Form\DataTransformer\IntToBooleanTransformer;
 use App\Form\Type\FilemanagerFileType;
 use App\Form\Type\MarkupType;
@@ -26,9 +27,9 @@ class PartnerType extends AbstractType
             ->add('type', ChoiceType::class, [
                 'label' => __('Type'),
                 'choices'  => [
-                    __('Sponsor') => \DataModelPartner::TYPE_SPONSOR,
-                    __('Main sponsor') => \DataModelPartner::TYPE_MAIN_SPONSOR,
-                    __('Other') => \DataModelPartner::TYPE_OTHER,
+                    __('Sponsor') => DataModelPartner::TYPE_SPONSOR,
+                    __('Main sponsor') => DataModelPartner::TYPE_MAIN_SPONSOR,
+                    __('Other') => DataModelPartner::TYPE_OTHER,
                 ],
             ])
             ->add('url', UrlType::class, [
