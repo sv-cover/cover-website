@@ -244,7 +244,7 @@ class SignUpEntriesController extends AbstractController
         $iter = $this->formModel->get_iter($form_id);
 
         if (!$this->policy->userCanDelete($iter))
-            throw new UnauthorizedException('You are not allowed to delete this announcement.');
+            throw new UnauthorizedException('You are not allowed to delete this entry.');
 
         $form = $this->createFormBuilder(null, ['csrf_token_id' => 'form_' . $iter['id'] . '_delete_entries'])
             ->add('entries', ChoiceType::class, [

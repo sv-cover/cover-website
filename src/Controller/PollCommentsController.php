@@ -99,7 +99,7 @@ class PollCommentsController extends AbstractController
             ]);
 
         if (!$this->policy->userCanDelete($iter))
-            throw new UnauthorizedException('You are not allowed to delete this announcement.');
+            throw new UnauthorizedException('You are not allowed to delete this comment.');
 
         $form = $this->createFormBuilder($iter)
             ->add('submit', SubmitType::class, ['label' => __('Delete'), 'color' => 'danger'])

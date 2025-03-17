@@ -177,7 +177,7 @@ class EventsController extends AbstractController
         $iter = $this->model->get_iter($id);
 
         if (!$this->policy->userCanRead($iter))
-            throw new UnauthorizedException('You are not allowed to read this announcement.');
+            throw new UnauthorizedException('You are not allowed to read this event.');
 
         return $this->render('events/single.html.twig', ['iter' => $iter]);
     }
@@ -194,7 +194,7 @@ class EventsController extends AbstractController
         $iter = $this->model->get_iter($id);
 
         if (!$this->policy->userCanUpdate($iter))
-            throw new UnauthorizedException('You are not allowed to edit this announcement.');
+            throw new UnauthorizedException('You are not allowed to edit this event.');
 
         $orig = DataIterAgenda::from_iter($iter);
 
@@ -251,7 +251,7 @@ class EventsController extends AbstractController
         $iter = $this->model->get_iter($id);
 
         if (!$this->policy->userCanDelete($iter))
-            throw new UnauthorizedException('You are not allowed to delete this announcement.');
+            throw new UnauthorizedException('You are not allowed to delete this event.');
 
         $form = $this->createFormBuilder($iter)
             ->add('submit', SubmitType::class, ['label' => __('Delete'), 'color' => 'danger'])

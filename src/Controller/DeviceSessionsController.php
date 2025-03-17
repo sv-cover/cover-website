@@ -64,7 +64,7 @@ class DeviceSessionsController extends AbstractController
         $iter = $this->model->get_iter($id);
 
         if (!$this->policy->userCanUpdate($iter))
-            throw new UnauthorizedException('You are not allowed to edit this announcement.');
+            throw new UnauthorizedException('You are not allowed to edit this session.');
 
         $form = $this->createForm(DeviceSessionType::class, $iter, ['mapped' => false]);
         $form->handleRequest($request);
@@ -86,7 +86,7 @@ class DeviceSessionsController extends AbstractController
         $iter = $this->model->get_iter($id);
 
         if (!$this->policy->userCanDelete($iter))
-            throw new UnauthorizedException('You are not allowed to delete this announcement.');
+            throw new UnauthorizedException('You are not allowed to delete this session.');
 
         $form = $this->createFormBuilder($iter)
             ->add('submit', SubmitType::class, ['label' => __('Delete'), 'color' => 'danger'])
