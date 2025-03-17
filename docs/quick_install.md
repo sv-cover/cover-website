@@ -11,13 +11,15 @@ sudo apt update
 sudo apt upgrade
 ```
 
-Install PHP (with extensions):
+Install PHP 8.3 (with extensions):
 
 ```bash
 sudo apt install php php-cli php-pgsql php-curl php-mbstring php-zip php-bcmath php-xml php-intl
 ```
 
-If this doesn't install PHP 8.3, change php to php8.3 throughout the command. You need the [Ondrej PHP PPA](https://launchpad.net/~ondrej/+archive/ubuntu/php) for this to work.
+**NB**: if you don't want this to install the Apache HTTP Server, install `php-fpm` first. This satisfies PHP's alternative dependency, which negates the need for Apache.
+
+**NB**: if this doesn't install PHP 8.3, change php to php8.3 throughout the command. You need the [Ondrej PHP PPA](https://launchpad.net/~ondrej/+archive/ubuntu/php) for this to work.
 
 Install Postgres:
 
@@ -36,11 +38,11 @@ Follow the Debian/Ubuntu instructions on [the Symfony download page](https://sym
 
 Install Node:
 
-First, follow the instructions for installing [Node Version Manager](https://github.com/nvm-sh/nvm?tab=readme-ov-file#installing-and-updating).
+First, follow the instructions for installing [Node Version Manager](https://github.com/nvm-sh/nvm?tab=readme-ov-file#installing-and-updating). (Use [nvm.fish](https://github.com/jorgebucaran/nvm.fish) if you use the fish shell.)
 
-Now, install Node v22:
+Now, install Node v18 (and dependencies):
 ```bash
-nvm install 22
+nvm install 18
 sudo apt-get install build-essential
 ```
 
@@ -137,7 +139,7 @@ symfony server:start
 
 Now, you should be able to load `localhost:8000/` in a browser and log in with `test@svcover.nl` and the password you just set.
 
-For more information on the Symfony developmen server, check out [the documentation](https://symfony.com/doc/current/setup/symfony_server.html).
+For more information on the Symfony development server, check out [the documentation](https://symfony.com/doc/current/setup/symfony_server.html).
 
 Please note that the bare-bones database is quite empty. If you need more content, you should add it yourself. The `test@svcover.nl` user is a member of the AC/DCee in this setup, so you should be able to do anything you need with this user. Feel free to create more users if you want.
 
