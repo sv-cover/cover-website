@@ -80,7 +80,8 @@ class PhotoBooksController extends AbstractController
 
         $response = $this->render('photos/books/single.html.twig', $context);
 
-        if ($auth->loggedIn && $this->policy->userCanMarkAsRead($book))
+        // Don't check the userCanMarkAsRead policy. That's only used to determine whether the "Mark as read" button should be shown.
+        if ($auth->loggedIn)
             $this->model->mark_read($auth->identity->get('id'), $book);
 
         return $response;
