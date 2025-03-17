@@ -16,7 +16,7 @@
             {% if iter.profile_picture and iter.is_private('foto') %}
                 <div class="field-label">
                     <figure class="image is-128x128">
-                        <img class="is-rounded" src="{{ path('profile_pictures', {id: iter.profile_picture.id, format: 'square', width: 256}) }}" width="128">
+                        <img class="is-rounded" src="{{ path('profile_pictures.single', {id: iter.profile_picture.id, format: 'square', width: 256}) }}" width="128">
                     </figure>
                 </div>
             {% endif %}
