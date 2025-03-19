@@ -273,10 +273,12 @@ class DataModelCommissie extends DataModel implements SearchProviderInterface
         $this->db->delete('committee_members', sprintf('committee_id = %d', $committee->get_id()));
 
         foreach ($members as $member)
-            $this->db->insert('committee_members', array(
-                'committee_id' => $committee->get_id(),
-                'member_id' => intval($member['member_id']),
-                'functie' => $member['functie']));
+            if (!empty($member['member_id']))
+                $this->db->insert('committee_members', [
+                    'committee_id' => $committee->get_id(),
+                    'member_id' => intval($member['member_id']),
+                    'functie' => $member['functie'],
+                ]);
     }
 
     public function get_for_member(DataIterMember $member)
