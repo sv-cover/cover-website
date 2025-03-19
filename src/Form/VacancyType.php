@@ -1,6 +1,7 @@
 <?php
 namespace App\Form;
 
+use App\DataIterDataIterVacancy;
 use App\DataModel\DataModelVacancy;
 use App\Form\Type\MarkupType;
 use Symfony\Component\Form\AbstractType;
@@ -74,7 +75,7 @@ class VacancyType extends AbstractType
         ]);
     }
 
-    public function validate_iter(\DataIterVacancy $iter, ExecutionContextInterface $context): void
+    public function validate_iter(DataIterVacancy $iter, ExecutionContextInterface $context): void
     {
         if (!(empty($iter['partner_id']) xor empty($iter['partner_name']))) {
             $context->buildViolation(__('Either Company or Partner name must be set, but not both.'))
