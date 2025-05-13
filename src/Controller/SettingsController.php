@@ -44,7 +44,7 @@ class SettingsController extends AbstractController
         if (!$this->policy->userCanCreate($iter))
             throw new UnauthorizedException('You are not allowed to create settings.');
 
-        $form = $this->createForm(AnnouncementType::class, $iter, ['mapped' => false]);
+        $form = $this->createForm(SettingsType::class, $iter, ['mapped' => false]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -64,7 +64,7 @@ class SettingsController extends AbstractController
         $iter = $this->model->get_iter($id);
 
         if (!$this->policy->userCanUpdate($iter))
-            throw new UnauthorizedException('You are not allowed to edit this announcement.');
+            throw new UnauthorizedException('You are not allowed to edit this setting.');
 
         $form = $this->createForm(SettingsType::class, $iter, ['mapped' => false]);
         $form->handleRequest($request);
@@ -86,7 +86,7 @@ class SettingsController extends AbstractController
         $iter = $this->model->get_iter($id);
 
         if (!$this->policy->userCanDelete($iter))
-            throw new UnauthorizedException('You are not allowed to delete this announcement.');
+            throw new UnauthorizedException('You are not allowed to delete this setting.');
 
         $form = $this->createFormBuilder($iter)
             ->add('submit', SubmitType::class, ['label' => __('Delete'), 'color' => 'danger'])

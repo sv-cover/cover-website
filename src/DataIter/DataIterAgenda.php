@@ -112,14 +112,12 @@ class DataIterAgenda extends DataIter implements SearchResultInterface
             $other_value = $other[$field];
 
             // Unfortunately, we need to 'normalize' the time fields for this to work
-            if ($field == 'van' || $field == 'tot')
-            {
-                $other_value = strtotime($other[$field]);
-                $value = strtotime($value);
+            if ($field == 'van' || $field == 'tot') {
+                $other_value = is_string($other[$field]) ? strtotime($other[$field]) : null;
+                $value = is_string($value) ? strtotime($value) : null;
             }
 
-            if ($field == 'committee_id')
-            {
+            if ($field == 'committee_id') {
                 $other_value = ['id' => $other_value, 'name' => $other['committee__naam'], 'login' => $other['committee__login']];
                 $value = ['id' => $value, 'name' => $this['committee__naam'], 'login' => $this['committee__login']];
             }

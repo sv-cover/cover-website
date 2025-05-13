@@ -1,6 +1,7 @@
 <?php
 namespace App\Form;
 
+use App\DataModel\DataModelAnnouncement;
 use App\Form\Type\MarkupType;
 use App\Form\Type\CommitteeIdType;
 use Symfony\Component\Form\AbstractType;
@@ -19,9 +20,9 @@ class AnnouncementType extends AbstractType
             ->add('visibility', ChoiceType::class, [
                 'label' => __('Visible to'),
                 'choices'  => [
-                    __('Everyone') => \DataModelAnnouncement::VISIBILITY_PUBLIC,
-                    __('Only logged in members') => \DataModelAnnouncement::VISIBILITY_MEMBERS,
-                    __('Only logged in active members') => \DataModelAnnouncement::VISIBILITY_ACTIVE_MEMBERS,
+                    __('Everyone') => DataModelAnnouncement::VISIBILITY_PUBLIC,
+                    __('Only logged in members') => DataModelAnnouncement::VISIBILITY_MEMBERS,
+                    __('Only logged in active members') => DataModelAnnouncement::VISIBILITY_ACTIVE_MEMBERS,
                 ],
             ])
             ->add('subject', TextType::class, [

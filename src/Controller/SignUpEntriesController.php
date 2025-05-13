@@ -165,7 +165,7 @@ class SignUpEntriesController extends AbstractController
                 ));
 
             // Redirect admins back to the entry index
-            if (!$this->policy->userCanUpdate($iter))
+            if ($this->policy->userCanUpdate($iter))
                 return $this->redirectToRoute('sign_up_entries.list', [
                     'form_id' => $form_id,
                 ]);
@@ -244,7 +244,7 @@ class SignUpEntriesController extends AbstractController
         $iter = $this->formModel->get_iter($form_id);
 
         if (!$this->policy->userCanDelete($iter))
-            throw new UnauthorizedException('You are not allowed to delete this announcement.');
+            throw new UnauthorizedException('You are not allowed to delete this entry.');
 
         $form = $this->createFormBuilder(null, ['csrf_token_id' => 'form_' . $iter['id'] . '_delete_entries'])
             ->add('entries', ChoiceType::class, [

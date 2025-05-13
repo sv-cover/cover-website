@@ -14,3 +14,43 @@
     {{ include('photos/books/_photos.html.twig', {photos: photos}) }}
 </div>
 {% endblock %}
+
+{% block scripts %}
+    {{ parent() }}
+    <script>
+        /**
+         * Determine the number of rows to show. Uses a crude approach to
+         * wrapping the rows, but its simple and does a good enough job of
+         * making the slide look okay.
+         */
+        function scale_gallery() {
+            // Set magic numbers
+            const BASE_HEIGHT = 300; // 300 is used for all height and aspect calcultaions in templates/photos/macros.html.twig
+            const H_SCALE = 0.8; // adjust horizontal scale. This makes photos in the most common aspect ratio (3:2) fit nicer on a 16:9 screen.
+
+            const gallery = document.querySelector('.photo-gallery');
+
+            // Calculate total width of all photos
+            let width = 0;
+            for (let photo of gallery.querySelectorAll('.photo')) {
+                const match = photo.className.match(/.*is-(?<width>[\d]+)/);
+                width += parseInt(match?.groups?.width) * H_SCALE || 0;
+            }
+
+            // Calculate number of rows
+            const aspect = width / BASE_HEIGHT;
+            const viewport = window.innerWidth / window.innerHeight;
+            const rows = Math.round(Math.sqrt(aspect / viewport));
+
+            // Apply
+            if (gallery.dataset.rows)
+                gallery.classList.remove('has-rows-' + gallery.dataset.rows);
+
+            gallery.classList.add('has-rows-' + rows);
+            gallery.dataset.rows = rows;
+        }
+
+        scale_gallery();
+        window.addEventListener('resize', scale_gallery);
+    </script>
+{% endblock %}

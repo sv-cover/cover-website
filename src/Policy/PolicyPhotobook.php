@@ -137,13 +137,13 @@ class PolicyPhotobook implements PolicyInterface
         return // only logged in members can track their viewed photo books
             $this->auth->loggedIn
 
-            // and only if we actually are watching a book
+            // and only if we actually are viewing a book
             && $book->get_id()
 
             // which is not artificial (faces, likes)
             && ctype_digit((string) $book->get_id())
 
-            // and has photos
+            // and has books
             && $book['num_books'] > 0;
     }
 

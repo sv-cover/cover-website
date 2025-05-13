@@ -5,22 +5,33 @@
 // Black is not black enough
 $background: #000000
 
+// Double gap to match slide scale
 $gallery-gap: $gallery-gap * 2
-$photo-height: math.div(100vh, 3)
+
+// 300 is used for all height and aspect calcultaions in templates/photos/macros.html.twig
+$base-height: 300
+
+// Adjust horizontal scale (make photos sligtly narrower). This makes photos in the most common aspect ratio (3:2) fit nicer on a 16:9 screen.
+$h-scale: 0.8
 
 .photo-slide
     background: $background
-
     .photo-gallery
         margin-top: 0
         gap: $gallery-gap
+        --rows: 3
+        &.has-rows-1
+            --rows: 1
+        &.has-rows-2
+            --rows: 2
         .photo
-            height: calc(#{$photo-height} - #{math.div(2 * $gallery-gap, 3)})
+            --row-height: calc(100vh / var(--rows))
+            height: calc(var(--row-height) - ((var(--rows) - 1) * #{$gallery-gap}) / var(--rows) )
             padding: 0
 
             @each $bin in $gallery-basis-bins
                 &.has-basis-#{$bin}
-                    flex-basis: calc(#{math.div($bin, 450)} * #{$photo-height})
+                    flex-basis: calc(#{math.div($bin, $base-height) * $h-scale} * var(--row-height))
 
 
     +until($tablet)

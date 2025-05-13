@@ -1,6 +1,8 @@
 <?php
 namespace App\Form;
 
+use App\DataIter\DataIterVacancy;
+use App\DataModel\DataModelVacancy;
 use App\Form\Type\MarkupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -33,21 +35,21 @@ class VacancyType extends AbstractType
             ->add('type', ChoiceType::class, [
                 'label' => __('Type'),
                 'choices'  => [
-                    __('Full-time')          => \DataModelVacancy::TYPE_FULL_TIME,
-                    __('Part-time')          => \DataModelVacancy::TYPE_PART_TIME,
-                    __('Internship')         => \DataModelVacancy::TYPE_INTERNSHIP,
-                    __('Graduation project') => \DataModelVacancy::TYPE_GRADUATION_PROJECT,
-                    __('Other/unknown')      => \DataModelVacancy::TYPE_OTHER,
+                    __('Full-time')          => DataModelVacancy::TYPE_FULL_TIME,
+                    __('Part-time')          => DataModelVacancy::TYPE_PART_TIME,
+                    __('Internship')         => DataModelVacancy::TYPE_INTERNSHIP,
+                    __('Graduation project') => DataModelVacancy::TYPE_GRADUATION_PROJECT,
+                    __('Other/unknown')      => DataModelVacancy::TYPE_OTHER,
                 ],
             ])
             ->add('study_phase', ChoiceType::class, [
                 'label' => __('Study phase'),
                 'choices'  => [
-                    __('Bachelor Student')   => \DataModelVacancy::STUDY_PHASE_BSC,
-                    __('Master Student')     => \DataModelVacancy::STUDY_PHASE_MSC,
-                    __('Graduated Bachelor') => \DataModelVacancy::STUDY_PHASE_BSC_GRADUATED,
-                    __('Graduated Master')   => \DataModelVacancy::STUDY_PHASE_MSC_GRADUATED,
-                    __('Other/unknown')      => \DataModelVacancy::STUDY_PHASE_OTHER,
+                    __('Bachelor Student')   => DataModelVacancy::STUDY_PHASE_BSC,
+                    __('Master Student')     => DataModelVacancy::STUDY_PHASE_MSC,
+                    __('Graduated Bachelor') => DataModelVacancy::STUDY_PHASE_BSC_GRADUATED,
+                    __('Graduated Master')   => DataModelVacancy::STUDY_PHASE_MSC_GRADUATED,
+                    __('Other/unknown')      => DataModelVacancy::STUDY_PHASE_OTHER,
                 ],
             ])
             ->add('url', UrlType::class, [
@@ -73,7 +75,7 @@ class VacancyType extends AbstractType
         ]);
     }
 
-    public function validate_iter(\DataIterVacancy $iter, ExecutionContextInterface $context): void
+    public function validate_iter(DataIterVacancy $iter, ExecutionContextInterface $context): void
     {
         if (!(empty($iter['partner_id']) xor empty($iter['partner_name']))) {
             $context->buildViolation(__('Either Company or Partner name must be set, but not both.'))

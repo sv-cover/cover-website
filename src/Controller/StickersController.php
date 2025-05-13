@@ -137,7 +137,7 @@ class StickersController extends AbstractController
         $sticker = $this->model->get_iter($id);
 
         if (!$this->policy->userCanDelete($sticker))
-            throw new UnauthorizedException('You are not allowed to delete this announcement.');
+            throw new UnauthorizedException('You are not allowed to delete this sticker.');
 
         $form = $this->createFormBuilder($sticker)
             ->add('submit', SubmitType::class, ['label' => __('Delete'), 'color' => 'danger'])

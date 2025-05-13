@@ -12,6 +12,7 @@ use App\Legacy\Database\DataIterNotFoundException;
 use App\Legacy\Database\DataModel;
 use App\Legacy\Database\SearchProviderInterface;
 use Symfony\Component\DependencyInjection\Attribute\Lazy;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 
 /**
  * A class implementing the Commissie data
@@ -92,7 +93,8 @@ class DataModelCommissie extends DataModel implements SearchProviderInterface
         if ($iter['vacancies'] === '')
             $iter['vacancies'] = null;
 
-        $iter['login'] = preg_replace('[^a-z0-9]', '', strtolower($iter['naam']));
+        $slugger = new AsciiSlugger();
+        $iter['login'] = $slugger->slug($iter['naam'])->lower()->toString();
 
         $committee_id = parent::insert($iter);
 
@@ -271,10 +273,12 @@ class DataModelCommissie extends DataModel implements SearchProviderInterface
         $this->db->delete('committee_members', sprintf('committee_id = %d', $committee->get_id()));
 
         foreach ($members as $member)
-            $this->db->insert('committee_members', array(
-                'committee_id' => $committee->get_id(),
-                'member_id' => intval($member['member_id']),
-                'functie' => $member['functie']));
+            if (!empty($member['member_id']))
+                $this->db->insert('committee_members', [
+                    'committee_id' => $committee->get_id(),
+                    'member_id' => intval($member['member_id']),
+                    'functie' => $member['functie'],
+                ]);
     }
 
     public function get_for_member(DataIterMember $member)

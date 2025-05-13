@@ -57,7 +57,7 @@ class DataModelVacancy extends DataModel implements SearchProviderInterface
 
     public function update(DataIter $iter)
     {
-        $iter['updated_on'] = new DateTime();
+        $iter['updated_on'] = new \DateTime();
 
         return parent::update($iter);
     }
