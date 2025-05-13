@@ -13,6 +13,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use ZBateson\MailMimeParser\MailMimeParser;
 use ZBateson\MailMimeParser\Header\HeaderConsts;
@@ -31,6 +32,7 @@ class ProcessMailingListQueueCommand extends Command
         private DataModelMailinglistQueue $queueModel,
         private MailingListUtils $mailingListUtils,
         private UrlGeneratorInterface $urlGenerator,
+        private UriSigner $uriSigner,
     ){
         parent::__construct();
         $this->parser = new MailMimeParser();
@@ -246,7 +248,9 @@ class ProcessMailingListQueueCommand extends Command
                 ]),
             );
 
-            $personalizedMessage->setRawHeader('List-Unsubscribe', sprintf('<%s>', $unsubscribeUrl));
+            // Add headers for RFC 2369 (https://datatracker.ietf.org/doc/html/rfc2369) and RFC 8058 (https://datatracker.ietf.org/doc/html/rfc8058)
+            $personalizedMessage->setRawHeader('List-Unsubscribe', sprintf('<%s>', $this->uriSigner->sign($unsubscribeUrl)));
+            $personalizedMessage->setRawHeader('List-Unsubscribe-Post', 'List-Unsubscribe=One-Click');
             $personalizedMessage->setRawHeader('List-Archive', sprintf('<%s>', $archiveUrl));
 
             $this->mailingListUtils->sendMessage($personalizedMessage, $subscription['email']);
