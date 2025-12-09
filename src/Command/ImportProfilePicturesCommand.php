@@ -32,8 +32,8 @@ class ImportProfilePicturesCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDescription('Update password')
-            ->setHelp('This command allows you to update a member’s password')
+            ->setDescription('Import profile pictures')
+            ->setHelp('This command allows you to set profile pictures for many members.')
             ->addArgument(
                 'photos',
                 InputArgument::IS_ARRAY | InputArgument::REQUIRED,
@@ -93,6 +93,12 @@ class ImportProfilePicturesCommand extends Command
             sprintf('member_%d_picture', $member->get_id()),
         ]);
         $this->profilePictureModel->set_for_member($member, $fh);
+
+        // Set the photo to reviewed. Don't add an extra argument to
+        // set_for_member to ensure proper process in all other situations.
+        $picture = $this->profilePictureModel->get_for_member($member);
+        $picture['reviewed'] = true;
+        $this->profilePictureModel->update($picture);
 
         unlink($file);
     }
