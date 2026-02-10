@@ -21,7 +21,7 @@
     </div>
 </header>
 
-{% if (policy.userCanUpdate(form) or policy.userCanRead(form))%}
+{% if policy.userCanUpdate(form) %}
     <article class="block">
         <p>
             {{ __N('There is currently %d sign-up.', 'There are currently %d sign-ups.', form.entries|length) }}
