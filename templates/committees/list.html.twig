@@ -53,18 +53,20 @@
 {% endblock %}
 
 {% block page %}
+
 <header class="section">
     <div class="container is-widescreen level">
         <div class="level-left">
             <h1 class="title">{{ __('Committees') }}</h1>
         </div>
-        {% if policy.userCanCreate('DataModelCommissie') %}
         <div class="level-right buttons">
+            <a href="/committee_join" class="button is-danger is-dark has-text-weight-bold">Join a committee</a>
             {# If someone can create, someone can probably also reactivate #}
+            {% if policy.userCanCreate('DataModelCommissie') %}
             <a href="{{ path('committees.archive') }}" class="button">{{ __('Committee archive') }}</a>
             <a href="{{ path('committees.create') }}" class="button">{{ __('New committee') }}</a>
+            {% endif %}
         </div>
-        {% endif %}
     </div>
 </header>
 
