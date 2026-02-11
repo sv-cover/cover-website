@@ -39,6 +39,16 @@ class CommitteesController extends AbstractController
         ]);
     }
 
+
+    #[Route('/committees/join', name: 'committees.join', methods: ['GET', 'POST'])]
+    public function joins(): Response
+    {
+
+        return $this->render('committees/joinform.html.twig');
+
+    }
+
+
     /**
      * The Thrash! All (including deleted) committees/groups/others/etc
      */
