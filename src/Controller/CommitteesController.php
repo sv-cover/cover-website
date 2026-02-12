@@ -41,8 +41,16 @@ class CommitteesController extends AbstractController
 
 
     #[Route('/committees/join', name: 'committees.join', methods: ['GET', 'POST'])]
-    public function joins(): Response
+    public function joins(
+        Authentication $auth,
+    ): Response
     {
+        if (!$auth->loggedIn)
+            throw new UnauthorizedException();
+
+
+        
+
 
         return $this->render('committees/joinform.html.twig');
 
