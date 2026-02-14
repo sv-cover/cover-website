@@ -41,7 +41,7 @@ class SignUpEntriesController extends AbstractController
                 'event' => $event,
             ]);
 
-        $forms = array_filter($event['signup_forms'], [$this->policy, 'userCanRead']);
+        $forms = array_filter($event['signup_forms'], [$this->policy, 'userCanSignup']);
 
         return $this->render('sign_ups/entries/_event_page.html.twig', [
             'forms' => $forms,
@@ -121,7 +121,7 @@ class SignUpEntriesController extends AbstractController
     {
         $iter = $this->formModel->get_iter($form_id);
 
-        if (!$this->policy->userCanRead($iter))
+        if (!$this->policy->userCanSignup($iter))
             throw new UnauthorizedException('You cannot access this form.');
 
         $entry = $iter->new_entry($prefill);
@@ -204,7 +204,7 @@ class SignUpEntriesController extends AbstractController
         $entry = $this->entryModel->get_iter($id);
         $iter = $entry['form'];
 
-        if (!$this->policy->userCanRead($iter))
+        if (!$this->policy->userCanSignup($iter))
             throw new UnauthorizedException('You cannot access this form.');
 
         if (!$this->policy->userCanUpdate($entry))
