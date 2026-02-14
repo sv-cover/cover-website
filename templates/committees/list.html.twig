@@ -57,6 +57,7 @@
 <section class="section">
     <div class="container is-widescreen photo-book">
 
+        {% set committee_description_page = get_page('committee_description_page') %}
 
         {# Controls for committee archive and creating a new committee #}
         {% if policy.userCanCreate('DataModelCommissie') %}
@@ -80,6 +81,12 @@
                             <a href="{{ path('committees.create') }}" class="dropdown-item">
                                 <span>{{ __('New committee') }}</span>
                             </a>
+
+                            {% if committee_description_page %}
+                            <a href="{{ path('page.update', {id: committee_description_page.id}) }}" class="dropdown-item">
+                                <span>{{ __('Modify description') }}</span>
+                            </a>
+                            {% endif %}
                         </div>
                     </div>
             </div>
@@ -91,10 +98,12 @@
         <header class="hero is-light">
             <div class="hero-body has-text-centered is-centered">
                 <h1 class="title">{{ __('Committees') }}</h1>
-            
-                <div class="description">
-                    <p>{{__('This is a description of committees')}}</p>
-                </div>
+
+                {% if committee_description_page %}
+                    <div class="description">
+                        {{ committee_description_page.locale_content|parse_markup }}
+                    </div>
+                {% endif %}
 
                 <div class="buttons is-centered">
                     <a href="{{ path('committees.join') }}" class="button is-cover is-inverted is-outlined is-size-6-tablet is-size-7-mobile">
