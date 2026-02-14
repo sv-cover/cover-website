@@ -221,17 +221,17 @@ class SignUpEntriesController extends AbstractController
             if (!$this->policy->userCanUpdate($iter))
             {
                 $this->addFlash('signup_entry_updated', __('Your signup has been updated'));
-                return $this->render('homepage/homepage.html.twig');
+                return $this->redirectToRoute('homepage');
                 // return $this->redirectToRoute('sign_up_entries.list', [
                 //     'form_id' => $entry['form_id'],
                 // ]);
+            } else {
+                return $this->render('sign_ups/entries/form_success.html.twig', [
+                    'iter' => $iter,
+                    'entry' => $entry,
+                    'context' => $context,
+                ]);
             }
-
-            return $this->render('sign_ups/entries/form_success.html.twig', [
-                'iter' => $iter,
-                'entry' => $entry,
-                'context' => $context,
-            ]);
         }
 
         return $this->render('sign_ups/entries/form.html.twig', [
