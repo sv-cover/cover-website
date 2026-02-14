@@ -54,31 +54,66 @@
 
 {% block page %}
 
-<header class="section">
-    <div class="container is-widescreen level">
-        <div class="level-left">
-            <h1 class="title">{{ __('Committees') }}</h1>
-        </div>
-        <div class="level-right buttons">
-            <a href="{{ path('committees.join') }}" class="button is-danger is-dark has-text-weight-bold">Join a committee</a>
-            {# If someone can create, someone can probably also reactivate #}
-            {% if policy.userCanCreate('DataModelCommissie') %}
-            <a href="{{ path('committees.archive') }}" class="button">{{ __('Committee archive') }}</a>
-            <a href="{{ path('committees.create') }}" class="button">{{ __('New committee') }}</a>
-            {% endif %}
-        </div>
-    </div>
-</header>
-
 <section class="section">
-    <div class="container is-widescreen">
+    <div class="container is-widescreen photo-book">
+
+
+        {# Controls for committee archive and creating a new committee #}
+        {% if policy.userCanCreate('DataModelCommissie') %}
+        <article class="controls">
+            <div class="level-right control dropdown is-right">
+                    <div class="dropdown-trigger">
+                        <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+                            <span>{{ __('Manage') }}</span>
+                            <span class="icon is-small">
+                                <i class="fas fa-angle-down" aria-hidden="true"></i>
+                            </span>
+                        </button>
+                    </div>
+
+                    <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                        <div class="dropdown-content">
+                            <a href="{{ path('committees.archive') }}" class="dropdown-item">
+                                <span>{{ __('Committee archive') }}</span>
+                            </a>
+
+                            <a href="{{ path('committees.create') }}" class="dropdown-item">
+                                <span>{{ __('New committee') }}</span>
+                            </a>
+                        </div>
+                    </div>
+            </div>
+        </article>
+        {% endif %}
+
+
+        {# Header #}
+        <header class="hero is-light">
+            <div class="hero-body has-text-centered is-centered">
+                <h1 class="title">{{ __('Committees') }}</h1>
+            
+                <div class="description">
+                    <p>{{__('This is a description of committees')}}</p>
+                </div>
+
+                <div class="buttons is-centered">
+                    <a href="{{ path('committees.join') }}" class="button is-cover is-inverted is-outlined is-size-6-tablet is-size-7-mobile">
+                        {{__('I am interested!')}}
+                    </a>
+                </div>
+            
+            </div>
+        </header>
+
+
         <div class="columns is-multiline">
-            {% for committee in committees %}
-                {{ _self.committee_card(committee) }}
-            {% endfor %}
+                {% for committee in committees %}
+                    {{ _self.committee_card(committee) }}
+                {% endfor %}
+            </div>
         </div>
+
     </div>
-</section>
 
 
 {% if working_groups %}
