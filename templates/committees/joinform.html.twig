@@ -4,7 +4,7 @@
 
 {% block page %}
 <section class="section">
-    <div class="container is-widescreen photo-book">
+    <div class="container photo-book">
         <header class="hero is-light">
 
             <div class="hero-body">
@@ -27,12 +27,26 @@
             </div>
         </header>
 
+        <section class="section">
+            {% if activeMode == 'join' %}
+                {{ form_start(form) }}
 
-        {% if activeMode == 'join' %}
-            <h1>JOIN</h1>
-        {% elseif activeMode == 'interest' %}
-            <h1>INTEREST</h1>
-        {% endif %}
+                {# Global errors #}
+                {{ form_errors(form) }}
+
+                {# Form fields #}
+
+                {{ form_row(form.name )}}
+
+                {{ form_row(form.committee) }}
+
+
+                {{ form_row(form.submit) }}
+                {{ form_end(form) }}
+            {% elseif activeMode == 'interest' %}
+                <h1>INTEREST</h1>
+            {% endif %}
+        </section>
 
     </div>
 </section>

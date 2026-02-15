@@ -472,6 +472,23 @@ class DataModelCommissie extends DataModel implements SearchProviderInterface
         return $this->_row_to_iter($row);
     }
 
+    public function get_all_committees()
+    {
+        $iters = $this->get(self::TYPE_COMMITTEE, false);
+
+        $options = [
+            'committees' => [],
+        ];
+
+        foreach ($iters as $iter) {
+            $options['committees'][$iter->get('naam')] = $iter->get_id();
+        }
+
+        return [
+            __('') => $options['committees'],
+        ];
+    }
+
     public function get_committee_choices($show_own = true)
     {
         $is_admin = (

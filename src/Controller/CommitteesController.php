@@ -6,12 +6,15 @@ use App\DataModel\DataModelCommissie;
 use App\Exception\UnauthorizedException;
 use App\Form\CommitteeType;
 use App\Form\DataTransformer\IntToBooleanTransformer;
+use App\Form\Type\CommitteeIdType;
 use App\Legacy\Authentication\Authentication;
 use App\Legacy\Policy\Policy;
+use PhpParser\Node\Name;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -44,17 +47,43 @@ class CommitteesController extends AbstractController
     public function joins(
         Authentication $auth,
         string $mode,
+        Request $request,
     ): Response
     {
-        if (!$auth->loggedIn)
+        if (!$auth->getIdentity()->is_member())
             throw new UnauthorizedException();
 
+        $member = $auth->identity->member();
 
+        $data = [
+            'name' => $member['full_name'],
+        ];
+
+        $form = $this->createFormBuilder($data)
+            ->add('name', TextType::class, [
+                'label' => __('Name'),
+                'required' => true,
+
+            ])
+            ->add('committee', CommitteeIdType::class, [
+                'required' => true,
+                'show_all' => true,
+                'show_own' => false,
+                'multiple' => true,
+                'expanded' => true,
+                'chips' => true,
+                'show_all_types' => false,
+                'label' => __('Committee(s)'),
+            ])
+            ->add('submit', SubmitType::class)
+            ->getForm();
+            $form->handleRequest($request);
         
 
 
         return $this->render('committees/joinform.html.twig', [
-            'activeMode' => $mode, 
+            'activeMode' => $mode,
+            'form'=> $form,
         ]);
 
     }
@@ -246,7 +275,7 @@ class CommitteesController extends AbstractController
                 ->cc($member['email'])
                 ->replyTo($member['email'])
                 ->subject("{$member['voornaam']} is interested in {$iter['naam']}")
-                ->htmlTemplate('emails/committee_interest.html.twig')
+                ->htmlTemplate(template: 'emails/committee_interest.html.twig')
                 ->context([
                     'committee' => $iter,
                     'member' => $member,
