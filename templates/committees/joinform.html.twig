@@ -1,9 +1,35 @@
 {% extends '@layout/layout.html.twig' %}
 
-{% block title __('Join a committee') ~ ' – ' ~ parent() %}
+{% block title __('Committee interest') ~ ' – ' ~ parent() %}
 
-{% block content %}
+{% block page %}
 
-<h1 class="title">Test</h1>
+<section class="hero is-light">
+
+    <div class="hero-body">
+        <div class="container has-text-centered is-centered">
+            <h2 class="title">Committee Interest</h2>
+            <p class="subtitle">Are you interested in committees? Fill out this form and the Commissioner of Internal Affairs will contact you!</p>
+        </div>
+
+        <div class="hero-foot">
+            <nav class="tabs is-boxed is-fullwidth">
+
+                <div class="container">
+                    <ul>
+                        <li>
+                            <a>I want to join a committee</a>
+                        </li>
+                        <li>
+                            <a>I want more information about committees</a>
+                        </li>
+                    </ul>
+                </div>
+
+            </nav>
+        </div>
+    </div>
+
+</section>
 
 {% endblock %}
