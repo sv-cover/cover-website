@@ -117,11 +117,11 @@
 
                 <div class="buttons is-centered">
                     {% if app.request.cookies.get('cover_color_mode', 'light') == 'dark' %}
-                    <a href="{{ path('committees.join') }}" class="button is-cover is-inverted is-outlined is-size-6-tablet is-size-7-mobile">
+                    <a href="{{ path('committees.join', {mode: 'join'}) }}" class="button is-cover is-inverted is-outlined is-size-6-tablet is-size-7-mobile">
                         {{ __('I am interested!') }}
                     </a>
                     {% else %}
-                    <a href="{{ path('committees.join') }}" class="button is-black is-outlined is-size-6-table is-size-7-mobile">
+                    <a href="{{ path('committees.join', {mode: 'join'}) }}" class="button is-black is-outlined is-size-6-table is-size-7-mobile">
                         {{ __('I am interested!') }}
                     </a>
                     {% endif %}

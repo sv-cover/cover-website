@@ -40,9 +40,10 @@ class CommitteesController extends AbstractController
     }
 
 
-    #[Route('/committees/join', name: 'committees.join', methods: ['GET', 'POST'])]
+    #[Route('/committees/join/{mode}', name: 'committees.join', defaults: ['mode' => 'join'], methods: ['GET', 'POST'])]
     public function joins(
         Authentication $auth,
+        string $mode,
     ): Response
     {
         if (!$auth->loggedIn)
@@ -52,7 +53,9 @@ class CommitteesController extends AbstractController
         
 
 
-        return $this->render('committees/joinform.html.twig');
+        return $this->render('committees/joinform.html.twig', [
+            'activeMode' => $mode, 
+        ]);
 
     }
 
