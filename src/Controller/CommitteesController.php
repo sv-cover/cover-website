@@ -51,8 +51,9 @@ class CommitteesController extends AbstractController
     #[Route('/committees/join/{mode}', name: 'committees.join', defaults: ['mode' => 'join'], methods: ['GET', 'POST'])]
     public function joins(
         Authentication $auth,
-        string $mode,
+        MailerInterface $mailer,
         Request $request,
+        string $mode,
     ): Response
     {
         if (!$auth->getIdentity()->is_member())
@@ -66,40 +67,63 @@ class CommitteesController extends AbstractController
             'phone' => $member['telefoonnummer'],
         ];
 
-        $form = $this->createFormBuilder($data)
-            ->add('name', TextType::class, [
-                'label' => __('Name'),
-                'required' => true,
-            ])
-            ->add('email', TextType::class, [
-                'label' => __('Email'),
-                'required' => true,
-                'constraints' => [
-                    new Assert\NotBlank(),
-                    new Assert\Email(),
-                ]  
-            ])
-            ->add('phone', TelType::class, [
-                'label'=> __('Phone number'),
-                'required'=> false,
-                'constraints' => [
-                    new AssertPhoneNumber(defaultRegion: 'NL'),
-                ]
-            ])
-            ->add('committee', CommitteeIdType::class, [
-                'required' => true,
-                'show_all' => true,
-                'show_own' => false,
-                'multiple' => true,
-                'expanded' => true,
-                'chips' => true,
-                'show_all_types' => false,
-                'label' => __('Committee(s)'),
-            ])
-            ->add('submit', SubmitType::class)
-            ->getForm();
-            $form->handleRequest($request);
-        
+        if ($mode == 'join')
+        {
+            $form = $this->createFormBuilder($data)
+                ->add('name', TextType::class, [
+                    'label' => __('Name'),
+                    'required' => true,
+                ])
+                ->add('email', TextType::class, [
+                    'label' => __('Email'),
+                    'required' => true,
+                    'constraints' => [
+                        new Assert\NotBlank(),
+                        new Assert\Email(),
+                    ]  
+                ])
+                ->add('phone', TelType::class, [
+                    'label'=> __('Phone number'),
+                    'required'=> false,
+                    'constraints' => [
+                        new AssertPhoneNumber(defaultRegion: 'NL'),
+                    ]
+                ])
+                ->add('wayOfContact', CheckboxType::class, [
+                    'label' => __('Check this checkbox if you would rather be contacted through text than through email'),
+                    'required' => false,
+                ])
+                ->add('committee', CommitteeIdType::class, [
+                    'required' => true,
+                    'show_all' => true,
+                    'show_own' => false,
+                    'multiple' => true,
+                    'expanded' => true,
+                    'chips' => true,
+                    'show_all_types' => false,
+                    'label' => __('Which committee(s)'),
+                ])
+                ->add('submit', SubmitType::class)
+                ->getForm();
+                $form->handleRequest($request);
+
+
+                if ($form->isSubmitted() && $form->isValid())
+                {
+                    $email = (new TemplatedEmail())
+                        ->to('jwsprietsma@gmail.com')
+                        ->subject("{$member['full_name']} wants to join one or more committees")
+                        ->htmlTemplate('emails/committee_join.html.twig')
+                        ->context([
+                            'member' => $member,
+                        ])
+                    ;
+                    $mailer->send($email);
+
+                    $this->addFlash('Success', __('The intern has been notified'));
+                }
+
+            }
 
 
         return $this->render('committees/joinform.html.twig', [
