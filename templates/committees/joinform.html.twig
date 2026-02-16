@@ -9,21 +9,16 @@
 
             <div class="hero-body">
                 <h1 class="title has-text-centered is-centered">Committee Interest Form</h1>
-            </div>
+                <p class="subtitle has-text-centered is-centered">After filling in the form below, the intern will get into contact with you!</p>
+            
+                <br>
 
-            <div class="hero-foot">
-                <nav class="tabs is-boxed is-fullwidth has-background-light">
-                    <div class="container">
-                        <ul>
-                            <li class="{{ activeMode == 'join' ? 'has-background-primary' : ''}}">
-                                <a  href="{{ path('committees.join', {mode: 'join'}) }}">I want to join a committee</a>
-                            </li>
-                            <li class="{{ activeMode == 'interest' ? 'has-background-primary' : ''}}">
-                                <a href="{{ path('committees.join', {mode: 'interest'}) }}">I want more information about committees</a>
-                            </li>
-                        </ul>
-                    </div>
-                </nav>
+                <div class="container is-centered is-fullwidth has-text-centered has-background-light">
+
+                    <a class="button {{ activeMode == 'join' ? 'has-background-primary' : ''}}" href="{{ path('committees.join', {mode: 'join'}) }}">I want to join a committee</a>
+                    <a class="button {{ activeMode == 'interest' ? 'has-background-primary' : ''}}" href="{{ path('committees.join', {mode: 'interest'}) }}">I want more information about committees</a>
+
+                </div>
             </div>
         </header>
 
@@ -36,11 +31,13 @@
 
                 {# Form fields #}
 
-                {{ form_row(form.name )}}
+                {{ form_row(form.name) }}
+                {{ form_row(form.email) }}
+                {{ form_row(form.phone) }}
 
                 {{ form_row(form.committee) }}
 
-
+                <br>
                 {{ form_row(form.submit) }}
                 {{ form_end(form) }}
             {% elseif activeMode == 'interest' %}

@@ -9,6 +9,7 @@ use App\Form\DataTransformer\IntToBooleanTransformer;
 use App\Form\Type\CommitteeIdType;
 use App\Legacy\Authentication\Authentication;
 use App\Legacy\Policy\Policy;
+use App\SignUp\Fields\PhoneField;
 use PhpParser\Node\Name;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,6 +22,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Attribute\Route;
+
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Form\Extension\Core\Type\TelType;
+use Misd\PhoneNumberBundle\Validator\Constraints\PhoneNumber as AssertPhoneNumber;
 
 class CommitteesController extends AbstractController
 {
@@ -57,13 +62,29 @@ class CommitteesController extends AbstractController
 
         $data = [
             'name' => $member['full_name'],
+            'email' => $member['email'],
+            'phone' => $member['telefoonnummer'],
         ];
 
         $form = $this->createFormBuilder($data)
             ->add('name', TextType::class, [
                 'label' => __('Name'),
                 'required' => true,
-
+            ])
+            ->add('email', TextType::class, [
+                'label' => __('Email'),
+                'required' => true,
+                'constraints' => [
+                    new Assert\NotBlank(),
+                    new Assert\Email(),
+                ]  
+            ])
+            ->add('phone', TelType::class, [
+                'label'=> __('Phone number'),
+                'required'=> false,
+                'constraints' => [
+                    new AssertPhoneNumber(defaultRegion: 'NL'),
+                ]
             ])
             ->add('committee', CommitteeIdType::class, [
                 'required' => true,
