@@ -89,10 +89,6 @@ class CommitteesController extends AbstractController
                         new AssertPhoneNumber(defaultRegion: 'NL'),
                     ]
                 ])
-                ->add('wayOfContact', CheckboxType::class, [
-                    'label' => __('Check this checkbox if you would rather be contacted through text than through email'),
-                    'required' => false,
-                ])
                 ->add('committee', CommitteeIdType::class, [
                     'required' => true,
                     'show_all' => true,
@@ -107,17 +103,26 @@ class CommitteesController extends AbstractController
                 ->getForm();
                 $form->handleRequest($request);
 
-
                 if ($form->isSubmitted() && $form->isValid())
                 {
+
+                    $committeeChoices = "";
+
+                    foreach ($form['committee']->getData() as $committee)
+                    {
+                        $committeeChoices .= $this->model->get_naam($committee) . ', ';
+                    }
+
                     $email = (new TemplatedEmail())
                         ->to('jwsprietsma@gmail.com')
                         ->subject("{$member['full_name']} wants to join one or more committees")
                         ->htmlTemplate('emails/committee_join.html.twig')
                         ->context([
                             'member' => $member,
+                            'committees' => $committeeChoices,
                         ])
                     ;
+                    
                     $mailer->send($email);
 
                     $this->addFlash('Success', __('The intern has been notified'));
