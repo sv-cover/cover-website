@@ -97,7 +97,7 @@ class CommitteesController extends AbstractController
                     'expanded' => true,
                     'chips' => true,
                     'show_all_types' => false,
-                    'label' => __('Which committee(s)'),
+                    'label' => __('Which committee(s) do you want to plan an interview for'),
                 ])
                 ->add('submit', SubmitType::class)
                 ->getForm();
@@ -128,7 +128,34 @@ class CommitteesController extends AbstractController
                     $this->addFlash('Success', __('The intern has been notified'));
                 }
 
-            }
+        } else if ($mode == 'interest')
+        {
+
+            $form = $this->createFormBuilder($data,)
+                ->add('name', TextType::class, [
+                    'label' => __('Name'),
+                    'required' => true,
+                ])
+                ->add('email', TextType::class, [
+                    'label' => __('Email'),
+                    'required' => true,
+                    'constraints' => [
+                        new Assert\NotBlank(),
+                        new Assert\Email(),
+                    ]  
+                ])
+                ->add('phone', TelType::class, [
+                    'label'=> __('Phone number'),
+                    'required'=> false,
+                    'constraints' => [
+                        new AssertPhoneNumber(defaultRegion: 'NL'),
+                    ]
+                ])
+                ->add('submit', SubmitType::class)
+                ->getForm();
+            
+            $form->handleRequest($request);
+        }
 
 
         return $this->render('committees/joinform.html.twig', [

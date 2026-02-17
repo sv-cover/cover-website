@@ -23,7 +23,6 @@
         </header>
 
         <section class="section">
-            {% if activeMode == 'join' %}
                 {{ form_start(form) }}
 
                 {# Global errors #}
@@ -35,14 +34,21 @@
                 {{ form_row(form.email) }}
                 {{ form_row(form.phone) }}
 
-                {{ form_row(form.committee) }}
+                {% if activeMode == 'join' %}
+
+                    <br>
+                    {{ form_row(form.committee) }}
+
+                {% elseif activeMode == 'interest' %}
+
+                    <h1>More stuff</h1>
+
+                {% endif %}
 
                 <br>
                 {{ form_row(form.submit) }}
                 {{ form_end(form) }}
-            {% elseif activeMode == 'interest' %}
-                <h1>INTEREST</h1>
-            {% endif %}
+
         </section>
 
     </div>
