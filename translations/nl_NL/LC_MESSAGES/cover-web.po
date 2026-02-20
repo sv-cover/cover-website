@@ -145,8 +145,8 @@ msgstr[0] "Er is vandaag %d jarige:"
 msgstr[1] "Er zijn vandaag %d jarigen:"
 
 #: themes/default/views/_layout/widgets/banners.twig:2
-msgid "Main partner"
-msgid_plural "Main partners"
+msgid "Main Partner"
+msgid_plural "Main Partners"
 msgstr[0] "Hoofdpartner"
 msgstr[1] "Hoofdpartners"
 
