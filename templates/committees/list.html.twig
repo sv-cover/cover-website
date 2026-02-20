@@ -54,7 +54,7 @@
 
 {% block page %}
 
-<section class="section">
+<section class="section fixed-grid">
     <div class="container is-widescreen photo-book">
 
         {% set committee_description_page = get_page('committee_description_page') %}
@@ -105,7 +105,7 @@
 
 
         {# Header #}
-        <header class="hero is-light">
+        <header class="hero is-light cell">
             <div class="hero-body has-text-centered is-centered">
                 <h1 class="title">{{ __('Committees') }}</h1>
 
@@ -129,8 +129,9 @@
             </div>
         </header>
 
+        <br>
 
-        <div class="columns is-multiline">
+        <div class="columns is-multiline cell">
                 {% for committee in committees %}
                     {{ _self.committee_card(committee) }}
                 {% endfor %}

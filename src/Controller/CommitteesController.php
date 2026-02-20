@@ -18,6 +18,7 @@ use Symfony\Component\Form\ChoiceList\ChoiceList;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -139,7 +140,26 @@ class CommitteesController extends AbstractController
                         'Web dev' => 'Web dev',
                         'Social activities' => 'Social activities',
                         'Career' => 'Career',
+                        'Sporting' => 'Sporting',
+                        'Hardware' => 'Hardware',
+                        'Programming' => 'Programming',
+                        'Handling Complaints' => 'Handling Complaints',
+                        'Writing' => 'Writing',
+                        'Gaming' => 'Gaming',
+                        'Traveling' => 'Traveling',
+                        'Safety' => 'Safety',
+                        'Education' => 'Education',
+                        'Socializing' => 'Socializing',
+                        'Photography' => 'Photography',
+                        'Design' => 'Design',
+                        'Rooms' => 'Rooms',
+                        'Organizing conferences' => 'Organizing conferences',
+                        'Designing Merchandise' => 'Designing Merchandise',
                     ],
+                ])
+                ->add('questions', TextareaType::class, [
+                    'label'=> __('Ask your questions here'),
+                    'required' => false,
                 ])
                 ->add('submit', SubmitType::class)
                 ->getForm();
