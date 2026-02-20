@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<body>
+<p>Hey,</p>
+
+<p>
+    <a href="{{ url('profile.member', {member_id: member.id})}}">{{ member.full_name }}</a>
+    indicated that they want more information about committees.
+</p>
+
+<p>
+    They have shown interest in:
+    {{ hobbies }}
+</p>
+
+<p>
+    They ask the following questions:
+    {{ questions }}
+</p>
+
+<p>Just so you know ;)</p>
+
+<p>Kind regards,<br>the Website</p>
+
+</body>
+</html>

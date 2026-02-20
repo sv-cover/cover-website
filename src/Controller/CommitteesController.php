@@ -107,6 +107,7 @@ class CommitteesController extends AbstractController
                 ->getForm();
                 $form->handleRequest($request);
 
+
         } else if ($mode == 'interest')
         {
 
@@ -169,23 +170,45 @@ class CommitteesController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $committeeChoices = "";
-
-            foreach ($form['committee']->getData() as $committee)
+            if ($mode == 'join')
             {
-                $committeeChoices .= $this->model->get_naam($committee) . ', ';
-            }
 
-            $email = (new TemplatedEmail())
-                ->to($form->get('email')->getData())
-                ->subject("{$member['full_name']} wants to join one or more committees")
-                ->htmlTemplate('emails/committee_join.html.twig')
-                ->context([
-                    'member' => $member,
-                    'committees' => $committeeChoices,
-                ])
-            ;
-                    
+                $committeeChoices = "";
+                foreach ($form['committee']->getData() as $committee)
+                {
+                    $committeeChoices .= $this->model->get_naam($committee) . ', ';
+                }
+
+                $email = (new TemplatedEmail())
+                    ->to($form->get('email')->getData())
+                    ->subject("{$member['full_name']} wants to join one or more committees")
+                    ->htmlTemplate('emails/committee_join.html.twig')
+                    ->context([
+                        'member' => $member,
+                        'committees' => $committeeChoices,
+                    ])
+                ;
+            } else if ($mode == 'interest')
+            {
+                $hobbies = "";
+                foreach ($form['hobbies']->getData() as $hobby)
+                {
+                    $hobbies .= $hobby . ', ';
+                }
+                
+                $email = (new TemplatedEmail())
+                    ->to($form->get('email')->getData())
+                    ->subject("{$member['full_name']} wants to join one or more committees")
+                    ->htmlTemplate('emails/committee_interest_form.html.twig')
+                    ->context([
+                        'member' => $member,
+                        'hobbies' => $hobbies,
+                        'questions' => $form['questions']->getData(),
+                    ])
+                ;
+            } 
+            
+            
             $mailer->send($email);
 
             $this->addFlash('Success', __('The intern has been notified'));
