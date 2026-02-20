@@ -9,11 +9,14 @@ use App\Form\DataTransformer\IntToBooleanTransformer;
 use App\Form\Type\CommitteeIdType;
 use App\Legacy\Authentication\Authentication;
 use App\Legacy\Policy\Policy;
+use App\SignUp\Fields\ChoiceField;
 use App\SignUp\Fields\PhoneField;
 use PhpParser\Node\Name;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\ChoiceList\ChoiceList;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -103,31 +106,6 @@ class CommitteesController extends AbstractController
                 ->getForm();
                 $form->handleRequest($request);
 
-                if ($form->isSubmitted() && $form->isValid())
-                {
-
-                    $committeeChoices = "";
-
-                    foreach ($form['committee']->getData() as $committee)
-                    {
-                        $committeeChoices .= $this->model->get_naam($committee) . ', ';
-                    }
-
-                    $email = (new TemplatedEmail())
-                        ->to('jwsprietsma@gmail.com')
-                        ->subject("{$member['full_name']} wants to join one or more committees")
-                        ->htmlTemplate('emails/committee_join.html.twig')
-                        ->context([
-                            'member' => $member,
-                            'committees' => $committeeChoices,
-                        ])
-                    ;
-                    
-                    $mailer->send($email);
-
-                    $this->addFlash('Success', __('The intern has been notified'));
-                }
-
         } else if ($mode == 'interest')
         {
 
@@ -151,10 +129,46 @@ class CommitteesController extends AbstractController
                         new AssertPhoneNumber(defaultRegion: 'NL'),
                     ]
                 ])
+                ->add('hobbies', ChoiceType::class, [
+                    'required' => false,
+                    'label' => __('Which of these topics are of interest to you'),
+                    'multiple' => true,
+                    'expanded' => true,
+                    'chips' => true,
+                    'choices' => [
+                        'Web dev' => 'Web dev',
+                        'Social activities' => 'Social activities',
+                        'Career' => 'Career',
+                    ],
+                ])
                 ->add('submit', SubmitType::class)
                 ->getForm();
             
             $form->handleRequest($request);
+        }
+
+        if ($form->isSubmitted() && $form->isValid())
+        {
+            $committeeChoices = "";
+
+            foreach ($form['committee']->getData() as $committee)
+            {
+                $committeeChoices .= $this->model->get_naam($committee) . ', ';
+            }
+
+            $email = (new TemplatedEmail())
+                ->to($form->get('email')->getData())
+                ->subject("{$member['full_name']} wants to join one or more committees")
+                ->htmlTemplate('emails/committee_join.html.twig')
+                ->context([
+                    'member' => $member,
+                    'committees' => $committeeChoices,
+                ])
+            ;
+                    
+            $mailer->send($email);
+
+            $this->addFlash('Success', __('The intern has been notified'));
         }
 
 
