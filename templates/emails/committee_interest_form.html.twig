@@ -8,15 +8,23 @@
     indicated that they want more information about committees.
 </p>
 
+{% if hobbies != '' %}
 <p>
-    They have shown interest in:
+    They have selected the following hobbies:
     {{ hobbies }}
+</p>
+{% endif %}
+
+
+{% if questions != '' %}
+<p>
+    They ask the following questions:
 </p>
 
 <p>
-    They ask the following questions:
     {{ questions }}
 </p>
+{% endif %}
 
 <p>Just so you know ;)</p>
 
