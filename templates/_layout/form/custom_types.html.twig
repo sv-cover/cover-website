@@ -55,3 +55,35 @@
         {{ content|parse_markup }}
     </div>
 {% endblock %}
+
+
+{% block calendar_row %}
+        <table class="table is-fullwidth is-bordered">
+            <tr class="thead">
+            
+            <th></th>
+
+            {% for day in Days %}
+            
+                <th>{{day}}</th>
+
+            {% endfor %}
+            </tr>
+
+        {% for row in 0..Rows %}
+            
+            <tr>
+                <td> time </td>
+
+                {% for day in Days %}
+                
+                <td> test </td>
+
+                {% endfor %}
+            </tr>
+
+        {% endfor %}
+
+        </table>
+    </div>
+{% endblock %}

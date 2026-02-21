@@ -7,6 +7,7 @@ use App\Exception\UnauthorizedException;
 use App\Form\CommitteeType;
 use App\Form\DataTransformer\IntToBooleanTransformer;
 use App\Form\Type\CommitteeIdType;
+use App\Form\Type\CalendarType;
 use App\Legacy\Authentication\Authentication;
 use App\Legacy\Policy\Policy;
 use App\SignUp\Fields\ChoiceField;
@@ -102,6 +103,9 @@ class CommitteesController extends AbstractController
                     'chips' => true,
                     'show_all_types' => false,
                     'label' => __('Which committee(s) do you want to plan an interview for'),
+                ])
+                ->add('calendar', CalendarType::class, [
+                    'label'=> __('Testcalendar'),
                 ])
                 ->add('submit', SubmitType::class)
                 ->getForm();
