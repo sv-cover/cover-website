@@ -73,11 +73,11 @@
         {% for row in 0..Rows %}
             
             <tr>
-                <td> {{ Times[row][0] < 10 ? 0 : '' }}{{ Times[row][0] }}:{{ Times[row][1] }}{{ Times[row][1] == 0 ? 0 : ''}}  </td>
+                <td> {{ Times[row] }}  </td>
 
                 {% for day in Days %}
                 
-                <td> {{ form_row('slot' . row . '-day' . day) }} </td>
+                <td>  </td>
 
                 {% endfor %}
             </tr>

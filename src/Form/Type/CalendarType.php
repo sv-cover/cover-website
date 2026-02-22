@@ -17,8 +17,8 @@ class CalendarType extends AbstractType
     {
         $resolver->setDefaults([
             'TimePerSlot' => 30,
-            'startTime' => '09:00',
-            'EndHour' => '17:00',
+            'StartTime' => '09:00',
+            'EndTime' => '17:00',
             'Days' => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
             'expanded' => true,
             'multiple' => true,
@@ -28,7 +28,19 @@ class CalendarType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $nslots = ($options['EndHour'] - $options['StartHour']) / ($options['TimePerSlot'] / 60);
+        
+
+        $nslots = 0;
+        $timePerSlot = $options['TimePerSlot'];
+        $startTime = new \DateTime($options['StartTime']);
+        $endTime = new \DateTime($options['EndTime']);
+        $currentTime = new \DateTime($options['StartTime']);
+        while ($currentTime < $endTime)
+        {
+            $nslots++;
+            $currentTime->modify("+$timePerSlot minutes");
+        }
+
         $numDays = count($options['Days']);
 
         for ($i = 0; $i < $numDays; $i++)
@@ -45,37 +57,24 @@ class CalendarType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
 
-        $nSlots = ($options['EndHour'] - $options['StartHour']) / ($options['TimePerSlot'] / 60);
-
+        $nslots = 0;
+        $timePerSlot = $options['TimePerSlot'];
+        $startTime = new \DateTime($options['StartTime']);
+        $endTime = new \DateTime($options['EndTime']);
+        $currentTime = new \DateTime($options['StartTime']);
+        $currentSlot = 0;
         $times = [];
-        for ($i = 0; $i <= $nSlots; $i++)
+        while ($currentTime <= $endTime)
         {
-            $hour = ($i != 0 ? $times[$i - 1][0] : $options['StartHour']);
-            $minute = ($i != 0 ? $times[$i - 1][1] : 0);
-
-            if ($i > 0)
-            {
-                $add = $options['TimePerSlot'];
-
-                if (($minute + $add) >= 60)
-                {
-                    $hour += ($minute + $add) / 60;
-                    $minute = ($minute + $add) % 60;
-                } else 
-                {
-                    $minute += $add;
-                }
-            }
-
-            $times[$i] = [$hour, $minute];
+            $times[$nslots] = $currentTime->format('H:i');
+            $nslots++;
+            $currentTime->modify("+$timePerSlot minutes");
         }
 
-
         $view->vars['Days'] = $options['Days'];
-        $view->vars['Rows'] = $nSlots;
+        $view->vars['Rows'] = $nslots - 1;
         $view->vars['Times'] = $times;
 
-        
         
     }
 
