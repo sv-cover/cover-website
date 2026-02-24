@@ -28,11 +28,6 @@ class Menu
                     'label' => __('Calendar'),
                 ],
                 [
-                    'url' => $this->router->generate('events.list', 
-                    ['year' => (date('Y') - 1) . '-' . date('Y')]),
-                    'label' => __('Calendar Archive'),
-                ],
-                [
                     'url' => $this->router->generate('photos'),
                     'label' => __('Photos'),
                 ]
@@ -82,8 +77,11 @@ class Menu
 
         $menu['career'] = [
             'label' => __('Career'),
-            'url' => $this->router->generate('career'),
             'submenu' => [
+                [
+                    'url' => $this->router->generate('career', ['slug' => 'career']),
+                    'label'=> __('Vacancies & Partners'),
+                ],
                 [
                     'url' => 'https://www.rug.nl/careerservices/',
                     'label' => __('Career Services'),
@@ -321,8 +319,8 @@ class Menu
             ];
 
             $menu['admin']['items'][] = [
-                'label' => __('Mailing lists'),
-                'title' => __('Manage committee mailing lists.'),
+                'label' => __('Mailing Lists'),
+                'title' => __('Manage mailing lists.'),
                 'url' => $this->router->generate('mailing_lists.list'),
                 'icon' => [
                     'fa' => 'fas fa-mail-bulk',
@@ -334,7 +332,7 @@ class Menu
             $menu['admin']['items'][] = [
                 'url' => $this->router->generate('sign_up_forms.list'),
                 'label' => __('Forms'),
-                'title' => __('Manage committee sign-up forms.'),
+                'title' => __('Manage sign-up forms.'),
                 'icon' => [
                     'fa' => 'fas fa-list-alt',
                     'color' => 'dark',
@@ -389,8 +387,8 @@ class Menu
                     'icon_color' => 'light'
                 ],
                 'url' => $this->router->generate('registrations.pending.list'),
-                'label' => __('Pending registrations'),
-                'title' => __('Handle pending registrations for signups who have not confirmed their email address.')
+                'label' => __('Pending Registrations'),
+                'title' => __('Manage membership applications with unconfirmed email addresses.')
             ];
         }
 
