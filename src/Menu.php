@@ -298,8 +298,7 @@ class Menu
 
             $menu['external']['items'][] = [
                 'icon' => [
-                    'fa' => 'fas fa-receipt',
-                    'color' => 'cover',
+                    'img' => '/images/applications/reclaim.svg',
                 ],
                 'url' => 'https://reclaim.svcover.nl/',
                 'label' => __('Reclaim'),
