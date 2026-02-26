@@ -2,13 +2,13 @@
 
 namespace App\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use App\Form\ChoiceList\CalendarChoiceLoader;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extenstion\Core\Type\FormType;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\ChoiceList\ChoiceList;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\OptionsResolver\Options;
+
 
 class CalendarType extends AbstractType
 {
@@ -22,60 +22,20 @@ class CalendarType extends AbstractType
             'Days' => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
             'expanded' => true,
             'multiple' => true,
+            'choice_loader' => function(Options $options) {
+                return ChoiceList::loader(
+                    $this,
+                    new CalendarChoiceLoader($options['TimePerSlot'], $options['StartTime'], $options['EndTime'], $options['Days']),
+                    [$options['TimePerSlot'], $options['StartTime'], $options['EndTime'], $options['Days']]
+                );
+            },
         ]);
 
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options): void
+    public function getParent(): ?string
     {
-        
-
-        $nslots = 0;
-        $timePerSlot = $options['TimePerSlot'];
-        $startTime = new \DateTime($options['StartTime']);
-        $endTime = new \DateTime($options['EndTime']);
-        $currentTime = new \DateTime($options['StartTime']);
-        while ($currentTime < $endTime)
-        {
-            $nslots++;
-            $currentTime->modify("+$timePerSlot minutes");
-        }
-
-        $numDays = count($options['Days']);
-
-        for ($i = 0; $i < $numDays; $i++)
-        {
-            for ($j = 0; $j < $nslots; $j++)
-            {
-                $builder->add('slot' . $j . '-day'  . $i, CheckBoxType::class, [
-                    'label' => __(' '),
-                ]);
-            }
-        }
-    }
-
-    public function buildView(FormView $view, FormInterface $form, array $options): void
-    {
-
-        $nslots = 0;
-        $timePerSlot = $options['TimePerSlot'];
-        $startTime = new \DateTime($options['StartTime']);
-        $endTime = new \DateTime($options['EndTime']);
-        $currentTime = new \DateTime($options['StartTime']);
-        $currentSlot = 0;
-        $times = [];
-        while ($currentTime <= $endTime)
-        {
-            $times[$nslots] = $currentTime->format('H:i');
-            $nslots++;
-            $currentTime->modify("+$timePerSlot minutes");
-        }
-
-        $view->vars['Days'] = $options['Days'];
-        $view->vars['Rows'] = $nslots - 1;
-        $view->vars['Times'] = $times;
-
-        
+        return ChoiceType::class;
     }
 
 }

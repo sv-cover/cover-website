@@ -106,6 +106,9 @@ class CommitteesController extends AbstractController
                 ])
                 ->add('calendar', CalendarType::class, [
                     'label'=> __('Testcalendar'),
+                    'multiple' => true,
+                    'expanded' => true,
+                    'chips' => true,
                 ])
                 ->add('submit', SubmitType::class)
                 ->getForm();

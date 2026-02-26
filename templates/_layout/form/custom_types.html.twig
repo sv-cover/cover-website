@@ -56,8 +56,22 @@
     </div>
 {% endblock %}
 
-
+{# 
 {% block calendar_row %}
+    {% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] %}
+    {% set times = [] %}
+
+    {% for child in form %}
+    
+        {% set parts = child.vars.value|split('_') %}
+        {% set time = parts[1] %}
+        {% if time not in times %}
+            {% set times = times|merge([time]) %}
+        {% endif %}
+    {% endfor %}
+
+    {{ times }}
+
         <table class="table is-fullwidth is-bordered">
             <tr class="thead has-text-centered">
             
@@ -86,4 +100,4 @@
 
         </table>
     </div>
-{% endblock %}
+{% endblock %} #}
