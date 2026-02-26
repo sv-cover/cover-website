@@ -38,7 +38,7 @@ class PolicySignUpForm implements PolicyInterface
         return $this->identity->member_in_committee($event['committee_id']);
     }
 
-    public function userCanSignup(DataIter $form): bool
+    public function userCanSignUp(DataIter $form): bool
     {
         return $this->identity->is_member() || $this->identity->is_donor();
     }
