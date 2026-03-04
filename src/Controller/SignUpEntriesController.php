@@ -41,7 +41,7 @@ class SignUpEntriesController extends AbstractController
                 'event' => $event,
             ]);
 
-        $forms = array_filter($event['signup_forms'], [$this->policy, 'userCanRead']);
+        $forms = array_filter($event['signup_forms'], [$this->policy, 'userCanSignUp']);
 
         return $this->render('sign_ups/entries/_event_page.html.twig', [
             'forms' => $forms,
@@ -121,7 +121,7 @@ class SignUpEntriesController extends AbstractController
     {
         $iter = $this->formModel->get_iter($form_id);
 
-        if (!$this->policy->userCanRead($iter))
+        if (!$this->policy->userCanSignUp($iter))
             throw new UnauthorizedException('You cannot access this form.');
 
         $entry = $iter->new_entry($prefill);
@@ -204,7 +204,7 @@ class SignUpEntriesController extends AbstractController
         $entry = $this->entryModel->get_iter($id);
         $iter = $entry['form'];
 
-        if (!$this->policy->userCanRead($iter))
+        if (!$this->policy->userCanSignUp($iter))
             throw new UnauthorizedException('You cannot access this form.');
 
         if (!$this->policy->userCanUpdate($entry))
@@ -219,15 +219,18 @@ class SignUpEntriesController extends AbstractController
 
             // Redirect admins back to the entry index
             if (!$this->policy->userCanUpdate($iter))
-                return $this->redirectToRoute('sign_up_entries.list', [
-                    'form_id' => $entry['form_id'],
+            {
+                return $this->render('sign_ups/entries/form_success.html.twig', [
+                    'iter' => $iter,
+                    'entry' => $entry,
+                    'context' => $context,
                 ]);
+            } else {
 
-            return $this->render('sign_ups/entries/form_success.html.twig', [
-                'iter' => $iter,
-                'entry' => $entry,
-                'context' => $context,
-            ]);
+                return $this->redirectToRoute('sign_up_entries.list', [
+                    'form_id' => $iter->get_id(),
+                ]);
+            }
         }
 
         return $this->render('sign_ups/entries/form.html.twig', [
