@@ -28,7 +28,7 @@ framework:
 
             profile_pictures.cache:
                 adapter: cache.adapter.filesystem
-                tags: true
+                tags: false
 
             sticker_pictures.cache:
                 adapter: cache.adapter.filesystem
