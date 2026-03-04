@@ -3,6 +3,7 @@
 namespace App\Policy;
 
 use App\DataIter\DataIterAgenda;
+use App\DataModel\DataModelCommissie;
 use App\DataModel\DataModelSignUpForm;
 use App\Legacy\Authentication\Authentication;
 use App\Legacy\Authentication\IdentityProviderInterface;
@@ -37,9 +38,20 @@ class PolicySignUpForm implements PolicyInterface
         return $this->identity->member_in_committee($event['committee_id']);
     }
 
-    public function userCanRead(DataIter $form): bool
+    public function userCanSignUp(DataIter $form): bool
     {
         return $this->identity->is_member() || $this->identity->is_donor();
+    }
+
+    public function userCanRead(DataIter $form): bool
+    {
+        if (
+            $this->identity->member_in_committee(DataModelCommissie::BOARD)
+            || $this->identity->member_in_committee(DataModelCommissie::CANDY)
+        )
+            return true;
+
+        return $this->identity->member_in_committee($form['committee_id']);
     }
 
     public function userCanUpdate(DataIter $form): bool
