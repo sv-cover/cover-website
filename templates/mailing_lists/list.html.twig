@@ -44,7 +44,7 @@
                 <tr>
                     <td colspan="6">
                         <p class="has-text-centered">
-                            {% if authj.identity.member and auth.identity.member.committees|length > 1 %}
+                            {% if auth.identity.member and auth.identity.member.committees|length > 1 %}
                                 {{ __('None of you committees is managing any mailing lists.') }}
                             {% else %}
                                 {{ __('Your committee is not managing any mailing lists.') }}

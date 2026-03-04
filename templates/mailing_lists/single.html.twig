@@ -100,6 +100,10 @@
                 <figcaption class="has-text-centered">{{ __('Type') }}</figcaption>
                 {{ barchart(iter.get_reach('type')) }}
             </figure>
+            <figure class="column is-half">
+                <figcaption class="has-text-centered">{{ __('Reach') }}</figcaption>
+                {{ barchart({(__('Total')): iter.reach}) }}
+            </figure>
         </div>
     {% else %}
         <div class="content">
