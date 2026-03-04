@@ -71,7 +71,7 @@ class PolicySignUpEntry implements PolicyInterface
         if ($this->identity->member_in_committee($entry['form']['committee_id']))
             return true;
 
-        // The member of the entry can read their own entries
+        // The member of the entry can update their own entries
         if ($this->identity->get('id') === $entry['member_id'])
             return $entry['form']->is_open();
 
