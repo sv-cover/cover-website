@@ -76,7 +76,7 @@ final class ImageUtils
 
         $response->setPublic();
         // $response->setMaxAge($expires);
-        $response->setCache(['no_cache']);
+        $response->setCache(['no_cache' => true]);
 
         // Set more headers
         $type = (new \finfo(\FILEINFO_MIME_TYPE))->buffer($image);
@@ -97,7 +97,7 @@ final class ImageUtils
         $response = new Response();
         $response->setPublic();
         // $response->setMaxAge($expires);
-        $response->setCache(['no_cache']);
+        $response->setCache(['no_cache' => true]);
         return $response;
     }
 }
