@@ -220,14 +220,15 @@ class SignUpEntriesController extends AbstractController
             // Redirect admins back to the entry index
             if (!$this->policy->userCanUpdate($iter))
             {
-                $this->addFlash('signup_entry_updated', __('Your signup has been updated'));
-
-                return $this->redirectToRoute('events.single', ['id' => $iter['agenda_id']]);
-            } else {
                 return $this->render('sign_ups/entries/form_success.html.twig', [
                     'iter' => $iter,
                     'entry' => $entry,
                     'context' => $context,
+                ]);
+            } else {
+
+                return $this->redirectToRoute('sign_up_entries.list', [
+                    'form_id' => $iter->get_id(),
                 ]);
             }
         }
