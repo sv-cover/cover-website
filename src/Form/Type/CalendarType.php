@@ -22,6 +22,7 @@ class CalendarType extends AbstractType
             'Days' => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
             'expanded' => true,
             'multiple' => true,
+            'choices_as_values' => true,
             'choice_loader' => function(Options $options) {
                 return ChoiceList::loader(
                     $this,

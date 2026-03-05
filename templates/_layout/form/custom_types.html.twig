@@ -56,6 +56,19 @@
     </div>
 {% endblock %}
 
+
+{% block calendar_row %}
+
+
+    {% for child in form %}
+   
+    {{ form_label(child) }}
+
+    {% endfor %}
+
+
+{% endblock %}
+
 {# 
 {% block calendar_row %}
     {% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] %}

@@ -21,24 +21,25 @@ class CalendarChoiceLoader implements ChoiceLoaderInterface
 
         $choices = [];
         $times = [];
+        $currentTime = 0;
         $startTime = new \DateTime($this->startTime);
         $endTime = new \DateTime($this->endTime);
-        while ($startTime <= $endTime) {
-            $times[$startTime->format('H:i')] = $startTime->format('H:i');
+        while ($startTime < $endTime) {
+            $times[$currentTime] = [$startTime->format('H'), $startTime->format('i')];
+            $currentTime++;
             $startTime->modify("+{$this->timePerSlot} minutes");
         }
+
+        dump($times);
 
         foreach ($this->days as $day)
         {
             $choices[$day] = $times;
         }
 
-
         $factory = new DefaultChoiceListFactory();
 
-        dump($factory->createListFromChoices($choices, $value, [$this, 'filter']));
-
-        return $factory->createListFromChoices($choices, $value, [$this, 'filter']);
+        return $factory->createListFromChoices($choices, $value);
     }
 
     public function loadChoicesForValues(array $values, callable $value = null): array
@@ -46,7 +47,7 @@ class CalendarChoiceLoader implements ChoiceLoaderInterface
         if (!$values)
             return [];
 
-        return $this->loadChoiceList($value)->getStructuredValues();
+        return $this->loadChoiceList($value)->getChoicesForValues($values);
     }
 
     public function loadValuesForChoices(array $choices, callable $value = null): array
@@ -57,11 +58,6 @@ class CalendarChoiceLoader implements ChoiceLoaderInterface
         if ($value)
             return array_map(fn ($item) => (string) $value($item), $choices);
 
-        return $this->loadChoiceList()->getStructuredValues();
-    }
-
-    public function filter($value)
-    {
-        return True;
+        return $this->loadChoiceList()->getValuesForChoices($choices);
     }
 }
