@@ -15,6 +15,9 @@ class CalendarType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
+        
+        
+
         $resolver->setDefaults([
             'TimePerSlot' => 30,
             'StartTime' => '09:00',
@@ -22,7 +25,7 @@ class CalendarType extends AbstractType
             'Days' => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
             'expanded' => true,
             'multiple' => true,
-            'choices_as_values' => true,
+            'choices_as_values' => false,
             'choice_loader' => function(Options $options) {
                 return ChoiceList::loader(
                     $this,

@@ -60,9 +60,10 @@
 {% block calendar_row %}
 
 
-    {% for child in form %}
+    {% for label, child in form %}
    
-    {{ form_label(child) }}
+    {{ label }}
+    {{ form_widget(child) }}
 
     {% endfor %}
 
