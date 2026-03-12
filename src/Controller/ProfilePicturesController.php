@@ -173,8 +173,8 @@ class ProfilePicturesController extends AbstractController
 
         // Return not modified if no changes since the client last checked
         $lastModified = gmdate(DATE_RFC1123, $iter->get_mtime());
-        if ($cache->hasItem($key) && $request->headers->get('if-modified-since') == $lastModified)
-            return $this->imageUtils->getNotModifiedResponse();
+        // if ($cache->hasItem($key) && $request->headers->get('if-modified-since') == $lastModified)
+        //     return $this->imageUtils->getNotModifiedResponse();
 
         // Get image and serve
         $image = $cache->get($key, function (ItemInterface $item) use ($iter): string {
@@ -196,8 +196,8 @@ class ProfilePicturesController extends AbstractController
 
         // Return not modified if no changes since the client last checked
         $lastModified = gmdate(DATE_RFC1123, $iter->get_mtime());
-        if ($cache->hasItem($key) && $request->headers->get('if-modified-since') == $lastModified)
-            return $this->imageUtils->getNotModifiedResponse();
+        // if ($cache->hasItem($key) && $request->headers->get('if-modified-since') == $lastModified)
+        //     return $this->imageUtils->getNotModifiedResponse();
 
         // Get image and serve
         $image = $cache->get($key, function (ItemInterface $item) use ($iter, $format, $width): string {
@@ -243,8 +243,8 @@ class ProfilePicturesController extends AbstractController
         });
 
         // Return not modified if no changes since the client last checked
-        if ($cache->hasItem($key) && $request->headers->get('if-modified-since') == $lastModified)
-            return $this->imageUtils->getNotModifiedResponse();
+        // if ($cache->hasItem($key) && $request->headers->get('if-modified-since') == $lastModified)
+        //     return $this->imageUtils->getNotModifiedResponse();
 
         // Get image and serve
         $image = $cache->get($key, function (ItemInterface $item) use ($tag, $member, $format, $width, $private): string {
