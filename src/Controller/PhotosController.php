@@ -329,8 +329,8 @@ class PhotosController extends AbstractController
 
         // Return not modified if no changes since the client last checked
         $lastModified = gmdate(DATE_RFC1123, filemtime($photo->get_full_path()));
-        // if ($cache->hasItem($key) && $request->headers->get('if-modified-since') == $lastModified)
-        //     return $this->imageUtils->getNotModifiedResponse(self::CACHE_EXPIRES);
+        if ($cache->hasItem($key) && $request->headers->get('if-modified-since') == $lastModified)
+            return $this->imageUtils->getNotModifiedResponse(self::CACHE_EXPIRES);
 
         // Get image and serve
         $image = $cache->get($key, function (ItemInterface $item) use ($photo, $callback): string {
