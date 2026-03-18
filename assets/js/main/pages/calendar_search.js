@@ -126,6 +126,21 @@ class CalendarSearch {
                 title.style.display = hasVisile ? '' : 'none';
             });
         }
+
+        // Show/hide "no results" message
+        const anyVisible = this.events.some(e => e.style.display !== 'none');
+        let noResultsEl = this.eventList.querySelector('.search-no-results');
+        if (!anyVisible) {
+            if (!noResultsEl) {
+                noResultsEl = document.createElement('li');
+                noResultsEl.className = 'column is-full has-text-centered search-no-results';
+                noResultsEl.textContent = 'No events match your filter.';
+                this.eventList.appendChild(noResultsEl);
+            }
+            noResultsEl.style.display = '';
+        } else if (noResultsEl) {
+            noResultsEl.style.display = 'none';
+        }
     }
 
     resetSearch() {
@@ -138,6 +153,8 @@ class CalendarSearch {
         if (this.eventList) {
             this.eventList.querySelectorAll('.month-title')
                 .forEach(title => title.style.display = '');
+            const noResultsEl = this.eventList.querySelector('.search-no-results');
+            if (noResultsEl) noResultsEl.style.display = 'none';
         }
         this.button.classList.remove('is-info');
     }
