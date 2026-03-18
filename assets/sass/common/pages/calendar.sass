@@ -237,6 +237,17 @@ $event-overlay-padding: 1.25rem
         cursor: pointer
         opacity: 0.4
         transition: opacity 0.15s ease-in-out
+        color: $white
+        font-weight: $weight-semibold
+        text-transform: capitalize
+        &.general
+            background: $red
+        &.social
+            background: $purple
+        &.educational
+            background: $orange
+        &.career
+            background: $cyan
         &:hover
             opacity: 0.7
         &.is-active
