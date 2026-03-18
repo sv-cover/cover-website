@@ -131,13 +131,13 @@
                     <span class="icon is-left">
                         <i class="fas fa-search" aria-hidden="true"></i>
                     </span>
-                </div>
+                </div>2
             </div>
 
             {#Committee Filter#}
             <div class="field">
                 <label class="label">{{__('Committee')}}</label>
-                <div class="control" id="search-committee-list">
+                <div class="chips" id="search-committee-list">
                 {#The committees checkboxes will be dynamically generated to avoid being ugly#}
                 </div>
             </div>
@@ -146,18 +146,20 @@
             <div class="field">
                 <label class="label">{{__('Category')}}</label>
                 <div class="control" id="search-category-list">
-                    <label class="checkbox">
-                        <input type="checkbox" value="general" class="search-category-checkbox"> General
-                    </label><br>
-                    <label class="checkbox">
-                        <input type="checkbox" value="social" class="search-category-checkbox"> Social
-                    </label><br>
-                    <label class="checkbox">
-                        <input type="checkbox" value="educational" class="search-category-checkbox"> Educational
-                    </label><br>
-                    <label class="checkbox">
-                        <input type="checkbox" value="career" class="search-category-checkbox"> Career
-                    </label><br>
+                    <div class="tags">
+                        <span class="tag is-rounded general search-category-tag" data-value="general">
+                            General
+                        </span>
+                        <span class="tag is-rounded social search-category-tag" data-value="social">
+                            Social
+                        </span>
+                        <span class="tag is-rounded educational search-category-tag" data-value="educational">
+                            Educational
+                        </span>
+                        <span class="tag is-rounded career search-category-tag" data-value="career">
+                            Career
+                        </span>
+                    </div>
                 </div>
             </div>
             </section>

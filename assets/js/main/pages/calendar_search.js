@@ -28,19 +28,20 @@ class CalendarSearch {
     }
 
     buildCommitteeCheckboxes() {
-        const committees = new Set();
+        const committees = new Map();
         this.events.forEach(event => {
-            const name = event.dataset.eventCommittee;
-            if (name) committees.add(name);
+            const key = event.dataset.eventCommittee;
+            const display = event.dataset.eventCommitteeDisplay;
+            if (key && !committees.has(key))
+                committees.set(key, display);
         });
 
-        const sorted = Array.from(committees).sort();
+        const sorted = Array.from(committees.entries())
+            .sort((a, b) => a[1].localeCompare(b[1]));
 
-        this.committeeListEl.innerHTML = sorted.map(name => `
-            <label class="checkbox">
-                <input type="checkbox" value="${name}" class="search-committee-checkbox">
-                ${name.charAt(0).toUpperCase() + name.slice(1)}
-            </label><br>
+        this.committeeListEl.innerHTML = sorted.map(([key, display], i) => `
+            <input type="checkbox" id="search-committee-${i}" value="${key}" class="chip search-committee-checkbox">
+            <label for="search-committee-${i}">${display}</label>
         `).join('');
     }
 
@@ -51,6 +52,12 @@ class CalendarSearch {
         this.applyBtn.addEventListener('click', () => {
             this.applySearch();
             this.closeModal();
+        });
+        
+        document.querySelectorAll('.search-category-tag').forEach(tag => {
+            tag.addEventListener('click', () => {
+                tag.classList.toggle('is-active');
+            });
         });
     }
 
@@ -70,8 +77,8 @@ class CalendarSearch {
         ).map(cb => cb.value);
 
         const selectedCategories = Array.from(
-            this.modal.querySelectorAll('.search-category-checkbox:checked')
-        ).map(cb => cb.value);
+            document.querySelectorAll('.search-category-tag.is-active')
+        ).map(tag => tag.dataset.value);
 
         this.events.forEach(event => {
             let visible = true;
