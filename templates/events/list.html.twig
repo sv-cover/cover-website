@@ -56,6 +56,13 @@
                         </span>
                     </button>
                 </div>
+                {# filter-search button #}
+                <div class="control">
+                    <button class="button calendar-search-button" id="search-open-btn">
+                        <span class="icon"><i class="fas fa-search" aria-hidden="true"></i></span>
+                        <span>{{ __('Search') }}</span>
+                    </button>
+                </div>
                 <div class="control">
                     <div class="dropdown">
                         <div class="dropdown-trigger">
@@ -106,4 +113,59 @@
 </section>
 </div>
 </article>
+
+{# Filter-Search Modal #}
+<div class="modal" id="search-modal">
+    <div class="modal-background" id="search-modal-bg"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">{{ __('Search Events') }}</p>
+            <button class="delete" aria-label="close" id="search-close-btn"></button>
+        </header>
+        <section class="modal-card-body">
+            {#Name Search#}
+            <div class="field">
+                <label class="label">{{__('Event name')}}</label>
+                <div class="control has-icons-left">
+                    <input class="input" type="text" id="search-name-input" placeholder="{{__('Search by event name')}}">
+                    <span class="icon is-left">
+                        <i class="fas fa-search" aria-hidden="true"></i>
+                    </span>
+                </div>
+            </div>
+
+            {#Committee Filter#}
+            <div class="field">
+                <label class="label">{{__('Committee')}}</label>
+                <div class="control" id="search-committee-list">
+                {#The committees checkboxes will be dynamically generated to avoid being ugly#}
+                </div>
+            </div>
+
+            {#Category Filter#}
+            <div class="field">
+                <label class="label">{{__('Category')}}</label>
+                <div class="control" id="search-category-list">
+                    <label class="checkbox">
+                        <input type="checkbox" value="general" class="search-category-checkbox"> General
+                    </label><br>
+                    <label class="checkbox">
+                        <input type="checkbox" value="general" class="search-category-checkbox"> Social
+                    </label><br>
+                    <label class="checkbox">
+                        <input type="checkbox" value="general" class="search-category-checkbox"> Educational
+                    </label><br>
+                    <label class="checkbox">
+                        <input type="checkbox" value="general" class="search-category-checkbox"> Career
+                    </label><br>
+                </div>
+            </div>
+            </section>
+        <footer class="modal-card-foot">
+            <button class="button is-primary" id="search-apply-btn">{{ __('Search') }}</button>
+        </footer>
+    </div>
+</div>
+
+
 {% endblock %}

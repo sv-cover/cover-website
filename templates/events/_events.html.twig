@@ -11,7 +11,10 @@
         </li>
         {% set current_month = event.van|date('n') %}
     {% endif %}
-    <li class="event {% if event.image_url %}has-image{% endif %} {% if event.is_proposal() %}is-proposal{% endif %} column is-half-tablet is-one-third-widescreen is-one-quarter-fullhd">
+    <li class="event {% if event.image_url %}has-image{% endif %} {% if event.is_proposal() %}is-proposal{% endif %} column is-half-tablet is-one-third-widescreen is-one-quarter-fullhd"
+                data-event-name="{{ event.kop|lower }}"
+                data-event-committee="{{ event.committee__naam|default('')|lower }}"
+                data-event-category="{{ event.category|default('') }}">
         <a href="{{ path('events.single', {id: event.id}) }}">
             {% if event.image_url %}
                 <figure class="image is-2by1" aria-hidden="true">

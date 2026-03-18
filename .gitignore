@@ -27,3 +27,9 @@ yarn-error.log
 /phpunit.xml
 .phpunit.result.cache
 ###< phpunit/phpunit ###
+
+### OS generated files ###
+.DS_Store
+
+### Development files ###
+plan.md
