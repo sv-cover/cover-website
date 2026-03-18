@@ -15,8 +15,10 @@ class CalendarSearch {
         this.modalBg = document.getElementById('search-modal-bg');
         this.closeBtn = document.getElementById('search-close-btn');
         this.applyBtn = document.getElementById('search-apply-btn');
+        this.resetBtn = document.getElementById('search-reset-btn');
         this.nameInput = document.getElementById('search-name-input');
         this.committeeListEl = document.getElementById('search-committee-list');
+        this.categoryListEl = document.getElementById('search-category-list');
 
         if (!this.modal) return;
 
@@ -49,16 +51,14 @@ class CalendarSearch {
         this.button.addEventListener('click', () => this.openModal());
         this.modalBg.addEventListener('click', () => this.closeModal());
         this.closeBtn.addEventListener('click', () => this.closeModal());
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') this.closeModal();
+        });
         this.applyBtn.addEventListener('click', () => {
             this.applySearch();
             this.closeModal();
         });
-        
-        document.querySelectorAll('.search-category-tag').forEach(tag => {
-            tag.addEventListener('click', () => {
-                tag.classList.toggle('is-active');
-            });
-        });
+        this.resetBtn.addEventListener('click', () => this.resetSearch());
     }
 
     openModal() {
@@ -77,8 +77,8 @@ class CalendarSearch {
         ).map(cb => cb.value);
 
         const selectedCategories = Array.from(
-            document.querySelectorAll('.search-category-tag.is-active')
-        ).map(tag => tag.dataset.value);
+            this.categoryListEl.querySelectorAll('.search-category-checkbox:checked')
+        ).map(cb => cb.value);
 
         this.events.forEach(event => {
             let visible = true;
@@ -126,6 +126,20 @@ class CalendarSearch {
                 title.style.display = hasVisile ? '' : 'none';
             });
         }
+    }
+
+    resetSearch() {
+        this.nameInput.value = '';
+        this.committeeListEl.querySelectorAll('.search-committee-checkbox')
+            .forEach(cb => cb.checked = false);
+        this.categoryListEl.querySelectorAll('.search-category-checkbox')
+            .forEach(cb => cb.checked = false);
+        this.events.forEach(event => event.style.display = '');
+        if (this.eventList) {
+            this.eventList.querySelectorAll('.month-title')
+                .forEach(title => title.style.display = '');
+        }
+        this.button.classList.remove('is-info');
     }
 }
 
