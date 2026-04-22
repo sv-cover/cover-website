@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<body>
+<p>Hey!</p>
+
+<p>{{ member.full_name }} requested the foundation of the {{ data.society_name }} society. Here’s more information:</p>
+
+<table>
+    <tr>
+        <th>Society name</th>
+        <td>{{ data.society_name }}</td>
+    </tr>
+    <tr>
+        <th>Society purpose</th>
+        <td>{{ data.society_purpose }}</td>
+    </tr>
+    <tr>
+        <th>Founding members</th>
+        <td>{{ data.founding_members }}</td>
+    </tr>
+    <tr>
+        <th>Leader</th>
+        <td>{{ data.leader }}</td>
+    </tr>
+    <tr>
+        <th>Other comments</th>
+        <td>{{ data.other_comments }}</td>
+    </tr>
+    <tr>
+        <th>Contact Email</th>
+        <td><a href="mailto:{{ data.email|e('html_attr') }}">{{ data.email }}</a></td>
+    </tr>
+    <tr>
+        <th>Contact Phone</th>
+        <td>{{ data.phone }}</td>
+    </tr>
+</table>
+
+<p>Just so you know ;)</p>
+
+<p>Kind regards,<br>the Website</p>
+
+</body>
+</html>

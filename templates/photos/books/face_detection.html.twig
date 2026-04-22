@@ -1,0 +1,74 @@
+{% extends '@layout/layout.html.twig' %}
+
+{% import _self as macros %}
+
+{% macro render_face(face) %}
+    {% set size = face.photo.get_scaled_size(null, 400) %}
+    {% set scale = 100 / (face.h * size[1]) %}
+    <figure
+        title="Added on {{face.photo.added_on}}"
+        style="display: inline-block; width: {{scale * face.w * size[0] }}px; height: {{scale * face.h * size[1]}}px; overflow: hidden; position: relative; padding: 0;"
+    >
+        <img
+            src="{{ path('photos.scaled', {photo_id: face.foto_id, width: 0, height: 400}) }}" width="{{ scale * size[0] }}"
+            height="{{ scale * size[1] }}"
+            style="position: absolute; left: -{{scale * face.x * size[0]}}px; top: -{{scale * face.y * size[1] }}px; max-width: unset;"
+        >
+    </figure>
+{% endmacro %}
+
+{% block title book.has('titel') ? book.titel : __('Photo book') ~ ' – ' ~ parent() %}
+
+{% block content %}
+<header class="block">
+    <div class="level">
+        <div class="level-left">
+            {% if book.id is not same as(0) %}
+                <a href="{{ path('photo_books.single', {book_id: book.id}) }}" class="button">
+                    <span class="icon"><i class="fas fa-arrow-left" aria-hidden="true"></i></span>
+                    <span>{{__('Back to')}} {{ book.titel }}</span>
+                </a>
+            {% endif %}
+        </div>
+        <div class="level-right buttons">
+            {% if policy.userCanUpdate(book) and book.get_photos() %}
+                {{ form_start(form) }}
+                    {{ form_widget(form.submit, {color: 'default'}) }}
+                {{ form_end(form) }}
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="level">
+        <div class="level-left">
+        </div>
+    </div>
+    <h1 class="title">{{ __('Faces in') }} {{ book.titel }}</h1>
+</header>
+
+<article>
+    {% for cluster, faces in clusters %}
+        <div class="media">
+            <div class="media-content">
+                <h2 class="title is-4">Cluster {{cluster}}</h2>
+                {% for member_id, member_faces in faces %}
+                    {% if not member_id %}
+                        <h3 class="title is-6">Not tagged</h3>
+                    {% else %}
+                        <h3 class="title is-6">Tagged as <a href="{{ path('profile.member', {member_id: member_id}) }}">{{ member_id }}</a></h3>
+                    {% endif %}
+                    <div class="columns">
+                        {% for face in member_faces %}
+                            <a class="column is-narrow" href="{{ path('photos.single', {book_id: book.id, photo_id: face.foto_id}) }}
+                            ">{{ macros.render_face(face) }}</a>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+    <a href="{{ path('photo_books.competition') }}" class="button">
+        {{ __('Face tag statistics') }}
+    </a>
+</article>
+{% endblock %}

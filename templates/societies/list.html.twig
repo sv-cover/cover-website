@@ -1,0 +1,41 @@
+{% extends '@layout/layout.html.twig' %}
+
+{% block title __('Societies') ~ ' – ' ~ parent() %}
+
+{% block content %}
+{% set header = get_page('societies') %}
+<div class="level">
+    <div class="level-left">
+        <h1 class="title">{{ header.get_title }}</h1>
+    </div>
+    {% if policy.userCanUpdate(header) %}
+        <div class="buttons level-right">
+            <a href="{{ path('page.update', {id: header.id}) }}" class="button">
+                <span class="icon is-small">
+                    <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                </span>
+                <span>
+                    {{ __('Modify page') }}
+                </span>
+            </a>
+        </div>
+    {% endif %}
+</div>
+<div class="content" id="page_{{ header.id }}">
+    {{ header.locale_content|parse_markup }}
+</div>
+<div class="box content has-text-centered">
+    <p>{{ __('Are you interesed in founding a society? You can request this using the form below. For more information about the process you can check the %s.')|e('html')|format('<a href="https://sd.svcover.nl/Association/Guidelines%20Societies.pdf" target="_blank">Societies Guidelines</a>')|raw }}</p>
+    {% if auth.loggedIn %}
+        <a href="{{ path('societies.create') }}" class="button is-medium is-primary">
+            {{ __('Found a society') }}
+        </a>
+    {% else %}
+        <p>
+            <a href="{{ login_path() }}" class="button is-fullwidth is-primary">{{ __('Log in') }}</a>
+            <div class="divider is-fullwidth">{{ __('or') }}</div>
+            <a href="{{ path('registrations.join') }}" class="button is-fullwidth">{{ __('Become a member') }}</a>
+        </p>
+    {% endif %}
+</div>
+{% endblock %}

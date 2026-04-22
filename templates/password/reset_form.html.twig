@@ -1,0 +1,17 @@
+{% extends '@layout/layout.html.twig' %}
+
+{% block title __('Change password') ~ ' – ' ~ parent() %}
+
+{% block content %}
+<h1 class="title">{{ __('Change password') }}</h1>
+{{ form_start(form) }}
+    <div class="field">
+        <p>{{ __('Choose a new password. Long passwords are great as well as passwords with different character types.') }}</p>
+    </div>
+    {# Global errors #}
+    {{ form_errors(form, {attr: {class: 'error-section'}}) }}
+    {# Fields #}
+    {{ form_row(form.password) }}
+    {{ form_row(form.submit) }}
+{{ form_end(form) }}
+{% endblock %}

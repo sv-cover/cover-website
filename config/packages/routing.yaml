@@ -1,0 +1,14 @@
+parameters:
+    default_uri: '%env(:ROUTER_DEFAULT_URI)%'
+    env(ROUTER_DEFAULT_URI): https://svcover.nl
+
+framework:
+    router:
+        # Configure how to generate URLs in non-HTTP contexts, such as CLI commands.
+        # See https://symfony.com/doc/current/routing.html#generating-urls-in-commands
+        default_uri: '%default_uri%'
+
+when@prod:
+    framework:
+        router:
+            strict_requirements: null

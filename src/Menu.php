@@ -1,0 +1,467 @@
+<?php
+
+namespace App;
+
+use App\DataModel\DataModelCommissie;
+use App\DataModel\DataModelConfiguratie;
+use App\Legacy\Authentication\Authentication;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
+class Menu
+{
+    public function __construct(
+        private Authentication $auth,
+        private DataModelConfiguratie $settingsModel,
+        private UrlGeneratorInterface $router,
+    ) {
+    }
+
+    public function main()
+    {
+        $menu = [];
+
+        $menu['activities'] = [
+            'label' => __('Events'),
+            'submenu' => [
+                [
+                    'url' => $this->router->generate('events.list'),
+                    'label' => __('Calendar'),
+                ],
+                [
+                    'url' => $this->router->generate('photos'),
+                    'label' => __('Photos'),
+                ]
+            ]
+        ];
+
+        $menu['studie'] = [
+            'label' => __('Education'),
+            'submenu' => [
+                [
+                    'url' => $this->router->generate('slug', ['slug' => 'degree-programmes']),
+                    'label' => __('Degree Programmes'),
+                ],
+                [
+                    'url' => $this->router->generate('slug', ['slug' => 'student-info']),
+                    'label' => __('Student Information'),
+                ],
+                [
+                    'url' => $this->router->generate('slug', ['slug' => 'student-representation']),
+                    'label' => __('Student Representation'),
+                ],
+                [
+                    'url' => 'https://symposium.svcover.nl/',
+                    'target' => '_blank',
+                    'label' => __('Symposium'),
+                ],
+                [
+                    'url' => 'https://studysupport.svcover.nl/',
+                    'target' => '_blank',
+                    'label' => __('Exams & Summaries'),
+                ],
+                [
+                    'url' => $this->router->generate('slug', ['slug' => 'books']),
+                    'label' => __('Book Store'),
+                ],
+                [
+                    'url' => 'https://tutoring.svcover.nl/',
+                    'target' => '_blank',
+                    'label' => __('Tutoring'),
+                ],
+                [
+                    'url' => $this->router->generate('slug', ['slug' => 'alumni']),
+                    'label' => __('Alumni'),
+                ],
+            ]
+        ];
+
+        $menu['career'] = [
+            'label' => __('Career'),
+            'submenu' => [
+                [
+                    'url' => $this->router->generate('career', ['slug' => 'career']),
+                    'label'=> __('Vacancies & Partners'),
+                ],
+                [
+                    'url' => 'https://www.rug.nl/careerservices/',
+                    'label' => __('Career Services'),
+                    'target' => '_blank',
+                ],
+                [
+                    'url' => 'https://careerday.svcover.nl/',
+                    'label' => __('Career Day'),
+                    'target' => '_blank',
+                ],
+                                [
+                    'url' => $this->router->generate('slug', ['slug' => 'sponsoring']),
+                    'label' => __('Information for Companies'),
+                ],
+            ]
+        ];
+
+        $menu['vereniging'] = [
+            'label' => __('Association'),
+            'submenu' => [
+                [
+                    'url' => $this->router->generate('committees.single', ['slug' => 'board']),
+                    'label' => __('Board'),
+                ],
+                [
+                    'url' => $this->router->generate('boards.list'),
+                    'label' => __('Former Boards'),
+                ],
+                [
+                    'url' => $this->router->generate('committees.list'),
+                    'label' => __('Committees'),
+                ],
+                [
+                    'url' => $this->router->generate('societies.list'),
+                    'label' => __('Societies'),
+                ],
+                [
+                    'url' => $this->router->generate('slug', ['slug' => 'new-members-and-contributors']),
+                    'label' => __('Become a Member/Contributor'),
+                ],
+                [
+                    'url' => $this->router->generate('slug', ['slug' => 'sisters']),
+                    'label' => __('Sister Associations'),
+                ],
+                [
+                    'url' => $this->router->generate('slug', ['slug' => 'wellbeing']),
+                    'label' => __('Well-being'),
+                ],
+                [
+                    'url' => $this->router->generate('slug', ['slug' => 'history']),
+                    'label' => __('History of Cover'),
+                ],
+            ]
+        ];
+
+        $menu['contact'] = [
+            'label' => __('Contact'),
+            'url' => $this->router->generate('slug', ['slug' => 'contact']),
+        ];
+
+        /*
+        Show highlight in menu if menu_highlight is configured in settings. Example:
+        {
+            "label": "Introduction 2023",
+            "url": "https://introcee.svcover.nl/"
+        }
+        */
+        $highlight = \json_decode(
+            $this->settingsModel->get_value('menu_highlight', '')
+        );
+        if (!empty($highlight) && !empty($highlight->label) && !empty($highlight->url))
+            $menu['highlight'] = [
+                'label' => $highlight->label,
+                'url' => $highlight->url,
+                'class' => $highlight->class ?? 'is-highlighted',
+                'title' => $highlight->title ?? null,
+                'target' => $highlight->target ?? null,
+            ];
+
+        // Filter out any empty menu items (I'm looking at you, admin menu!)
+        $menu = array_filter($menu, function($item) {
+            return isset($item['url']) || !empty($item['submenu']);
+        });
+
+        return $menu;
+    }
+
+    public function tools()
+    {
+        $identity = $this->auth->getIdentity();
+
+        $menu = [];
+
+        $menu['internal'] = [
+            'label' => __(''),
+            'items' => [
+                [
+                    'label' => __('Members'),
+                    'url' => $this->router->generate('almanak'),
+                    'icon' => [
+                        'fa' => 'fas fa-users',
+                        'color' => 'cover',
+                    ],
+                    'title' => __('Search for Cover members.'),
+                ],
+                [
+                    'label' => __('Polls'),
+                    'url' => $this->router->generate('polls.list'),
+                    'icon' => [
+                        'fa' => 'fas fa-poll-h',
+                        'color' => 'cover',
+                    ],
+                    'title'=> __('View, create, and vote on polls.'),
+                ],
+                [
+                    'label' => __('Sticker Map'),
+                    'url' => $this->router->generate('stickers.list'),
+                    'icon' => [
+                        'fa' => 'fas fa-map-marked-alt',
+                        'color' => 'cover',
+                    ],
+                    'title' => __('View the sticker map and add your own sticker locations.'),
+                ],
+            ]
+        ];
+
+        $menu['external'] = [
+            'label' => __('Tools & Applications'),
+            'items' => [
+                [
+                    'label' => __('Wiki'),
+                    'url' => 'https://wiki.svcover.nl/',
+                    'target' => '_blank',
+                    'icon' => [
+                        'fa' => 'fas fa-graduation-cap',
+                        'color' => 'cover',
+                    ],
+                    'title' => __('Access the Cover wiki.'),
+                ],
+                [
+                    'label' => __('Documents & Templates'),
+                    'url' => 'https://sd.svcover.nl/',
+                    'target' => '_blank',
+                    'icon' => [
+                        'fa' => 'fas fa-file',
+                        'color' => 'cover',
+                    ],
+                    'title' => __('Find important documents and templates.'),
+                ],
+                [
+                    'label' => __('Merchandise'),
+                    'url' => 'https://merchandise.svcover.nl/',
+                    'target' => '_blank',
+                    'icon' => [
+                        'fa' => 'fas fa-tshirt',
+                        'color' => 'cover',
+                    ],
+                    'title'=> __('Buy Cover merchandise.'),
+                ],
+                [
+                    'label' => __('Exams & Summaries'),
+                    'url' => 'https://studysupport.svcover.nl/',
+                    'target' => '_blank',
+                    'icon' => [
+                        'fa' => 'fas fa-book',
+                        'color' => 'cover',
+                    ],
+                    'title' => __('Find past exams and summaries.'),
+                ],
+                [
+                    'label' => __('Tutoring'),
+                    'url' => 'https://tutoring.svcover.nl/',
+                    'target' => '_blank',
+                    'icon'=> [
+                        'fa' => 'fas fa-chalkboard-teacher',
+                        'color' => 'cover',
+                    ],
+                    'title' => __('Sign up for tutoring or become a tutor.'),
+                ],
+                [
+                    'label' => __('Submit an Idea'),
+                    'url' => 'https://idea.svcover.nl/',
+                    'target' => '_blank',
+                    'icon' => [
+                        'fa' => 'fas fa-lightbulb',
+                        'color' => 'cover',
+                    ],
+                    'title' => __('Submit your ideas to the Cover Board.'),
+                ],
+            ]
+        ];
+
+        $menu['admin'] = [
+            'label' => __('Committee'),
+            'items' => []
+        ];
+
+        if ($identity->member_in_committee(DataModelCommissie::BOARD) ||
+            $identity->member_in_committee(DataModelCommissie::CANDY) ||
+            $identity->member_in_committee(DataModelCommissie::WEBCIE))
+            $menu['admin']['label'] = __('Admin');
+
+        if ($identity->member_in_committee()) { // Member in any committee at all
+            $menu['external']['items'][] = [
+                'icon' => [
+                    'fa' => 'fas fa-print',
+                    'color' => 'cover',
+                ],
+                'url' => 'https://myprint.svcover.nl/',
+                'label' => __('Printer'),
+                'target' => '_blank',
+                'title' => __("Print documents on Cover's printer.")
+            ];
+
+            $menu['external']['items'][] = [
+                'icon' => [
+                    'img' => '/images/applications/reclaim.svg',
+                ],
+                'url' => 'https://reclaim.svcover.nl/',
+                'label' => __('Reclaim'),
+                'target' => '_blank',
+                'title' => __('Reclaim your expenses.')
+            ];
+
+            $menu['external']['items'][] = [
+                'label' => __('Webmail'),
+                'title' => __('Access the webmail for Cover email addresses.'),
+                'url' => 'https://webmail.svcover.nl/',
+                'target' => '_blank',
+                'icon' => [
+                    'fa' => 'fas fa-envelope',
+                    'color' => 'cover',
+                ],
+            ];
+
+            $menu['admin']['items'][] = [
+                'label' => __('Mailing Lists'),
+                'title' => __('Manage mailing lists.'),
+                'url' => $this->router->generate('mailing_lists.list'),
+                'icon' => [
+                    'fa' => 'fas fa-mail-bulk',
+                    'color' => 'dark',
+                    'icon_color' => 'light'
+                ],
+            ];
+
+            $menu['admin']['items'][] = [
+                'url' => $this->router->generate('sign_up_forms.list'),
+                'label' => __('Forms'),
+                'title' => __('Manage sign-up forms.'),
+                'icon' => [
+                    'fa' => 'fas fa-list-alt',
+                    'color' => 'dark',
+                    'icon_color' => 'light'
+                ],
+            ];
+        }
+
+        if ($identity->member_in_committee(DataModelCommissie::COMEXA) ||
+            $identity->member_in_committee(DataModelCommissie::BOARD) ||
+            $identity->member_in_committee(DataModelCommissie::CANDY)) {
+            $menu['admin']['items'][] = [
+                'icon' => [
+                    'fa' => 'fas fa-building',
+                    'color' => 'dark',
+                    'icon_color' => 'light'
+                ],
+                'url' => $this->router->generate('partners.list'),
+                'label' => __('Partners'),
+                'title' => __('View and manage partner profiles and banners.')
+            ];
+            $menu['admin']['items'][] = [
+                'label' => __('Vacancies'),
+                'title' => __('View and manage job vacancies.'),
+                'url' => $this->router->generate('vacancies.list'),
+                'icon' => [
+                    'fa' => 'fas fa-briefcase',
+                    'color' => 'dark',
+                    'icon_color' => 'light'
+                ],
+            ];
+        }
+
+        if ($identity->member_in_committee(DataModelCommissie::BOARD) ||
+            $identity->member_in_committee(DataModelCommissie::CANDY) ||
+            $identity->member_in_committee(DataModelCommissie::WEBCIE)) {
+            $menu['admin']['items'][] = [
+                'icon' => [
+                    'fa' => 'fas fa-file-alt',
+                    'color' => 'dark',
+                    'icon_color' => 'light'
+                ],
+                'url' => $this->router->generate('page.list'),
+                'label' => __('Pages'),
+                'title' => __('View and manage pages.')
+            ];
+
+            $menu['admin']['items'][] = [
+                'icon' => [
+                    'fa' => 'fas fa-user-plus',
+                    'color' => 'dark',
+                    'icon_color' => 'light'
+                ],
+                'url' => $this->router->generate('registrations.pending.list'),
+                'label' => __('Pending Registrations'),
+                'title' => __('Manage membership applications with unconfirmed email addresses.')
+            ];
+        }
+
+        if ($identity->member_in_committee(DataModelCommissie::BOARD) ||
+            $identity->member_in_committee(DataModelCommissie::CANDY)) {
+            $menu['admin']['items'][] = [
+                'label' => __('Active members'),
+                'title' => __('View all active committee members according to the website.'),
+                'url' => $this->router->generate('committee_members'),
+                'icon' => [
+                    'fa' => 'fas fa-user-friends',
+                    'color' => 'dark',
+                    'icon_color' => 'light'
+                ],
+            ];
+        }
+
+        if ($identity->member_in_committee(DataModelCommissie::WEBCIE)) {
+            $menu['admin']['items'][] = [
+                'label' => __('Device sessions'),
+                'title' => __('Manage device sessions.'),
+                'url' => $this->router->generate('device_sessions.list'),
+                'icon' => [
+                    'fa' => 'fas fa-desktop',
+                    'color' => 'dark',
+                    'icon_color' => 'light'
+                ],
+            ];
+            $menu['admin']['items'][] = [
+                'label' => __('Settings'),
+                'title' => __('Manage a few of the website’s settings.'),
+                'url' => $this->router->generate('settings.list'),
+                'icon' => [
+                    'fa' => 'fas fa-cog',
+                    'color' => 'dark',
+                    'icon_color' => 'light'
+                ],
+            ];
+        }
+
+        // Filter out any empty menu items (I'm looking at you, admin menu!)
+        $menu = array_filter($menu, function($item) {
+            return !empty($item['items']);
+        });
+
+        return $menu;
+    }
+
+    public function footer()
+    {
+        $menu = [];
+
+        $menu[] = [
+            'url' => $this->router->generate('slug', ['slug' => 'contact']),
+            'label' => __('Contact'),
+        ];
+
+        $menu[] = [
+            'url' => '//sd.svcover.nl/Privacy%20Statement/Privacy%20statement.pdf',
+            'label' => __('Privacy Statement'),
+            'target' => '_blank',
+        ];
+
+        $menu[] = [
+            'url' => $this->router->generate('slug', ['slug' => 'cancellation-policy']),
+            'label' => __('Cancellation Policy'),
+        ];
+
+        $menu[] = [
+            'url' => 'https://bitbucket.org/cover-webcie/cover-php/issues',
+            'label' => __('Report A Bug'),
+            'target' => '_blank',
+        ];
+
+        return $menu;
+    }
+}

@@ -1,0 +1,59 @@
+{% if auth.logged_in %}
+<div class="navbar-item has-dropdown is-hoverable-desktop user {% if auth.identity.can_impersonate and auth.identity.is_impersonating %}is-impersonating{% endif %}">
+    <a class="navbar-link is-arrowless profile" tabindex="0">
+        <span class="icon">
+            <img src="{{ path('profile_pictures.member', {member_id: auth.identity.member.id, format: 'square', width: 64}) }}" aria-hidden="true">
+            <span class="is-sr-only">
+                {{ __('User') }}
+            </span>
+        </span>
+    </a>
+    <div class="navbar-dropdown is-right">
+        {% if auth.logged_in %}
+            <div class="navbar-item profile">
+                <a class="image is-48x48" href="{{ path('profile') }}">
+                    <img class="is-rounded" src="{{ path('profile_pictures.member', {member_id: auth.identity.member.id, format: 'square', width: 96}) }}" aria-hidden="true">
+                </a>
+                <div class="user-info">
+                    <a class="name" href="{{ path('profile') }}">
+                        {{ auth.identity.member.full_name }}
+                    </a>
+                    
+                    {% if auth.identity.can_impersonate %}
+                        <a class="impersonate-link" href="{{ path('impersonate', {referrer: app.request.requestUri}) }}" data-popup="modal">
+                            {{ __('Impersonate') }}
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <hr class="navbar-divider">
+
+            <form class="navbar-item">
+                <div class="field dark-mode-switch">
+                    <div aria-hidden="true">
+                        {{ __('Dark mode') }}
+                    </div>
+                    <div class="control">
+                        <input id="dark-mode-switch" type="checkbox" name="dark-mode-switch" class="switch is-small is-rounded" {{ app.request.cookies.get('cover_color_mode', 'light') == 'dark' ? 'checked' : ''}}>
+                        <label for="dark-mode-switch"><span class="is-sr-only">{{ __('Toggle dark mode') }}</span></label>
+                    </div>
+                </div>
+            </form>
+
+            <hr class="navbar-divider">
+
+            <a class="navbar-item" href="{{ path('profile') }}">
+                {{ __('Your profile') }}
+            </a>
+            <a class="navbar-item" href="{{ logout_path(app.request.requestUri) }}">
+                {{ __('Log out') }}
+            </a>
+        {% endif %}
+    </div>
+</div>
+{% else %}
+    <a class="navbar-item" href="{{ login_path(app.request.requestUri) }}">
+        {{ __('Log in') }}
+    </a>
+{% endif %}

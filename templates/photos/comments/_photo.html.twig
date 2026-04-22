@@ -1,0 +1,35 @@
+{% if comments|length > 0 %}
+    {% for comment in comments %}
+        {{ include('photos/comments/_comment.html.twig', {iter: comment, photo:photo, book:book}) }}
+    {% endfor %}
+{% endif %}
+
+{% if policy.userCanCreate('DataModelPhotobookReactie') %}
+    {{ form_start(form, {id: 'photo-create-comment-form', action: path('photo_comments.create', {book_id: book.id, photo_id: photo.id}), attr: {class: 'media  photo-comment'}}) }}
+        {# Global errors #}
+        {{ form_errors(form) }}
+        <figure class="media-left">
+            <p class="image avatar">
+                <img
+                    class="is-rounded"
+                    src="{{ path('profile_pictures.member', {member_id: new_comment.author.id, format: 'square', width: 128}) }}"
+                    alt="Photo of {{ new_comment.author.get_full_name(bePersonal: true) }}"
+                >
+            </p>
+        </figure>
+        <div class="media-content">
+            <div class="field">
+                <p class="control">
+                    {{ form_widget(form.reactie, {attr: {'aria-label': __('Comment')}}) }}
+                </p>
+                {{ form_errors(form.reactie) }}
+                {{ form_help(form.reactie) }}
+            </div>
+            <div class="field is-grouped is-grouped-right">
+                <div class="control">
+                    {{ form_widget(form.submit, {label: __('Post comment')}) }}
+                </div>
+            </div>
+        </div>
+    {{ form_end(form) }}
+{% endif %}

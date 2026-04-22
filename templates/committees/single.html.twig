@@ -1,0 +1,130 @@
+{% extends
+    iter.page.cover_image_url and iter.page.cover_image_orientation == 'portrait'
+    ? 'committees/_single_portrait.html.twig'
+    : 'committees/_single_default.html.twig'
+%}
+
+{% block title %}
+    {{ iter.naam }} – {{ parent() }}
+{% endblock %}
+
+{% block committee_controls %}
+    <div class="level is-mobile controls">
+        <div class="level-left">
+            {% if iter.is_type('committee') %}
+                <a href="{{ path('committees.list') }}" class="button">
+                    <span class="icon"><i class="fas fa-arrow-left" aria-hidden="true"></i></span>
+                    <span>{{__('All committees')}}</span>
+                </a>
+            {% elseif iter.is_type('working_group') %}
+                <a href="{{ path('committees.list') }}" class="button">
+                    <span class="icon"><i class="fas fa-arrow-left" aria-hidden="true"></i></span>
+                    <span>{{__('All groups')}}</span>
+                </a>
+            {% endif %}
+        </div>
+        <div class="level-right">
+            {% if policy.userCanUpdate(iter) or policy.userCanUpdate(iter.page) or policy.userCanDelete(iter) %}
+                <div class="dropdown is-right">
+                    <div class="dropdown-trigger">
+                        <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+                            <span>{{ __('Manage') }}</span>
+                            <span class="icon is-small">
+                                <i class="fas fa-angle-down" aria-hidden="true"></i>
+                            </span>
+                        </button>
+                    </div>
+                    <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                        <div class="dropdown-content">
+                            {% if policy.userCanUpdate(iter) %}
+                                <a href="{{ path('committees.update', {slug: iter.login}) }}" class="dropdown-item">
+                                    <span class="icon">
+                                        <i class="fas fa-users-cog" aria-hidden="true"></i>
+                                    </span>
+                                    <span>{{ __('Edit %s')|format(constant('App\\DataModel\\DataModelCommissie::TYPE_OPTIONS')[iter.type]) }}</span>
+                                </a>
+                            {% endif %}
+
+                            {% if not iter.hidden and policy.userCanDelete(iter) %}
+                                <a href="{{ path('committees.delete', {slug: iter.login}) }}" class="dropdown-item" data-popup="modal">
+                                    <span class="icon">
+                                        <i class="fas fa-trash" aria-hidden="true"></i>
+                                    </span>
+                                    <span>{{ __('Deactivate %s')|format(constant('App\\DataModel\\DataModelCommissie::TYPE_OPTIONS')[iter.type]) }}</span>
+                                </a>
+                                <hr class="dropdown-divider">
+                            {% endif %}
+
+
+                            {% if policy.userCanUpdate(iter.page) %}
+                                <a href="{{ path('page.update', {id: iter.page.id}) }}" class="dropdown-item">
+                                    <span class="icon">
+                                        <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                                    </span>
+                                    <span>{{ __('Edit %s page')|format(constant('App\\DataModel\\DataModelCommissie::TYPE_OPTIONS')[iter.type]) }}</span>
+                                </a>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block committee_interest %}
+    {% if app.session.flashbag.peek('committee_interest') %}
+        {% for message in app.flashes('committee_interest') %}
+            <div class="notification is-danger">
+                <button class="delete"></button>
+                <p>{{ message }}</p>
+            </div>
+        {% endfor %}
+    {% elseif iter.has_vacancy %}
+        {{ include('committees/_members_wanted.html.twig') }}
+    {% endif %}
+{% endblock %}
+
+{% block committee_info %}
+    <section class="committee-info block">
+        <h2 class="is-sr-only">{{ __('Committee information') }}</h2>
+        {% if iter.website %}
+            <a href="{{ iter.website }}" target="_blank" rel="noopener noreferrer" class="button is-primary is-fullwidth block">
+                {{ __('%s website')|format(iter.naam) }}
+            </a>
+        {% endif %}
+        <div class="content">
+            {{ iter.page.locale_content|parse_markup }}
+        </div>
+
+        <h3 class="title is-5">{{ __('Members') }}</h3>
+        {{ include('committees/_members.html.twig') }}
+    </section>
+{% endblock %}
+
+{% block committee_events %}
+    {{ render(controller('App\\Controller\\EventsController::committeePage', {'committee': iter})) }}
+{% endblock %}
+
+{% block committee_contact %}
+    <section class="committee-contact block">
+        <h2 class="title is-5">{{ __('Contact') }}</h2>
+        <ul>
+            <li>
+                <span class="icon"><i class="fas fa-at" aria-hidden="true"></i></span>
+                <a href="mailto:{{ iter.get_email() }}">
+                    {{ iter.get_email() }}
+                </a>
+            </li>
+            {% if iter.website %}
+            <li>
+                <span class="icon"><i class="fas fa-globe" aria-hidden="true"></i></span>
+                <a href="{{ iter.website }}" target="_blank" rel="noopener noreferrer">
+                    {{ __('%s website')|format(iter.naam) }}
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </section>
+{% endblock %}

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=9">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="shortcut icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+        <link rel="shortcut icon" type="image/png"  href="/images/favicon-64x64.png" sizes="64x64">
+        <link rel="shortcut icon" type="image/png"  href="/images/favicon-128x128.png" sizes="128x128">
+        <link rel="shortcut icon" type="image/png"  href="/images/favicon-192x192.png" sizes="192x192">
+        <link rel="apple-touch-icon" href="filename='/images/apple-touch-icon-180x180.png">
+        <meta name="msapplication-TileImage" content="/images/favicon-270x270.png">
+
+        <title>Error! – Cover</title>
+
+        {{ encore_entry_link_tags('theme_light') }}
+    </head>
+    <body class="has-navbar-fixed-top">
+        <nav class="navbar is-cover is-fixed-top" role="navigation" aria-label="main navigation">
+            <div class="container">
+                <div class="navbar-brand">
+                    <a class="navbar-item" href="/">
+                        <img class="cover-logo" src="/images/cover_logo.png" alt="Cover">
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <article class="section">
+            <div class="container">
+                <section class="block">
+                    <h1 class="title">Error!</h1>
+                    <div class="content">
+                        <p>
+                            {{ __('Sorry, something went horribly wrong. Please try again in a bit or contact the AC/DCee (acdcee@svcover.nl)') }}
+                        </p>
+
+                        {% if get_sentry_id() and config.sentry_dsn is not empty %}
+                            <p>
+                                Glitchtip event id: <code>{{ get_sentry_id() }}</code>
+                            </p>
+                        {% endif %}
+
+                        <div class="buttons">
+                            {% if get_sentry_id() and config.sentry_dsn is not empty %}
+                                <button class="button" onclick="reportUserFeedback()">Provide feedback</button>
+                            {% endif %}
+                            <a href="{{ path('homepage') }}" class="button">{{ __('Go to the homepage') }}</a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </article>
+
+        {{ encore_entry_script_tags('sentry', attributes: { defer: false }) }}
+        <script>
+            function reportUserFeedback() {
+                Sentry.init({ dsn: {{ config.sentry_dsn|json_encode|raw }} });
+                let config = {
+                    eventId: {{ get_sentry_id()|json_encode|raw }},
+                };
+                {% if auth.loggedIn %}
+                    Sentry.setContext("user", {
+                        id: {{ auth.identity.get('id')|json_encode|raw }},
+                    });
+                    config.user = {
+                        name: {{ auth.identity.member.full_name|json_encode|raw }},
+                        email: {{ auth.identity.member.email|json_encode|raw }},
+                    };
+                {% endif %}
+                Sentry.showReportDialog(config);
+            }
+        </script>
+    </body>
+</html>

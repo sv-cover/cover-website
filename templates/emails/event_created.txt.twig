@@ -1,0 +1,18 @@
+Hi!
+
+{{ member_name }} added the following event on behalf of the {{ committee_name }}:
+
+Name:     {{ event.kop }}
+From:     {{ event.van }}
+Until:    {{ event.tot }}
+Location: {{ event.locatie }}
+Category: {{ event.category|split(',')|map(c => c|title)|join(', ', __(' and ')) }}
+
+{{ event.beschrijving }}
+
+You can approve (or decline) this event on {{ url('events.moderate', {_fragment: 'event_' ~ event.id}) }} .
+
+Kind Regards,
+
+
+The Website

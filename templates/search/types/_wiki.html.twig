@@ -1,0 +1,8 @@
+<h2 class="title is-5">
+    {# Wiki raths are always URLs, not routes #}
+    <a href="{{ result.absolute_path|e('html_attr') }}" data-search-main-link>{{ result.title }}</a>
+</h2>
+<p class="subtitle is-7">
+    Wiki page, {{ __N('%d hit', '%d hits', result.score) }}
+</p>
+<div class="content">{{ result.snippet|raw }}</div>

@@ -1,0 +1,53 @@
+{% extends '@layout/layout.html.twig' %}
+
+{% block title __('Active Members') ~ ' – ' ~ parent() %}
+
+{% block content %}
+<h1 class="title">{{ __('Active Members') }}</h1>
+<div class="content">
+    <p>{{ __('Taking all %s together, there are currently <strong>%d</strong> active Cover members.')|format(type ?: __('group types (committees, working groups, other)'), iters|length)|raw }}</p>
+</div>
+
+<div class="tabs is-toggle">
+    <ul>
+        <li class="{% if type is null %}is-active{% endif %}">
+            <a href="{{ path('committee_members') }}">
+                All types
+            </a>
+        </li>
+        {% for type_id, type_name in constant('App\\DataModel\\DataModelCommissie::TYPE_OPTIONS') %}
+            <li class="{% if type == type_name %}is-active{% endif %}">
+                <a href="{{ path('committee_members', {type: type_name}) }}">
+                    {{ type_name|title }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+<table class="table is-hoverable is-fullwidth">
+    <thead>
+        <tr>
+            <th>{{ __('ID') }}</th>
+            <th>{{ __('Name') }}</th>
+            <th>{{ __('Email') }}</th>
+            <th class="has-text-right is-nowrap">
+                {% if type is null %}
+                    {{ __('All groups') }}
+                {% else %}
+                    {{ type|title }}
+                {% endif %}
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for iter in iters %}
+        <tr>
+            <td>{{ iter.id }}</td>
+            <td><a href="{{ path('profile.member', {member_id: iter.id}) }}">{{ iter.get_full_name(ignorePrivacy: true) }}</a></td>
+            <td>{{ iter.email }}</td>
+            <td class="has-text-right">{{ iter.commissie_count }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

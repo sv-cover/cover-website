@@ -1,0 +1,67 @@
+{% extends '@layout/layout.html.twig' %}
+
+{% block title iter.subject ~ ' – ' ~ parent() %}
+
+{% block content %}
+    <header class="block">
+        <div class="level is-mobile controls">
+            <div class="level-left">
+                <a href="{{ path('announcements.list') }}" class="button">
+                    <span class="icon"><i class="fas fa-arrow-left" aria-hidden="true"></i></span>
+                    <span>{{__('All announcements')}}</span>
+                </a>
+            </div>
+            <div class="level-right">
+                {% if policy.userCanUpdate(iter) or policy.userCanDelete(iter) %}
+                    <div class="dropdown is-right">
+                        <div class="dropdown-trigger">
+                            <button class="button" aria-haspopup="true" aria-controls="manage-announcement" aria-label="{{ __('Manage') }}" title="{{ __('Manage') }}">
+                                <span class="icon is-small">
+                                    <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                </span>
+                            </button>
+                        </div>
+                        <div class="dropdown-menu" id="manage-announcement" role="menu">
+                            <div class="dropdown-content">
+                                <a class="dropdown-item" href="{{ path('announcements.single', {id: iter.id}) }}" title="{{ __('Link announcement') }}">
+                                    <span class="icon">
+                                        <i class="fas fa-link" aria-hidden="true"></i>
+                                    </span>
+                                    <span>{{ __('Link announcement') }}</span>
+                                </a>
+                                {% if policy.userCanUpdate(iter) %}
+                                    <a class="dropdown-item" href="{{ path('announcements.update', {id: iter.id}) }}" title="{{ __('Edit announcement') }}">
+                                        <span class="icon">
+                                            <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                                        </span>
+                                        <span>{{ __('Edit announcement') }}</span>
+                                    </a>
+                                {% endif %}
+                                {% if policy.userCanDelete(iter) %}
+                                    <a class="dropdown-item" href="{{ path('announcements.delete', {id: iter.id}) }}" title="{{ __('Delete announcement') }}" data-popup="modal">
+                                        <span class="icon">
+                                            <i class="fas fa-trash" aria-hidden="true"></i>
+                                        </span>
+                                        <span>{{ __('Delete announcement') }}</span>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+    <section class="content block">
+        <h1 class="title">
+            {{ iter.subject }}
+        </h1>
+        <p class="subtitle is-7">
+            {{ __('By') }}
+            <a href="{{ path('committees.single', {slug: iter.committee.login}) }}">{{ iter.committee.naam }}</a>
+            {{ __('on') }}
+            {{ iter.created_on|date() }}
+        </p>
+        {{ iter.message|parse_markup }}
+    </section>
+{% endblock %}

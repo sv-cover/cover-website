@@ -1,0 +1,97 @@
+{
+    "type": "project",
+    "license": "proprietary",
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.2",
+        "ext-ctype": "*",
+        "ext-iconv": "*",
+        "jeroendesloovere/vcard": "^1.7",
+        "maennchen/zipstream-php": "^3.1",
+        "odolbeau/phone-number-bundle": "^4.0",
+        "phpdocumentor/reflection-docblock": "^5.6",
+        "sentry/sentry-symfony": "^5.1",
+        "symfony/asset": "7.2.*",
+        "symfony/console": "7.2.*",
+        "symfony/dotenv": "7.2.*",
+        "symfony/flex": "^2",
+        "symfony/form": "7.2.*",
+        "symfony/framework-bundle": "7.2.*",
+        "symfony/http-client": "7.2.*",
+        "symfony/mailer": "7.2.*",
+        "symfony/mime": "7.2.*",
+        "symfony/property-access": "7.2.*",
+        "symfony/property-info": "7.2.*",
+        "symfony/runtime": "7.2.*",
+        "symfony/security-csrf": "7.2.*",
+        "symfony/serializer": "7.2.*",
+        "symfony/twig-bundle": "7.2.*",
+        "symfony/uid": "7.2.*",
+        "symfony/validator": "7.2.*",
+        "symfony/webpack-encore-bundle": "^2.2",
+        "symfony/yaml": "7.2.*",
+        "twig/extra-bundle": "^2.12|^3.0",
+        "twig/intl-extra": "^3.15",
+        "twig/twig": "^3.15",
+        "zbateson/mail-mime-parser": "^3.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true,
+            "symfony/flex": true,
+            "symfony/runtime": true
+        },
+        "sort-packages": true
+    },
+    "autoload": {
+        "files": [ "src/functions.php" ],
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "files": [ "src/functions.php" ],
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
+    },
+    "replace": {
+        "symfony/polyfill-ctype": "*",
+        "symfony/polyfill-iconv": "*",
+        "symfony/polyfill-php72": "*",
+        "symfony/polyfill-php73": "*",
+        "symfony/polyfill-php74": "*",
+        "symfony/polyfill-php80": "*",
+        "symfony/polyfill-php81": "*",
+        "symfony/polyfill-php82": "*"
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        },
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ]
+    },
+    "conflict": {
+        "symfony/symfony": "*"
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": false,
+            "require": "7.2.*"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5",
+        "symfony/browser-kit": "7.2.*",
+        "symfony/css-selector": "7.2.*",
+        "symfony/debug-bundle": "7.2.*",
+        "symfony/phpunit-bridge": "^7.2"
+    }
+}

@@ -1,0 +1,24 @@
+<footer>
+    {% if render_sponsors is not defined or render_sponsors %}
+        {{ render(controller('App\\Controller\\PartnersController::footer')) }}
+    {% endif %}
+    <div class="footer footer-main">
+        <ul>
+            {% for item in menu.footer -%}
+                <li>
+                    <a
+                        href="{{ item.url|e('html_attr') }}"
+                        target="{{ item.target|default('') }}"
+                        class="{{ item.class|default('') }}"
+                        {% if item.title is defined %} title="{{ item.title }}"{% endif %}
+                    >
+                        {{- item.label -}}
+                    </a>
+                </li>
+                {%- if not loop.last -%}
+                    <li class="divider" role="separator"></li>
+                {%- endif -%}
+            {%- endfor %}
+        </ul>
+    </div>
+</footer>

@@ -1,0 +1,15 @@
+{% extends '@layout/layout.html.twig' %}
+
+{% block title __('Create form') ~ ' – ' ~ parent() %}
+
+{% block content %}
+<header class="level">
+    <div class="level-left">
+        <h1 class="title">{{ __('Create form') }}</h1>
+    </div>
+</header>
+
+<article class="block">
+    {{ include('sign_ups/forms/_form.html.twig') }}
+</article>
+{% endblock %}

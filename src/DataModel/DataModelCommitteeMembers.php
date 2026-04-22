@@ -1,0 +1,61 @@
+<?php
+
+namespace App\DataModel;
+
+use App\DataIter\DataIterMember;
+use App\Legacy\Authentication\Authentication;
+use App\Legacy\Database\DataModel;
+use Symfony\Component\DependencyInjection\Attribute\Lazy;
+
+class DataModelCommitteeMembers extends DataModel
+{
+    public string $dataiter = DataIterMember::class;
+    public string $table = 'committee_members';
+
+    public function __construct(
+        #[Lazy] public Authentication $auth, // Lazy to prevent circular dependencies
+    ) {
+    }
+
+    public function get_active_members($type = null, $include_hidden = false)
+    {
+        $committee_conditions = "";
+
+        if ($type !== null)
+            $committee_conditions .= sprintf('AND c.type = %d', $type);
+
+        if (!$include_hidden)
+            $committee_conditions .= 'AND c.hidden = 0';
+
+        $rows = $this->db->query("SELECT DISTINCT
+            l.id,
+            l.voornaam,
+            l.tussenvoegsel,
+            l.achternaam,
+            l.email,
+            l.privacy,
+            array_agg(c.id) as commissie_ids,
+            COUNT(c.id) as commissie_count
+            FROM
+                committee_members a
+            LEFT JOIN leden l ON
+                a.member_id = l.id
+            JOIN commissies c ON
+                a.committee_id = c.id
+                $committee_conditions
+            GROUP BY
+                l.id,
+                l.voornaam,
+                l.tussenvoegsel,
+                l.achternaam,
+                l.email,
+                l.privacy
+            ORDER BY
+                voornaam,
+                tussenvoegsel,
+                achternaam ASC
+        ");
+
+        return $this->_rows_to_iters($rows);
+    }
+}

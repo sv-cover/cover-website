@@ -1,0 +1,61 @@
+{% extends '@layout/layout.html.twig' %}
+
+{% block title __('Settings') ~ ' – ' ~ parent() %}
+
+{% block content %}
+<header class="level is-mobile">
+    <div class="level-left">
+        <h1 class="title">{{ __('Settings') }}</h1>
+    </div>
+    <div class="level-right buttons">
+        {% if policy.userCanCreate('DataModelConfiguratie') %}
+            <a href="{{ path('settings.create') }}" class="button">
+                {{ __('Add setting') }}
+            </a>
+        {% endif %}
+    </div>
+</header>
+<div class="table-container">
+    <table class="table is-fullwidth">
+        <thead>
+            <tr>
+                <th>{{ __('Key') }}</th>
+                <th>{{ __('Value') }}</th>
+                <th class="is-sticky is-right is-nowrap is-narrow"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in iters %}
+                {% if policy.userCanRead(item) %}
+                    <tr>
+                        <td>{{ item.key }}</td>
+                        <td><code>{{ item.value }}</code></td>
+                        <td class="is-sticky is-right is-nowrap is-narrow">
+                            <ul class="controls">
+                                {% if policy.userCanDelete(item) %}
+                                    <li>
+                                        <a href="{{ path('settings.delete', {id: item.id}) }}" data-popup="modal" title="{{ __('Delete') }}" aria-label="{{ __('Delete') }}">
+                                            <span class="icon is-small">
+                                                <i class="fas fa-trash" aria-hidden="true"></i>
+                                            </span>
+                                        </a>
+                                    </li>
+                                {% endif -%}
+                                {%- if policy.userCanUpdate(item) %}
+                                    <li>
+                                        <a href="{{ path('settings.update', {id: item.id}) }}" title="{{ __('Edit') }}" aria-label="{{ __('Edit') }}">
+                                            <span class="icon is-small">
+                                                <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                                            </span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
