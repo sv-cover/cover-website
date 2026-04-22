@@ -1,0 +1,60 @@
+{% extends '@layout/layout.html.twig' %}
+
+{% block title __('Review photo submissions') ~ ' – ' ~ book.titel ~ ' – ' ~ parent() %}
+
+{% block content %}
+<h1 class="title">{{ __('Review photo submissions for %s')|format(book.titel) }}</h1>
+
+<p>
+    <a href="{{ path('photo_books.single', {book_id: book.id}) }}" class="button">
+        <span class="icon"><i class="fas fa-arrow-left" aria-hidden="true"></i></span>
+        <span>{{ __('Back to album') }}</span>
+    </a>
+</p>
+
+{% if submissions is empty %}
+    <div class="notification is-success is-light">
+        {{ __('No pending photo submissions for this album.') }}
+    </div>
+{% else %}
+    <div class="columns is-multiline">
+        {% for sub in submissions %}
+            <div class="column is-one-third">
+                <div class="card">
+                    <div class="card-image">
+                        <figure class="image">
+                            <img src="{{ path('photo_submissions.thumbnail', {id: sub.id}) }}"
+                                 alt="{{ __('Submitted photo') }}"
+                                 style="max-height: 300px; object-fit: contain; width: 100%;">
+                        </figure>
+                    </div>
+                    <div class="card-content">
+                        {% if sub.beschrijving is not empty %}
+                            <p class="content">{{ sub.beschrijving }}</p>
+                        {% endif %}
+                        <p class="is-size-7 has-text-grey">
+                            {{ __('Submitted on %s')|format(sub.submitted_on|date('j F Y, H:i')) }}
+                        </p>
+                    </div>
+                    <footer class="card-footer" style="display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.75rem;">
+                        <form method="post" action="{{ path('photo_submissions.approve', {id: sub.id}) }}" style="flex: 1; min-width: 0;">
+                            <input type="hidden" name="form[_token]" value="{{ csrf_token('approve_submission_' ~ sub.id) }}">
+                            <button type="submit" class="button is-success is-fullwidth">
+                                <span class="icon"><i class="fas fa-check" aria-hidden="true"></i></span>
+                                <span>{{ __('Approve') }}</span>
+                            </button>
+                        </form>
+                        <form method="post" action="{{ path('photo_submissions.reject', {id: sub.id}) }}" style="flex: 1; min-width: 0;">
+                            <input type="hidden" name="form[_token]" value="{{ csrf_token('reject_submission_' ~ sub.id) }}">
+                            <button type="submit" class="button is-danger is-fullwidth">
+                                <span class="icon"><i class="fas fa-times" aria-hidden="true"></i></span>
+                                <span>{{ __('Reject') }}</span>
+                            </button>
+                        </form>
+                    </footer>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}
