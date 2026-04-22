@@ -134,7 +134,7 @@ class DataModelPhotobook extends DataModel implements SearchProviderInterface
                 (SELECT COUNT(id) FROM foto_boeken WHERE parent_id = 0) as num_books,
                 (SELECT COUNT(id) FROM fotos WHERE boek = 0 AND hidden = 'f') as num_photos");
 
-        return new DataIterRootPhotobook($this, 0, array_merge(['titel' => __('Photo album')], $counts));
+        return new DataIterRootPhotobook($this, 0, array_merge(['titel' => __('Photo Album')], $counts));
     }
 
     /**

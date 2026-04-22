@@ -1327,7 +1327,7 @@ msgstr "Foto's toevoegen"
 #: themes/default/views/fotoboek/photobook.twig:6
 #: themes/default/views/fotoboek/single.twig:6
 #: include/models/DataModelPhotobook.php:564
-msgid "Photo album"
+msgid "Photo Album"
 msgstr "Fotoboek"
 
 #: themes/default/views/fotoboek/competition.twig:3
