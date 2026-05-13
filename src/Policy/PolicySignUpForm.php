@@ -51,11 +51,7 @@ class PolicySignUpForm implements PolicyInterface
         )
             return true;
 
-        if ($this->identity->member_in_committee($form['committee_id']))
-            return true;
-
-        // return $this->identity->is_member() || $this->identity->is_donor();
-        return false;
+        return $this->identity->member_in_committee($form['committee_id']);
     }
 
     public function userCanUpdate(DataIter $form): bool

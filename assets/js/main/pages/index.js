@@ -8,3 +8,4 @@ import './calendar';
 import './calendar_single';
 import './committees_form';
 import './mailing_list_message';
+import './calendar_search';
