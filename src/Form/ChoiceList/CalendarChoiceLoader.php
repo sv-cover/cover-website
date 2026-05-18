@@ -36,7 +36,6 @@ class CalendarChoiceLoader implements ChoiceLoaderInterface
 
         $factory = new DefaultChoiceListFactory();
 
-        dump($factory->createListFromChoices($choices, $value, [$this, 'filter']));
 
         return $factory->createListFromChoices($choices, $value, [$this, 'filter']);
     }
@@ -46,7 +45,7 @@ class CalendarChoiceLoader implements ChoiceLoaderInterface
         if (!$values)
             return [];
 
-        return $this->loadChoiceList($value)->getStructuredValues();
+        return $this->loadChoiceList($value)->getChoicesForValues($values);
     }
 
     public function loadValuesForChoices(array $choices, callable $value = null): array
@@ -62,6 +61,6 @@ class CalendarChoiceLoader implements ChoiceLoaderInterface
 
     public function filter($value)
     {
-        return True;
+        return true;
     }
 }

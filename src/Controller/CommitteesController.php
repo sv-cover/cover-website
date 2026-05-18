@@ -186,6 +186,8 @@ class CommitteesController extends AbstractController
                     $committeeChoices .= $this->model->get_naam($committee) . ', ';
                 }
 
+                dump($form['calendar']->getData());
+
                 $email = (new TemplatedEmail())
                     ->to($form->get('email')->getData())
                     ->subject("{$member['full_name']} wants to join one or more committees")
@@ -193,6 +195,7 @@ class CommitteesController extends AbstractController
                     ->context([
                         'member' => $member,
                         'committees' => $committeeChoices,
+                        // 'calendarTimes' => $calendarOptions,
                     ])
                 ;
             } else if ($mode == 'interest')

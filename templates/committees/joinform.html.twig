@@ -39,6 +39,9 @@
                     <br>
                     {{ form_row(form.committee) }}
 
+                    <br>
+                    {{ form_row(form.calendar) }}
+
                 {% elseif activeMode == 'interest' %}
 
                     <br>
@@ -48,6 +51,7 @@
                 {% endif %}
 
                 <br>
+
                 {{ form_row(form.submit) }}
                 {{ form_end(form) }}
 

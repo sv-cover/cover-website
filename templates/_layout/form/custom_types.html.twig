@@ -56,7 +56,7 @@
     </div>
 {% endblock %}
 
-
+{# 
 {% block calendar_row %}
 
 
@@ -68,7 +68,51 @@
     {% endfor %}
 
 
+{% endblock %} #}
+
+
+{% block calendar_row %}
+
+    {% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] %}
+    {% set times = [] %}
+
+    {% set numTimeSlots = (form|length) / (days|length) - 1 %}
+
+    {# {% for label, child in form.children %}
+
+        {{ child.vars.label }}
+
+    {% endfor %}
+
+    <h1>Test: {{ form.children[10].vars.label }}</h1> #}
+
+    <table class="table is-fullwidth is-bordered">
+
+    {% for day in days %}
+
+        <th>{{ day }}</th>
+
+    {% endfor %}
+
+    {% for time in 0..numTimeSlots %}
+
+        <tr>
+
+        {% for day in 0..days|length - 1 %}
+
+            <td>{{ form_widget(form.children[time + (day * 17)]) }}</td>
+
+        {% endfor %}
+
+        </tr>
+
+    {% endfor %}
+
+
+    </table>
+
 {% endblock %}
+
 
 {# 
 {% block calendar_row %}

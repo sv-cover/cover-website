@@ -30,7 +30,6 @@ class CalendarChoiceLoader implements ChoiceLoaderInterface
             $startTime->modify("+{$this->timePerSlot} minutes");
         }
 
-        dump($times);
 
         foreach ($this->days as $day)
         {
