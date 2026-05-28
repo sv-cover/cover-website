@@ -481,7 +481,8 @@ class DataModelCommissie extends DataModel implements SearchProviderInterface
         ];
 
         foreach ($iters as $iter) {
-            if ($iter->get('naam') != 'Board of Advisors' && $iter->get('naam') != 'AudiCee' && $iter->get('naam') != 'A Candidate Board')
+            if ($iter->get('naam') != 'Board of Advisors' && $iter->get('naam') != 'AudiCee' && $iter->get('id') != self::CANDY
+                && $iter->get('naam') != 'Application Committee')
                 $options['committees'][$iter->get('naam')] = $iter->get_id();
         }
 
