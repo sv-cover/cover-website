@@ -4,6 +4,7 @@ namespace App\DataModel;
 
 use App\Bridge\Filemanager;
 use App\DataModel\DataModelCommissie;
+use App\DataModel\DataModelPhotobook;
 use App\DataModel\DataModelSignUpForm;
 use App\DataIter\DataIterAgenda;
 use App\Legacy\Authentication\Authentication;
@@ -11,6 +12,7 @@ use App\Legacy\Database\DataIter;
 use App\Legacy\Database\DataModel;
 use App\Legacy\Database\SearchProviderInterface;
 use App\Utils\SearchUtils;
+use Symfony\Component\DependencyInjection\Attribute\Lazy;
 
 class DataModelAgenda extends DataModel implements SearchProviderInterface
 {
@@ -27,7 +29,21 @@ class DataModelAgenda extends DataModel implements SearchProviderInterface
         public Filemanager $filemanager,
         private DataModelCommissie $committeeModel,
         private DataModelSignUpForm $signUpFormModel,
+        #[Lazy] private DataModelPhotobook $photobookModel,
     ) {
+    }
+
+    public function insert(DataIter $iter)
+    {
+        $id = parent::insert($iter);
+
+        if ($iter->get('replacement_for') === null && $id) {
+            $eventData = array_merge($iter->data, ['id' => $id]);
+            if (!$this->photobookModel->get_book_for_event($id))
+                $this->photobookModel->create_for_event($eventData);
+        }
+
+        return $id;
     }
 
     public function get_include_private(): bool
@@ -194,6 +210,10 @@ class DataModelAgenda extends DataModel implements SearchProviderInterface
         {
             $proposal->set('replacement_for', null);
             $proposal->update();
+
+            $eventId = $proposal->get_id();
+            if ($eventId && !$this->photobookModel->get_book_for_event($eventId))
+                $this->photobookModel->create_for_event(array_merge($proposal->data, ['id' => $eventId]));
         }
         // It is an update: replace the contents of the old item (to preserve the id)
         // and throw away the proposal afterwards.
@@ -208,6 +228,10 @@ class DataModelAgenda extends DataModel implements SearchProviderInterface
             $this->update($current);
 
             $this->delete($proposal);
+
+            $eventId = $current->get_id();
+            if ($eventId && !$this->photobookModel->get_book_for_event($eventId))
+                $this->photobookModel->create_for_event(array_merge($current->data, ['id' => $eventId]));
         }
     }
 
