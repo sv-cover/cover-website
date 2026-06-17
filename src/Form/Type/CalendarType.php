@@ -15,9 +15,6 @@ class CalendarType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        
-        
-
         $resolver->setDefaults([
             'TimePerSlot' => 30,
             'StartTime' => '09:00',
@@ -34,7 +31,6 @@ class CalendarType extends AbstractType
                 );
             },
         ]);
-
     }
 
     public function getParent(): ?string

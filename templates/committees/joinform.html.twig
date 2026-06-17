@@ -40,12 +40,20 @@
                     {{ form_row(form.committee) }}
 
                     <br>
-                    {{ form_row(form.calendar) }}
+                    <br>
+                    <hr>
+                    
+                    {{ form_label(form.calendar) }}
+                    <p>In the form below, please fill in on what times you would be available for an interview during any normal week. </p>
+                    <br>
+                    {{ form_widget(form.calendar) }}
 
                 {% elseif activeMode == 'interest' %}
 
                     <br>
-                    {{ form_row(form.hobbies) }}
+                    {# {{ form_row(form.hobbies) }} #}
+                    {{ form_row(form.committee) }}
+                    <br>
                     {{ form_row(form.questions) }}
 
                 {% endif %}

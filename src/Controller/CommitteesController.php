@@ -12,6 +12,7 @@ use App\Legacy\Authentication\Authentication;
 use App\Legacy\Policy\Policy;
 use App\SignUp\Fields\ChoiceField;
 use App\SignUp\Fields\PhoneField;
+use phpDocumentor\Reflection\PseudoTypes\True_;
 use PhpParser\Node\Name;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -102,13 +103,14 @@ class CommitteesController extends AbstractController
                     'expanded' => true,
                     'chips' => true,
                     'show_all_types' => false,
-                    'label' => __('Which committee(s) do you want to plan an interview for'),
+                    'label' => __('Which committee(s) do you want to plan an interview for?'),
                 ])
                 ->add('calendar', CalendarType::class, [
-                    'label'=> __('Testcalendar'),
+                    'label' => __('What is your availability for an interview in the upcoming week'),
+                    'required' => true,
                     'multiple' => true,
                     'expanded' => true,
-                    'chips' => true,
+                    'chips' => true
                 ])
                 ->add('submit', SubmitType::class)
                 ->getForm();
@@ -138,32 +140,15 @@ class CommitteesController extends AbstractController
                         new AssertPhoneNumber(defaultRegion: 'NL'),
                     ]
                 ])
-                ->add('hobbies', ChoiceType::class, [
-                    'required' => false,
-                    'label' => __('Which of these topics are of interest to you'),
+                ->add('committee', CommitteeIdType::class, [
+                    'required' => true,
+                    'show_all' => true,
+                    'show_own' => false,
                     'multiple' => true,
                     'expanded' => true,
                     'chips' => true,
-                    'choices' => [
-                        'Web dev' => 'Web dev',
-                        'Social activities' => 'Social activities',
-                        'Career' => 'Career',
-                        'Sporting' => 'Sporting',
-                        'Hardware' => 'Hardware',
-                        'Programming' => 'Programming',
-                        'Handling Complaints' => 'Handling Complaints',
-                        'Writing' => 'Writing',
-                        'Gaming' => 'Gaming',
-                        'Traveling' => 'Traveling',
-                        'Safety' => 'Safety',
-                        'Education' => 'Education',
-                        'Socializing' => 'Socializing',
-                        'Photography' => 'Photography',
-                        'Design' => 'Design',
-                        'Rooms' => 'Rooms',
-                        'Organizing conferences' => 'Organizing conferences',
-                        'Designing Merchandise' => 'Designing Merchandise',
-                    ],
+                    'show_all_types' => false,
+                    'label' => __('Which committee(s) do you have questions about?'),
                 ])
                 ->add('questions', TextareaType::class, [
                     'label'=> __('Ask your questions here'),
@@ -186,33 +171,38 @@ class CommitteesController extends AbstractController
                     $committeeChoices .= $this->model->get_naam($committee) . ', ';
                 }
 
-                dump($form['calendar']->getData());
+                $calendarTimes = "";
+                foreach ($form['calendar']->getData() as $time)
+                {
+                    $calendarTimes .= $time . ', ';
+                }
 
                 $email = (new TemplatedEmail())
                     ->to($form->get('email')->getData())
-                    ->subject("{$member['full_name']} wants to join one or more committees")
+                    ->subject("{$form->get('name')->getData()} wants to join one or more committees")
                     ->htmlTemplate('emails/committee_join.html.twig')
                     ->context([
                         'member' => $member,
                         'committees' => $committeeChoices,
-                        // 'calendarTimes' => $calendarOptions,
+                        'calendarTimes' => $calendarTimes,
                     ])
                 ;
             } else if ($mode == 'interest')
             {
-                $hobbies = "";
-                foreach ($form['hobbies']->getData() as $hobby)
+                $committeeChoices = "";
+                foreach ($form['committee']->getData() as $committee)
                 {
-                    $hobbies .= $hobby . ', ';
+                    $committeeChoices .= $this->model->get_naam($committee) . ', ';
                 }
+
                 
                 $email = (new TemplatedEmail())
                     ->to($form->get('email')->getData())
-                    ->subject("{$member['full_name']} wants to join one or more committees")
+                    ->subject("{$form->get('naam')->getData} wants more information about committees")
                     ->htmlTemplate('emails/committee_interest_form.html.twig')
                     ->context([
                         'member' => $member,
-                        'hobbies' => $hobbies,
+                        'committees' => $committeeChoices,
                         'questions' => $form['questions']->getData(),
                     ])
                 ;

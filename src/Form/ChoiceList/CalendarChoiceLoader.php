@@ -12,30 +12,34 @@ class CalendarChoiceLoader implements ChoiceLoaderInterface
         private int $timePerSlot = 30,
         private string $startTime = '09:00',
         private string $endTime = '17:00',
-        private array $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
     ){
     }
 
     public function loadChoiceList(callable $value = null): ChoiceListInterface
     {
-
-        $choices = [];
-        $times = [];
         $startTime = new \DateTime($this->startTime);
         $endTime = new \DateTime($this->endTime);
-        while ($startTime <= $endTime) {
-            $times[$startTime->format('H:i')] = $startTime->format('H:i');
+
+        $choices = [
+            'Monday' => [],
+            'Tuesday' => [],
+            'Wednesday' => [],
+            'Thursday' => [],
+            'Friday' => []
+        ];
+
+        $startTime = new \DateTime($this->startTime);
+        while ($startTime <= $endTime)
+        {
+            $choices['Monday'][$startTime->format('H:i')] = "Monday: " . $startTime->format('H:i');
+            $choices['Tuesday'][$startTime->format('H:i')] = "Tuesday: " . $startTime->format('H:i');
+            $choices['Wednesday'][$startTime->format('H:i')] = "Wednesday: " . $startTime->format('H:i');
+            $choices['Thursday'][$startTime->format('H:i')] = "Thursday: " . $startTime->format('H:i');
+            $choices['Friday'][$startTime->format('H:i')] = "Friday: " . $startTime->format('H:i');
             $startTime->modify("+{$this->timePerSlot} minutes");
         }
 
-        foreach ($this->days as $day)
-        {
-            $choices[$day] = $times;
-        }
-
-
         $factory = new DefaultChoiceListFactory();
-
 
         return $factory->createListFromChoices($choices, $value, [$this, 'filter']);
     }
