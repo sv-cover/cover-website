@@ -198,7 +198,7 @@ class CommitteesController extends AbstractController
                 
                 $email = (new TemplatedEmail())
                     ->to($form->get('email')->getData())
-                    ->subject("{$form->get('naam')->getData} wants more information about committees")
+                    ->subject("{$form->get('name')->getData()} wants more information about committees")
                     ->htmlTemplate('emails/committee_interest_form.html.twig')
                     ->context([
                         'member' => $member,
