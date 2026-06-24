@@ -157,7 +157,7 @@
 <div class="media poll">
     <figure class="media-left is-hidden-mobile">
         {% if poll.committee %}
-            <a class="image is-64x64" href="{{ path('committees.single', {slug: poll.committee.login}) }}" title="{{ poll.committee.naam }}" aria-label="{{ poll.committee.naam }}">
+            <a class="image is-64x64" href="{{ poll.committee.url }}" title="{{ poll.committee.naam }}" aria-label="{{ poll.committee.naam }}">
                 <span class="committee-avatar" aria-hidden="true">
                     <span class="icon is-large">
                         <i class="fas fa-users fa-2x"></i>
@@ -182,7 +182,7 @@
         <div class="poll-meta">
             <span class="is-hidden-tablet">
                 {% if poll.committee %}
-                    <a class="image is-48x48" href="{{ path('committees.single', {slug: poll.committee.login}) }}" title="{{ poll.committee.naam }}" aria-label="{{ poll.committee.naam }}">
+                    <a class="image is-48x48" href="{{ poll.committee.url }}" title="{{ poll.committee.naam }}" aria-label="{{ poll.committee.naam }}">
                         <span class="committee-avatar" aria-hidden="true">
                             <span class="icon">
                                 <i class="fas fa-users"></i>
@@ -207,7 +207,7 @@
                 <li>
                     <strong>
                         {% if poll.committee %}
-                            <a href="{{ path('committees.single', {slug: poll.committee.login}) }}">
+                            <a href="{{ poll.committee.url }}">
                                 {{ poll.committee.naam }}
                             </a>
                         {% elseif poll.member %}

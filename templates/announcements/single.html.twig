@@ -58,7 +58,7 @@
         </h1>
         <p class="subtitle is-7">
             {{ __('By') }}
-            <a href="{{ path('committees.single', {slug: iter.committee.login}) }}">{{ iter.committee.naam }}</a>
+            <a href="{{ iter.committee.url }}">{{ iter.committee.naam }}</a>
             {{ __('on') }}
             {{ iter.created_on|date() }}
         </p>

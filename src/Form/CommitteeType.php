@@ -23,6 +23,7 @@ class CommitteeType extends AbstractType
                 'choices'  => [
                     __('Committee') => DataModelCommissie::TYPE_COMMITTEE,
                     __('Working Group') => DataModelCommissie::TYPE_WORKING_GROUP,
+                    __('Society') => DataModelCommissie::TYPE_SOCIETY,
                     __('Other') => DataModelCommissie::TYPE_OTHER,
                 ],
                 'expanded' => true,

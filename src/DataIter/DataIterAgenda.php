@@ -3,6 +3,7 @@
 namespace App\DataIter;
 
 use App\Legacy\Database\DataIter;
+use App\Legacy\Database\DataModel;
 use App\Legacy\Database\SearchResultInterface;
 use App\Utils\SearchUtils;
 
@@ -118,8 +119,8 @@ class DataIterAgenda extends DataIter implements SearchResultInterface
             }
 
             if ($field == 'committee_id') {
-                $other_value = ['id' => $other_value, 'name' => $other['committee__naam'], 'login' => $other['committee__login']];
-                $value = ['id' => $value, 'name' => $this['committee__naam'], 'login' => $this['committee__login']];
+				$other_value = $this->model->get_committee_for_id($other_value);
+				$value = $this->model->get_committee_for_id($value);
             }
 
             if ($other_value != $value)

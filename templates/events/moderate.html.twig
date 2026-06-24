@@ -46,8 +46,18 @@
                         {# New value #}
                         <div class="field content">
                             <p class="control">
-                                <strong>{{  __('Committee') }}</strong>:
-                                <a href="{{ path('committees.single', {slug: event.committee.login}) }}">{{ event.committee.naam }}</a>,
+                                <strong>
+                                    {%- if event.committee.type == constant('App\\DataModel\\DataModelCommissie::TYPE_COMMITTEE') -%}
+                                        {{- __('Committee') -}}
+                                    {%- elseif event.committee.type == constant('App\\DataModel\\DataModelCommissie::TYPE_SOCIETY') -%}
+                                        {{- __('Society') -}}
+                                    {%- elseif event.committee.type == constant('App\\DataModel\\DataModelCommissie::TYPE_WORKING_GROUP') -%}
+                                        {{- __('Working group') -}}
+                                    {%- else -%}
+                                        {{- __('Group') -}}
+                                    {%- endif -%}
+                                </strong>:
+                                <a href="{{ event.committee.url }}">{{ event.committee.naam }}</a>,
                                 <strong>{{  __('Location') }}</strong>:
                                 {{ event.locatie|default(__('not specified')) }}
                             </p>
@@ -95,8 +105,8 @@
                                     {{ change[0] }}
                                     (<em>{{ __('was') }}</em> {{ change[1] }})
                                 {% elseif field == 'committee_id' %}
-                                    <a href="{{ path('committees.single', {slug: change[0].login}) }}">{{ change[0].name }}</a>
-                                    (<em>{{ __('was') }}</em> <a href="{{ path('committees.single', {slug: change[1].login}) }}">{{ change[1].name }}</a>)
+                                    <a href="{{ change[0].url }}">{{ change[0].naam }}</a>
+                                    (<em>{{ __('was') }}</em> <a href="{{ change[1].url }}">{{ change[1].naam }}</a>)
                                 {% elseif field == 'private' %}
                                     {% if change[0] %}
                                         {{ __('members only (<em>was</em> everyone)')|raw }}

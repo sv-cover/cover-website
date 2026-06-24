@@ -246,6 +246,12 @@ class DataModelAgenda extends DataModel implements SearchProviderInterface
         return $this->committeeModel->get_iter($iter['committee_id']);
     }
 
+	public function get_committee_for_id(int $id)
+	{
+		return $this->committeeModel->get_iter($id);
+	}
+
+
     public function get_signup_forms_for_iter(DataIterAgenda $iter)
     {
         return $this->signUpFormModel->find(['agenda_id' => $iter->get_id()]);

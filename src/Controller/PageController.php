@@ -90,7 +90,7 @@ class PageController extends AbstractController
     {
         $committee = $this->committeeModel->get_from_page($iter['id']);
         if (isset($committee))
-            return $this->redirectToRoute('committees.single', ['slug' => $committee->get('login')], Response::HTTP_MOVED_PERMANENTLY);
+            return $this->redirect($committee->get_url(), Response::HTTP_MOVED_PERMANENTLY);
 
         $board = $this->boardModel->get_from_page($iter['id']);
         if (isset($board))

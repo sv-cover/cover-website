@@ -4,7 +4,7 @@
 <p class="subtitle is-7">
     {{ __('Announcement from %s on %s')|format(
         '<a href="%s">%s</a>'|format(
-            path('committees.single', {slug: result.committee.login}),
+            result.committee.url,
             result.committee.naam|e('html')),
             result.created_on|date('Y-m-d'))|raw }}
 </p>

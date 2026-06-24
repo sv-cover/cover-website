@@ -66,6 +66,11 @@ class DataIterCommissie extends DataIter implements SearchResultInterface
         return $this->model->get_summary_for_iter($this);
     }
 
+	public function get_year()
+	{
+		return $this->model->get_year_for_iter($this);
+	}
+
     public function get_search_relevance(): float
     {
         return floatval($this->data['search_relevance']);
@@ -102,6 +107,8 @@ class DataIterCommissie extends DataIter implements SearchResultInterface
             return $this['type'] === DataModelCommissie::TYPE_COMMITTEE;
         elseif ($type === 'working_group')
             return $this['type'] === DataModelCommissie::TYPE_WORKING_GROUP;
+		elseif ($type === 'society')
+			return $this['type'] === DataModelCommissie::TYPE_SOCIETY;
         else
             return $this['type'] === DataModelCommissie::TYPE_OTHER;
     }
@@ -112,4 +119,9 @@ class DataIterCommissie extends DataIter implements SearchResultInterface
             return $this->model->get_member_for_search_result($this);
         return null;
     }
+
+	public function get_url()
+	{
+		return $this->model->get_url_for_iter($this);
+	}
 }

@@ -85,6 +85,7 @@
 
 {% set working_groups = committees|filter(c => c.type == constant('App\\DataModel\\DataModelCommissie::TYPE_WORKING_GROUP')) %}
 {% set others = committees|filter(c => c.type == constant('App\\DataModel\\DataModelCommissie::TYPE_OTHER')) %}
+{% set societies = committees|filter(c => c.type == constant('App\\DataModel\\DataModelCommissie::TYPE_SOCIETY')) %}
 {% set committees = committees|filter(c => c.type == constant('App\\DataModel\\DataModelCommissie::TYPE_COMMITTEE')) %}
 <article class="block">
     <div class="profile-field">
@@ -105,8 +106,33 @@
         {% for committee in committees %}
             <li>
                 <a class="committee-name"
-                   href="{{ path('committees.single', {slug: committee.login}) }}">{{ committee.naam }}</a>
+                   href="{{ committee.url }}">{{ committee.naam }}</a>
                 <div class="committee-position">{{ __translate_parts(committee.functie, ',\/&') }}</div>
+            </li>
+        {% endfor %}
+    </ul>
+</article>
+<article class="block">
+    <div class="profile-field">
+        <div class="field-body">
+            <h2 class="title is-4">{{ __('Societies') }}</h2>
+        </div>
+    </div>
+    <div class="profile-field">
+        <div class="field-body">
+            {% if societies|length > 0 %}
+                <p>{{ __('%s is a member of the following societies:')|format(iter.first_name) }}</p>
+            {% else %}
+                <p>{{ __('%s is not a member of any society.')|format(iter.first_name) }}</p>
+            {% endif %}
+        </div>
+    </div>
+    <ul class="profile-committees">
+        {% for society in societies %}
+            <li>
+                <a class="committee-name"
+                   href="{{ society.url }}">{{ society.naam }}</a>
+                <div class="committee-position">{{ __translate_parts(society.functie, ',\/&') }}</div>
             </li>
         {% endfor %}
     </ul>
@@ -127,7 +153,7 @@
             {% for working_group in working_groups %}
                 <li>
                     <a class="committee-name"
-                       href="{{ path('committees.single', {slug: working_group.login}) }}">{{ working_group.naam }}</a>
+                       href="{{ working_group.url }}">{{ working_group.naam }}</a>
                     <div class="committee-position">{{ __translate_parts(working_group.functie, ',\/&') }}</div>
                 </li>
             {% endfor %}
@@ -150,7 +176,7 @@
             {% for other in others %}
                 <li>
                     <a class="committee-name"
-                       href="{{ path('committees.single', {slug: other.login}) }}">{{ other.naam }}</a>
+                       href="{{ other.url }}">{{ other.naam }}</a>
                     <div class="committee-position">{{ __translate_parts(other.functie, ',\/&') }}</div>
                 </li>
             {% endfor %}

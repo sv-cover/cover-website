@@ -12,6 +12,7 @@ use App\Legacy\Database\DataIterNotFoundException;
 use App\Legacy\Database\DataModel;
 use App\Legacy\Database\SearchProviderInterface;
 use Symfony\Component\DependencyInjection\Attribute\Lazy;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 
 /**
@@ -23,10 +24,13 @@ class DataModelCommissie extends DataModel implements SearchProviderInterface
     const TYPE_WORKING_GROUP = 2;
     const TYPE_OTHER = 3;
 
+	const TYPE_SOCIETY = 4;
+
     CONST TYPE_OPTIONS = [
         self::TYPE_COMMITTEE => 'committee',
         self::TYPE_WORKING_GROUP => 'working group',
         self::TYPE_OTHER => 'group',
+		self::TYPE_SOCIETY => 'society',
     ];
 
     const BOARD = 0;
@@ -48,6 +52,7 @@ class DataModelCommissie extends DataModel implements SearchProviderInterface
         private Authentication $auth,
         #[Lazy] private DataModelMember $memberModel, // Lazy to prevent circular dependencies
         #[Lazy] private DataModelPage $pageModel, // Lazy to prevent circular dependencies
+        private UrlGeneratorInterface $router,
     ) {
     }
 
@@ -487,6 +492,7 @@ class DataModelCommissie extends DataModel implements SearchProviderInterface
             'committees' => [],
             'working_groups' => [],
             'other' => [],
+			'societies' => [],
             'archived' => [],
         ];
 
@@ -499,6 +505,8 @@ class DataModelCommissie extends DataModel implements SearchProviderInterface
                 $options['committees'][$iter->get('naam')] = $iter->get_id();
             elseif ($iter['type'] === self::TYPE_WORKING_GROUP)
                 $options['working_groups'][$iter->get('naam')] = $iter->get_id();
+			elseif ($iter['type'] === self::TYPE_SOCIETY)
+				$options['societies'][$iter->get('naam')] = $iter->get_id();
             else
                 $options['other'][$iter->get('naam')] = $iter->get_id();
         }
@@ -508,6 +516,7 @@ class DataModelCommissie extends DataModel implements SearchProviderInterface
             __('Committees') => $options['committees'],
             __('Working groups') => $options['working_groups'],
             __('Groups') => $options['other'],
+			__('Societies') => $options['societies'],
             __('Archived') => $options['archived'],
         ];
     }
@@ -517,10 +526,23 @@ class DataModelCommissie extends DataModel implements SearchProviderInterface
         return $this->pageModel->get_iter($iter['page_id']);
     }
 
+	public function get_url_for_iter(DataIterCommissie $iter)
+	{
+		return $this->router->generate('groups.single', [
+			'type' => self::TYPE_OPTIONS[$iter->get('type') ? $iter->get('type') : self::TYPE_OTHER],
+			'slug' => $iter->get('login'),
+		]);
+	}
+
     public function get_summary_for_iter(DataIterCommissie $iter)
-    {
-        return $this->pageModel->get_summary($iter['page_id']);
-    }
+	{
+		return $this->pageModel->get_summary($iter['page_id']);
+	}
+
+	public function get_year_for_iter(DataIterCommissie $iter)
+	{
+		return $this->pageModel->get_year($iter['page_id']);
+	}
 
     public function get_member_for_search_result(DataIterCommissie $iter)
     {
