@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<body>
+<p>Hey,</p>
+
+<p>
+    <a href="{{ url('profile.member', {member_id: member.id})}}">{{ member.full_name }}</a>
+    indicated that they want more information about committees.
+</p>
+
+{% if committees != '' %}
+<p>
+    They want more information about the selected the following committeess:
+    {{ committees }}
+</p>
+{% endif %}
+
+
+{% if questions != '' %}
+<p>
+    They ask the following questions:
+</p>
+
+<p>
+    {{ questions }}
+</p>
+{% endif %}
+
+<p>Just so you know ;)</p>
+
+<p>Kind regards,<br>the Website</p>
+
+</body>
+</html>

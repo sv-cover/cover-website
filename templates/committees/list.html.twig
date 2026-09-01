@@ -53,30 +53,92 @@
 {% endblock %}
 
 {% block page %}
-<header class="section">
-    <div class="container is-widescreen level">
-        <div class="level-left">
-            <h1 class="title">{{ __('Committees') }}</h1>
-        </div>
-        {% if policy.userCanCreate('DataModelCommissie') %}
-        <div class="level-right buttons">
-            {# If someone can create, someone can probably also reactivate #}
-            <a href="{{ path('groups.archive') }}" class="button">{{ __('Committee archive') }}</a>
-            <a href="{{ path('groups.create') }}" class="button">{{ __('New committee') }}</a>
-        </div>
-        {% endif %}
-    </div>
-</header>
 
-<section class="section">
-    <div class="container is-widescreen">
-        <div class="columns is-multiline">
-            {% for committee in committees %}
-                {{ _self.committee_card(committee) }}
-            {% endfor %}
+<section class="section fixed-grid">
+    <div class="container is-widescreen photo-book">
+
+        {% set committee_description_page = get_page('committee_description_page') %}
+
+        {# Controls for committee archive and creating a new committee #}
+        {% if policy.userCanCreate('DataModelCommissie') %}
+        <article class="controls">
+            <div class="level-right control dropdown is-right">
+                    <div class="dropdown-trigger">
+                        <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+                            <span>{{ __('Manage') }}</span>
+                            <span class="icon is-small">
+                                <i class="fas fa-angle-down" aria-hidden="true"></i>
+                            </span>
+                        </button>
+                    </div>
+
+                    <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                        <div class="dropdown-content">
+                            <a href="{{ path('committees.create') }}" class="dropdown-item">
+                                <span class="icon">
+                                    <i class="fas fa-plus" aria-hidden="true"></i>
+                                </span>
+                                <span>{{ __('New committee') }}</span>
+                            </a>
+                            
+                            <a href="{{ path('committees.archive') }}" class="dropdown-item">
+                                <span class="icon">
+                                    <i class="fas fa-archive"></i>
+                                </span>
+                                <span>{{ __('Committee archive') }}</span>
+                            </a>
+
+                            {% if committee_description_page %}
+                            <a href="{{ path('page.update', {id: committee_description_page.id}) }}" class="dropdown-item">
+                                <span class="icon">
+                                    <i class="fas fa-edit"></i>
+                                </span>
+                                <span>{{ __('Modify description') }}</span>
+                            </a>
+                            {% endif %}
+                            
+                        </div>
+                    </div>
+            </div>
+        </article>
+        {% endif %}
+
+
+        {# Header #}
+        <header class="hero is-light cell">
+            <div class="hero-body has-text-centered is-centered">
+                <h1 class="title">{{ __('Committees') }}</h1>
+
+                {% if committee_description_page %}
+                    <div class="description">
+                        {{ committee_description_page.locale_content|parse_markup }}
+                    </div>
+                {% endif %}
+
+                <div class="buttons is-centered">
+                    {% if app.request.cookies.get('cover_color_mode', 'light') == 'dark' %}
+                    <a href="{{ path('committees.join', {mode: 'join'}) }}" class="button is-cover is-inverted is-outlined is-size-6-tablet is-size-7-mobile">
+                        {{ __('I am interested!') }}
+                    </a>
+                    {% else %}
+                    <a href="{{ path('committees.join', {mode: 'join'}) }}" class="button is-black is-outlined is-size-6-table is-size-7-mobile">
+                        {{ __('I am interested!') }}
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </header>
+
+        <br>
+
+        <div class="columns is-multiline cell">
+                {% for committee in committees %}
+                    {{ _self.committee_card(committee) }}
+                {% endfor %}
+            </div>
         </div>
+
     </div>
-</section>
 
 
 {% if working_groups %}

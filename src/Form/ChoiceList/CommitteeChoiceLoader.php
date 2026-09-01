@@ -14,14 +14,19 @@ class CommitteeChoiceLoader implements ChoiceLoaderInterface
         private DataModelCommissie $committeeModel,
         private bool $showAll = false,
         private bool $showOwn = true,
+        private bool $showAllTypes = true,
     ) {
     }
 
     public function loadChoiceList(callable $value = null): ChoiceListInterface
     {
-        $choices = $this->committeeModel->get_committee_choices($this->showOwn);
+        if ($this->showAllTypes)
+            $choices = $this->committeeModel->get_committee_choices($this->showOwn);
+        else
+            $choices = $this->committeeModel->get_all_committees();
 
         $factory = new DefaultChoiceListFactory();
+
         return $factory->createListFromChoices($choices, $value, [$this, 'filterCommittees']);
     }
 
@@ -32,7 +37,7 @@ class CommitteeChoiceLoader implements ChoiceLoaderInterface
         if (!$values) {
             return [];
         }
-
+        
         return $this->loadChoiceList($value)->getChoicesForValues($values);
     }
 

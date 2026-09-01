@@ -4,16 +4,34 @@ namespace App\Controller;
 
 use App\DataModel\DataModelCommissie;
 use App\Exception\UnauthorizedException;
+use App\Form\CommitteeType;
+use App\Form\DataTransformer\IntToBooleanTransformer;
+use App\Form\Type\CommitteeIdType;
+use App\Form\Type\CalendarType;
 use App\Legacy\Authentication\Authentication;
 use App\Legacy\Policy\Policy;
+use App\SignUp\Fields\ChoiceField;
+use App\SignUp\Fields\PhoneField;
+use phpDocumentor\Reflection\PseudoTypes\True_;
+use PhpParser\Node\Name;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\ChoiceList\ChoiceList;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Attribute\Route;
+
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Form\Extension\Core\Type\TelType;
+use Misd\PhoneNumberBundle\Validator\Constraints\PhoneNumber as AssertPhoneNumber;
 
 class CommitteesController extends AbstractController
 {
@@ -33,6 +51,191 @@ class CommitteesController extends AbstractController
             'committees' => array_filter($committees, [$this->policy, 'userCanRead']),
             'working_groups' => array_filter($working_groups, [$this->policy, 'userCanRead']),
         ]);
+    }
+
+
+    #[Route('/committees/join/{mode}', name: 'committees.join', defaults: ['mode' => 'join'], methods: ['GET', 'POST'])]
+    public function joins(
+        Authentication $auth,
+        MailerInterface $mailer,
+        Request $request,
+        string $mode,
+    ): Response
+    {
+        if (!$auth->getIdentity()->is_member())
+            throw new UnauthorizedException();
+
+        $member = $auth->identity->member();
+
+        $data = [
+            'name' => $member['full_name'],
+            'email' => $member['email'],
+            'phone' => $member['telefoonnummer'],
+        ];
+
+        if ($mode == 'join')
+        {
+            $form = $this->createFormBuilder($data)
+                ->add('name', TextType::class, [
+                    'label' => __('Name'),
+                    'required' => true,
+                ])
+                ->add('email', TextType::class, [
+                    'label' => __('Email'),
+                    'required' => true,
+                    'constraints' => [
+                        new Assert\NotBlank(),
+                        new Assert\Email(),
+                    ]  
+                ])
+                ->add('phone', TelType::class, [
+                    'label'=> __('Phone number'),
+                    'required'=> false,
+                    'constraints' => [
+                        new AssertPhoneNumber(defaultRegion: 'NL'),
+                    ]
+                ])
+                ->add('committee', CommitteeIdType::class, [
+                    'required' => true,
+                    'show_all' => true,
+                    'show_own' => false,
+                    'multiple' => true,
+                    'expanded' => true,
+                    'chips' => true,
+                    'show_all_types' => false,
+                    'label' => __('Which committee(s) do you want to plan an interview for?'),
+                ])
+                ->add('calendar', CalendarType::class, [
+                    'label' => __('What is your availability for an interview in the upcoming week'),
+                    'required' => true,
+                    'multiple' => true,
+                    'expanded' => true,
+                    'chips' => true
+                ])
+                ->add('submit', SubmitType::class)
+                ->getForm();
+                $form->handleRequest($request);
+
+
+        } else if ($mode == 'interest')
+        {
+
+            $form = $this->createFormBuilder($data,)
+                ->add('name', TextType::class, [
+                    'label' => __('Name'),
+                    'required' => true,
+                ])
+                ->add('email', TextType::class, [
+                    'label' => __('Email'),
+                    'required' => true,
+                    'constraints' => [
+                        new Assert\NotBlank(),
+                        new Assert\Email(),
+                    ]  
+                ])
+                ->add('phone', TelType::class, [
+                    'label'=> __('Phone number'),
+                    'required'=> false,
+                    'constraints' => [
+                        new AssertPhoneNumber(defaultRegion: 'NL'),
+                    ]
+                ])
+                ->add('committee', CommitteeIdType::class, [
+                    'required' => true,
+                    'show_all' => true,
+                    'show_own' => false,
+                    'multiple' => true,
+                    'expanded' => true,
+                    'chips' => true,
+                    'show_all_types' => false,
+                    'label' => __('Which committee(s) do you have questions about?'),
+                ])
+                ->add('questions', TextareaType::class, [
+                    'label'=> __('Ask your questions here'),
+                    'required' => false,
+                ])
+                ->add('submit', SubmitType::class)
+                ->getForm();
+            
+            $form->handleRequest($request);
+        }
+
+        if ($form->isSubmitted() && $form->isValid())
+        {
+            if ($mode == 'join')
+            {
+
+                $committeeChoices = "";
+                foreach ($form['committee']->getData() as $committee)
+                {
+                    $committeeChoices .= $this->model->get_naam($committee) . ', ';
+                }
+
+                $calendarTimes = "";
+                foreach ($form['calendar']->getData() as $time)
+                {
+                    $calendarTimes .= $time . ', ';
+                }
+
+                $email = (new TemplatedEmail())
+                    ->to($form->get('email')->getData())
+                    ->subject("{$form->get('name')->getData()} wants to join one or more committees")
+                    ->htmlTemplate('emails/committee_join.html.twig')
+                    ->context([
+                        'member' => $member,
+                        'committees' => $committeeChoices,
+                        'calendarTimes' => $calendarTimes,
+                    ])
+                ;
+            } else if ($mode == 'interest')
+            {
+                $committeeChoices = "";
+                foreach ($form['committee']->getData() as $committee)
+                {
+                    $committeeChoices .= $this->model->get_naam($committee) . ', ';
+                }
+
+                
+                $email = (new TemplatedEmail())
+                    ->to($form->get('email')->getData())
+                    ->subject("{$form->get('name')->getData()} wants more information about committees")
+                    ->htmlTemplate('emails/committee_interest_form.html.twig')
+                    ->context([
+                        'member' => $member,
+                        'committees' => $committeeChoices,
+                        'questions' => $form['questions']->getData(),
+                    ])
+                ;
+            } 
+            
+            
+            $mailer->send($email);
+
+            $this->addFlash('Success', __('The intern has been notified'));
+        }
+
+
+        return $this->render('committees/joinform.html.twig', [
+            'activeMode' => $mode,
+            'form'=> $form,
+        ]);
+
+    }
+
+
+    /**
+     * The Thrash! All (including deleted) committees/groups/others/etc
+     */
+    #[Route('/committees/archive', name: 'committees.archive', methods: ['GET'])]
+    public function archive(): Response
+    {
+        // If you can't create a committee, you won't need the archive either.
+        if (!$this->policy->userCanCreate('DataModelCommissie'))
+            throw new UnauthorizedException('You are not allowed to view the committee archive.');
+
+        $iters = $this->model->get(null, true);
+
+        return $this->render('committees/archive.html.twig', ['iters' => $iters]);
     }
 
     #[Route('/committees/slide/{slug}', name: 'committees.slide', methods: ['GET'])]
@@ -89,7 +292,7 @@ class CommitteesController extends AbstractController
                 ->cc($member['email'])
                 ->replyTo($member['email'])
                 ->subject("{$member['voornaam']} is interested in {$iter['naam']}")
-                ->htmlTemplate('emails/committee_interest.html.twig')
+                ->htmlTemplate(template: 'emails/committee_interest.html.twig')
                 ->context([
                     'committee' => $iter,
                     'member' => $member,
