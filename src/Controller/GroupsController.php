@@ -124,9 +124,11 @@ class GroupsController extends AbstractController
             $members = $form['members']->getData();
             $this->model->set_members($iter, empty($members) ? [] : $members);
 
-			$typeId = array_search($iter['type'], DataModelCommissie::TYPE_OPTIONS, strict: true);
+			if ($iter['hidden']) {
+				return $this->redirectToRoute('groups.archive');
+			}
 
-			return $this->redirectToRoute('groups.single', ['slug' => $iter['login'], 'type' => $typeId]);
+			return $this->redirect($iter->get_url());
         }
 
         return $this->render('groups/form.html.twig', [

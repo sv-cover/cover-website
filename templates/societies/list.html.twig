@@ -44,6 +44,7 @@
         </div>
         {% if policy.userCanCreate('DataModelCommissie') %}
         <div class="level-right buttons">
+            <a href="{{ path('groups.archive') }}" class="button">{{ __('Societies archive') }}</a>
             <a href="{{ path('groups.create') }}" class="button">{{ __('New society') }}</a>
         </div>
         {% endif %}
@@ -52,7 +53,7 @@
 
 <section class="section">
     <div class="container is-content-optimized">
-        <div class="columns is-multiline">
+        <div class="is-multiline">
             {% for society in societies %}
                 {{ _self.society_card(society) }}
             {% endfor %}
