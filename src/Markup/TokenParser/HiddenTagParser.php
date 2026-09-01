@@ -17,6 +17,7 @@ class HiddenTagParser extends AbstractTokenParser implements TagParserInterface,
             ['name' => 'h1'],
             ['name' => 'samenvatting'],
             ['name' => 'prive'],
+			['name' => 'year'],
         ];
     }
 

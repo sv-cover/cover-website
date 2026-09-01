@@ -12,7 +12,7 @@
     </div>
     {% if policy.userCanCreate('DataModelCommissie') %}
         <div class="level-right buttons">
-            <a href="{{ path('committees.create') }}" class="button">{{ __('New committee') }}</a>
+            <a href="{{ path('groups.create') }}" class="button">{{ __('New group') }}</a>
         </div>
     {% endif %}
 </div>
@@ -29,22 +29,22 @@
             </tr>
         </thead>
         <tbody>
-            {% for committee in iters|filter(c => not c.hidden) %}
+            {% for group in iters|filter(c => not c.hidden) %}
                 <tr>
-                    <td>{{ committee.naam }}</td>
-                    <td>{{ committee.member_count }}</td>
-                    <td>{{ constant('App\\DataModel\\DataModelCommissie::TYPE_OPTIONS')[committee.type]|title }}</td>
+                    <td>{{ group.naam }}</td>
+                    <td>{{ group.member_count }}</td>
+                    <td>{{ constant('App\\DataModel\\DataModelCommissie::TYPE_OPTIONS')[group.type]|title }}</td>
                     <td class="has-text-right is-nowrap">
-                        {% if not committee.hidden and policy.userCanDelete(committee) %}
-                            <a href="{{ path('committees.delete', {slug: committee.login}) }}" data-popup="modal">
+                        {% if not group.hidden and policy.userCanDelete(group) %}
+                            <a href="{{ path('groups.delete', {slug: group.login}) }}" data-popup="modal">
                                 <span class="icon">
                                     <i class="fas fa-trash" aria-hidden="true"></i>
                                 </span>
                                 <span class="is-sr-only">{{ __('Deactivate') }}</span>
                             </a>
                         {% endif %}
-                        {% if policy.userCanUpdate(committee) %}
-                            <a href="{{ path('committees.update', {slug: committee.login}) }}">
+                        {% if policy.userCanUpdate(group) %}
+                            <a href="{{ path('groups.update', {slug: group.login}) }}">
                                 <span class="icon">
                                     <i class="fas fa-pencil-alt" aria-hidden="true"></i>
                                 </span>
@@ -69,13 +69,13 @@
             </tr>
         </thead>
         <tbody>
-            {% for committee in iters|filter(c => c.hidden) %}
+            {% for group in iters|filter(c => c.hidden) %}
                 <tr>
-                    <td>{{ committee.naam }}</td>
-                    <td>{{ constant('App\\DataModel\\DataModelCommissie::TYPE_OPTIONS')[committee.type]|title }}</td>
+                    <td>{{ group.naam }}</td>
+                    <td>{{ constant('App\\DataModel\\DataModelCommissie::TYPE_OPTIONS')[group.type]|title }}</td>
                     <td class="has-text-right is-nowrap">
-                        {% if policy.userCanUpdate(committee) %}
-                            <a href="{{ path('committees.update', {slug: committee.login}) }}">
+                        {% if policy.userCanUpdate(group) %}
+                            <a href="{{ path('groups.update', {slug: group.login}) }}">
                                 <span class="icon">
                                     <i class="fas fa-pencil-alt" aria-hidden="true"></i>
                                 </span>

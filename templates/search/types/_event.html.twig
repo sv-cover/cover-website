@@ -10,7 +10,7 @@
         {{ __('External activity from %d')|format(result.van|date('Y')) }}
     {% elseif result.committee %}
         {% set committee_link = '<a href="%s">%s</a>'|format(
-            path('committees.single', {slug: result.committee.login}),
+            result.committee.url,
             result.committee.naam|e('html')) %}
         {{ __('Activity by %s from %d')|format(committee_link, result.van|date('Y')|e('html'))|raw }}
     {% else %}

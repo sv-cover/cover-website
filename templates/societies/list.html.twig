@@ -1,41 +1,80 @@
 {% extends '@layout/layout.html.twig' %}
 
-{% block title __('Societies') ~ ' – ' ~ parent() %}
-
-{% block content %}
-{% set header = get_page('societies') %}
-<div class="level">
-    <div class="level-left">
-        <h1 class="title">{{ header.get_title }}</h1>
-    </div>
-    {% if policy.userCanUpdate(header) %}
-        <div class="buttons level-right">
-            <a href="{{ path('page.update', {id: header.id}) }}" class="button">
-                <span class="icon is-small">
-                    <i class="fas fa-pencil-alt" aria-hidden="true"></i>
-                </span>
-                <span>
-                    {{ __('Modify page') }}
-                </span>
-            </a>
+{% macro society_card(society) %}
+<a href="{{ society.url }}" class="member-block">
+    <div class="cover-thumbnail">
+        <div class="overlay is-bottom">
+            <div class="name boxed-title-wrapper">
+                <h3 class="boxed-title is-size-5-mobile">
+                    {{ society.naam }}
+                </h3>
+            </div>
+            <div class="boxed-title-wrapper">
+            <span class="boxed-title has-text-weight-normal is-italic is-size-6">
+                {{ __('Since') }} {{ society.year }}
+            </span>
+            </div>
         </div>
-    {% endif %}
-</div>
-<div class="content" id="page_{{ header.id }}">
-    {{ header.locale_content|parse_markup }}
-</div>
-<div class="box content has-text-centered">
-    <p>{{ __('Are you interesed in founding a society? You can request this using the form below. For more information about the process you can check the %s.')|e('html')|format('<a href="https://sd.svcover.nl/Association/Guidelines%20Societies.pdf" target="_blank">Societies Guidelines</a>')|raw }}</p>
-    {% if auth.loggedIn %}
-        <a href="{{ path('societies.create') }}" class="button is-medium is-primary">
-            {{ __('Found a society') }}
-        </a>
-    {% else %}
-        <p>
-            <a href="{{ login_path() }}" class="button is-fullwidth is-primary">{{ __('Log in') }}</a>
-            <div class="divider is-fullwidth">{{ __('or') }}</div>
-            <a href="{{ path('registrations.join') }}" class="button is-fullwidth">{{ __('Become a member') }}</a>
-        </p>
-    {% endif %}
-</div>
+        <figure class="image">
+            <img
+                loading="lazy"
+                srcset="{{ society.page.get_cover_image(400) }} 400w,
+                        {{ society.page.get_cover_image(600) }} 600w"
+                sizes="100vw"
+                src="{{ society.page.get_cover_image(600) }}"
+                alt="{{ __('Society photo of %s')|format(society.naam) }}"
+            >
+        </figure>
+    </div>
+    <div class="member-block-details column">
+        {{ society.page.summary|default('') }}
+    </div>
+</a>
+{% endmacro %}
+
+{% block title %}
+    {{ __('Societies') }} – {{ parent() }}
+{% endblock %}
+
+{% block page %}
+<header class="section">
+    <div class="container is-content-optimized level">
+        <div class="level-left">
+            <h1 class="title">{{ __('Societies') }}</h1>
+        </div>
+        {% if policy.userCanCreate('DataModelCommissie') %}
+        <div class="level-right buttons">
+            <a href="{{ path('groups.archive') }}" class="button">{{ __('Societies archive') }}</a>
+            <a href="{{ path('groups.create') }}" class="button">{{ __('New society') }}</a>
+        </div>
+        {% endif %}
+    </div>
+</header>
+
+<section class="section">
+    <div class="container is-content-optimized">
+        <div class="is-multiline">
+            {% for society in societies %}
+                {{ _self.society_card(society) }}
+            {% endfor %}
+
+            <div class="box has-text-centered">
+                <div class="content">
+                    <p>{{ __('Are you interesed in founding a society? You can request this using the form below. For more information about the process you can check the %s.')|e('html')|format('<a href="https://sd.svcover.nl/Association/Guidelines%20Societies.pdf" target="_blank">Societies Guidelines</a>')|raw }}</p>
+                    {% if auth.loggedIn %}
+                        <a href="{{ path('societies.create') }}" class="button is-medium is-primary">
+                            {{ __('Found a society') }}
+                        </a>
+                    {% else %}
+                        <p>
+                            <a href="{{ login_path() }}" class="button is-fullwidth is-primary">{{ __('Log in') }}</a>
+                        <div class="divider is-fullwidth">{{ __('or') }}</div>
+                        <a href="{{ path('registrations.join') }}" class="button is-fullwidth">{{ __('Become a member') }}</a>
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}
