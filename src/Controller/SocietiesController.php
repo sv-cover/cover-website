@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\DataModel\DataModelCommissie;
+use App\DataIter\DataIterCommissie;
 use App\Exception\UnauthorizedException;
 use App\Legacy\Authentication\Authentication;
 use App\Legacy\Policy\Policy;
@@ -30,6 +31,9 @@ class SocietiesController extends AbstractController
     public function societies(): Response
     {
 		$societies = $this->model->get(DataModelCommissie::TYPE_SOCIETY);
+		usort($societies, function (DataIterCommissie $a, DataIterCommissie $b) {
+			return $a->get_id() <=> $b->get_id();
+		});
 
         return $this->render('societies/list.html.twig', [
 			'societies' => $societies,

@@ -27,7 +27,7 @@
         </figure>
     </div>
     <div class="member-block-details column">
-        {{ society.page.summary|default('') }}
+        {{ society.page.summary|default('')|nl2br }}
     </div>
 </a>
 {% endmacro %}
