@@ -2,8 +2,11 @@
 
 namespace App\Controller;
 
+use App\DataModel\DataModelCommissie;
+use App\DataIter\DataIterCommissie;
 use App\Exception\UnauthorizedException;
 use App\Legacy\Authentication\Authentication;
+use App\Legacy\Policy\Policy;
 use Misd\PhoneNumberBundle\Validator\Constraints\PhoneNumber as AssertPhoneNumber;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,10 +23,21 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class SocietiesController extends AbstractController
 {
+	public function __construct(
+		private DataModelCommissie $model,
+	) {
+	}
     #[Route('/societies', name: 'societies.list', methods: ['GET'])]
     public function societies(): Response
     {
-        return $this->render('societies/list.html.twig');
+		$societies = $this->model->get(DataModelCommissie::TYPE_SOCIETY);
+		usort($societies, function (DataIterCommissie $a, DataIterCommissie $b) {
+			return $a->get_id() <=> $b->get_id();
+		});
+
+        return $this->render('societies/list.html.twig', [
+			'societies' => $societies,
+		]);
     }
 
     #[Route('/societies/create', name: 'societies.create', methods: ['GET', 'POST'])]

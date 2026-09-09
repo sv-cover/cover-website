@@ -2,7 +2,7 @@
 
 {% macro committee_card(committee) %}
 <div class="column is-half-tablet is-one-third-desktop is-one-quarter-fullhd">
-    <a href="{{ path('committees.single', {slug: committee.login}) }}" class="committee">
+    <a href="{{ committee.url }}" class="committee">
         <div class="overlay">
             <h2 class="name">
                 {{ committee.naam }}

@@ -63,7 +63,7 @@
         </div>
         <p class="subtitle is-7">
             {{ __('By') }}
-            <a href="{{ path('committees.single', {slug: item.committee.login}) }}">{{ item.committee.naam }}</a>
+            <a href="{{ item.committee.url }}">{{ item.committee.naam }}</a>
             {{ __('on') }}
             {{ item.created_on|date() }}
         </p>

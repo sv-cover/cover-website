@@ -103,7 +103,7 @@ class Menu
             'label' => __('Association'),
             'submenu' => [
                 [
-                    'url' => $this->router->generate('committees.single', ['slug' => 'board']),
+                    'url' => $this->router->generate('groups.single', ['slug' => 'board', 'type'=> DataModelCommissie::TYPE_OPTIONS[DataModelCommissie::TYPE_OTHER]]),
                     'label' => __('Board'),
                 ],
                 [

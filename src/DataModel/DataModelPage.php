@@ -88,6 +88,21 @@ class DataModelPage extends DataModel implements SearchProviderInterface
         return $summary;
     }
 
+	public function get_year($id)
+	{
+		return $this->get_year_for_iter($this->get_iter($id));
+	}
+
+	public function get_year_for_iter(DataIterPage $iter, ?string $language = null)
+	{
+		$content = $iter->get_locale_content($language);
+
+		if (preg_match('/\[year\](.+?)\[\/year\]/msi', $content ?? '', $matches))
+			return $this->markup->strip($matches[1]);
+
+		return trim($this->markup->strip($content));
+	}
+
     public function search(string $search_query, ?int $limit = null): array
     {
         // TODO: This thing barely works. Try searching the contact page.

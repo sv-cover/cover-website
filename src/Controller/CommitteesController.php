@@ -250,131 +250,14 @@ class CommitteesController extends AbstractController
         return $this->render('committees/slide.html.twig', ['committee' => $committee]);
     }
 
-    #[Route('/committees/create', name: 'committees.create', methods: ['GET', 'POST'])]
-    public function create(Request $request): Response|RedirectResponse
-    {
-        $iter = $this->model->new_iter([
-            'type' => DataModelCommissie::TYPE_COMMITTEE
-        ]);
+	#[Route('/committees/{slug}', name: 'committees.single', methods: ['GET'], priority: -1)]
+	public function single(string $slug): Response
+	{
+		$iter = $this->model->find_one(['login' => $slug]);
+		$newUrl = $iter->get_url();
 
-        if (!$this->policy->userCanCreate($iter))
-            throw new UnauthorizedException('You are not allowed to create groups.');
-
-        $form = $this->createForm(CommitteeType::class, $iter, ['mapped' => false]);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $id = $this->model->insert($iter);
-
-            $members = $form['members']->getData();
-            if (!empty($members))
-                $this->model->set_members($iter, $members);
-
-            return $this->redirectToRoute('committees.single', ['slug' => $iter['login']]);
-        }
-
-        return $this->render('committees/form.html.twig', [
-            'iter' => $iter,
-            'form' => $form,
-            'functions' => $this->model->get_functies(),
-        ]);
-    }
-
-    #[Route('/committees/{slug}', name: 'committees.single', methods: ['GET'], priority: -1)]
-    public function single(string $slug): Response
-    {
-        $iter = $this->model->find_one(['login' => $slug]);
-
-        if (!isset($iter))
-            throw $this->createNotFoundException('Committee/group not found.');
-
-        if ($iter['hidden'])
-            throw $this->createNotFoundException('This committee/group is no longer active.');
-
-        if (!$this->policy->userCanRead($iter))
-            throw new UnauthorizedException('You are not allowed to see this committee.');
-
-        return $this->render('committees/single.html.twig', ['iter' => $iter]);
-    }
-
-    #[Route('/committees/{slug}/update', name: 'committees.update', methods: ['GET', 'POST'])]
-    public function update(string $slug, Request $request, FormFactoryInterface $formFactory): Response|RedirectResponse
-    {
-        $iter = $this->model->find_one(['login' => $slug]);
-
-        if (!$this->policy->userCanUpdate($iter))
-            throw new UnauthorizedException('You are not allowed to edit this group.');
-
-        $builder = $formFactory->createBuilder(CommitteeType::class, $iter, ['mapped' => false]);
-
-        // Add field to reactivate deactivated groups
-        if (!empty($iter['hidden'])) {
-            $builder->add('hidden', CheckboxType::class, [
-                'label' => __('This group is deactivated.'),
-                'help' => __('Uncheck this box and submit to reactivate.'),
-                'required' => false,
-            ]);
-            $builder->get('hidden')->addModelTransformer(new IntToBooleanTransformer());
-        }
-
-        // Populate members field
-        // TODO: this is terribly inefficient
-        $members = array_map(
-            fn($member) => ['member_id' => $member['id'], 'functie' => $member['functie']],
-            $iter->get_members()
-        );
-        $builder->get('members')->setData($members);
-
-        $form = $builder->getForm();
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->model->update($iter);
-
-            $members = $form['members']->getData();
-            $this->model->set_members($iter, empty($members) ? [] : $members);
-
-            return $this->redirectToRoute('committees.single', ['slug' => $iter['login']]);
-        }
-
-        return $this->render('committees/form.html.twig', [
-            'iter' => $iter,
-            'form' => $form,
-            'functions' => $this->model->get_functies(),
-        ]);
-    }
-
-    #[Route('/committees/{slug}/delete', name: 'committees.delete', methods: ['GET', 'POST'])]
-    public function delete(string $slug, Request $request): Response|RedirectResponse
-    {
-        $iter = $this->model->find_one(['login' => $slug]);
-
-        if (!$this->policy->userCanDelete($iter))
-            throw new UnauthorizedException('You are not allowed to delete this group.');
-
-        $form = $this->createFormBuilder($iter)
-            ->add('submit', SubmitType::class, ['label' => __('Delete'), 'color' => 'danger'])
-            ->getForm();
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Some committees already have pages etc. We will mark the committee as hidden.
-            // That way they remain in the history of Cover and could, if needed, be reactivated.
-            $iter['hidden'] = true;
-
-            // We'll also remove all its members at least
-            $iter['members'] = [];
-
-            $this->model->update($iter);
-
-            return $this->redirectToRoute('committees.list');
-        }
-
-        return $this->render('committees/confirm_delete.html.twig', [
-            'iter' => $iter,
-            'form' => $form,
-        ]);
-    }
+		return $this->redirect($newUrl);
+	}
 
     #[Route('/committees/{slug}/interest', name: 'committees.interest', methods: ['POST'])]
     public function interest(Authentication $auth, MailerInterface $mailer, Request $request, string $slug): RedirectResponse
@@ -420,6 +303,8 @@ class CommitteesController extends AbstractController
             $this->addFlash('committee_interest', __('Cool! We’ve notified the Commissioner of Internal Affairs for you!'));
         }
 
-        return $this->redirectToRoute('committees.single', ['slug' => $iter['login']]);
+		$typeId = array_search($iter['type'], DataModelCommissie::TYPE_OPTIONS, strict: true);
+
+		return $this->redirectToRoute('groups.single', ['slug' => $iter['login'], 'type' => $typeId]);
     }
 }

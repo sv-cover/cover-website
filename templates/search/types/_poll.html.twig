@@ -4,7 +4,7 @@
 <p class="subtitle is-7">
     {% if result.committee %}
         {% set committee_link = '<a href="%s">%s</a>'|format(
-            path('committees.single', {slug: result.committee.login}),
+            results.committee.url,
             result.committee.naam|e('html')) %}
         {{ __('%s asked on %s')|format(committee_link, result.created_on|date('F j, Y')|e('html'))|raw }}
     {% elseif result.member %}

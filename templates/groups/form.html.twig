@@ -94,7 +94,7 @@
         <div class="control buttons">
             {{ form_widget(form.submit, {'label': iter.has_id() ? __('Modify %s')|format(constant('App\\DataModel\\DataModelCommissie::TYPE_OPTIONS')[iter.type]) : __('Create group')}) }}
             {% if iter.has_id %}
-                <a href="{{ path('committees.single', {slug: iter.login}) }}" class="button">
+                <a href="{{ iter.url }}" class="button">
                     {{ __('Return to %s')|format(constant('App\\DataModel\\DataModelCommissie::TYPE_OPTIONS')[iter.type]) }}
                 </a>
             {% else %}
@@ -103,7 +103,7 @@
                 </a>
             {% endif %}
             {% if iter.has_id and not iter.hidden and policy.userCanDelete(iter) %}
-                <a href="{{ path('committees.delete', {slug: iter.login}) }}" class="button" data-popup="modal">
+                <a href="{{ path('groups.delete', {slug: iter.login}) }}" class="button" data-popup="modal">
                     {{ __('Deactivate') }}
                 </a>
             {% endif %}

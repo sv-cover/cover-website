@@ -77,12 +77,6 @@ class DataModelAnnouncement extends DataModel implements SearchProviderInterface
 
     public function get_committee_for_iter(DataIterAnnouncement $iter)
     {
-        $data = [];
-
-        foreach ($iter->data as $k => $v)
-            if (str_starts_with($k, 'committee__'))
-                $data[substr($k, strlen('committee__'))] = $v;
-
-        return $this->committeeModel->new_iter($data);
+		return $this->committeeModel->get_iter($iter->data['committee_id']);
     }
 }

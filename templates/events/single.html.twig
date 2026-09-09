@@ -180,12 +180,12 @@
                         <div class="has-text-danger">{{  __('This activity is not organised by Cover.') }}</div>
                         {% if iter.committee %}
                             {{  __('Placed by') }}:
-                            <a href="{{ path('committees.single', {slug: iter.committee.login}) }}">{{ iter.committee.naam }}</a>
+                            <a href="{{ iter.committee.url }}">{{ iter.committee.naam }}</a>
                         {% endif %}
                     </p>
                 {% elseif iter.committee %}
                     <h3>{{  __('Organiser') }}</h3>
-                    <p><a href="{{ path('committees.single', {slug: iter.committee.login}) }}">{{ iter.committee.naam }}</a></p>
+                    <p><a href="{{ iter.committee.url }}">{{ iter.committee.naam }}</a></p>
                 {% endif %}
             </div>
         </div>

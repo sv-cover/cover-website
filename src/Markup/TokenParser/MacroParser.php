@@ -69,7 +69,7 @@ class MacroParser extends AbstractTokenParser implements TokenProcessorInterface
     {
         try {
             $committee = $this->committeeModel->get_from_name($name);
-            $url = $this->urlGenerator->generate('committees.single', ['slug' => $committee['login']]);
+            $url = $committee->get_url();
             $name = $this->twig->getRuntime('Twig\Runtime\EscaperRuntime')->escape($committee['naam'], 'html');
             return "<a href=\"$url\">$name</a>";
         } catch (NotFoundException $e) {
