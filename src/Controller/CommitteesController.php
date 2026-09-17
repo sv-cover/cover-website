@@ -211,7 +211,7 @@ class CommitteesController extends AbstractController
             
             $mailer->send($email);
 
-            $this->addFlash('Success', __('The intern has been notified'));
+            $this->addFlash('Success', __('The Commissioner of Internal Affairs has been notified'));
         }
 
 
