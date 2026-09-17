@@ -52,8 +52,8 @@ class PolicySignUpEntry implements PolicyInterface
             return true;
 
         // The member of the entry can read their own entries
-        if ($this->identity->get('id') === $entry['member_id'])
-            return true;
+        // if ($this->identity->get('id') === $entry['member_id'])
+        //     return true;
 
         return false;
     }

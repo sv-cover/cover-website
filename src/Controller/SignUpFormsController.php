@@ -48,7 +48,7 @@ class SignUpFormsController extends AbstractController
             $forms = $this->model->find(['committee_id__in' => $identity->get('committees')]);
 
         // Apply policy
-        $forms = array_filter($forms, [$this->policy, 'userCanRead']);
+        $forms = array_filter($forms, [$this->policy, 'userCanSignUp']);
 
         return $this->render('sign_ups/forms/list.html.twig', [
             'forms' => $forms,
