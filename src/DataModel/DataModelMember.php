@@ -490,7 +490,7 @@ class DataModelMember extends DataModel implements SearchProviderInterface
                 break;
 
             case self::STATUS_LID_AF:
-                $condition = "member_from < NOW()";
+                $condition = "member_from < NOW() AND member_till IS NOT NULL AND member_till < NOW()";
                 break;
 
             case self::STATUS_PENDING:
