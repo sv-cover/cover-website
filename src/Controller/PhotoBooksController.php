@@ -8,6 +8,7 @@ use App\DataIter\DataIterRootPhotobook;
 use App\DataModel\DataModelPhotobook;
 use App\DataModel\DataModelPhotobookFace;
 use App\DataModel\DataModelPhotobookReactie;
+use App\DataModel\DataModelPhotoSubmission;
 use App\Exception\UnauthorizedException;
 use App\Form\PhotoBookType;
 use App\Form\PhotoType;
@@ -52,6 +53,7 @@ class PhotoBooksController extends AbstractController
     public function single(
         Authentication $auth,
         DataModelPhotobookReactie $commentModel,
+        DataModelPhotoSubmission $submissionModel,
         ?string $book_id = null,
     ): Response
     {
@@ -77,6 +79,9 @@ class PhotoBooksController extends AbstractController
 
             $context['recent_comments'] = $recentComments;
         }
+
+        if ($this->policy->userCanReviewSubmissions($book) && ctype_digit((string) $book->get_id()) && $book->get_id() > 0)
+            $context['pending_submission_count'] = $submissionModel->count_pending_for_book($book->get_id());
 
         $response = $this->render('photos/books/single.html.twig', $context);
 

@@ -187,6 +187,30 @@
         {{ include('photos/books/_photos.html.twig', {photos: book.photos}) }}
     {% endif %}
 
+    {# Submit photos prompt for logged-in members #}
+    {% if book is not instanceof('App\\DataIter\\DataIterRootPhotobook') and book.agenda_id is not empty and policy.userCanSubmitPhotos(book) %}
+    <article class="section">
+        <div class="notification is-info is-light">
+            <p>{{ __('Did you take photos at this event? You can submit them for inclusion in this album!') }}
+               <a href="{{ path('photo_submissions.submit', {book_id: book.id}) }}" class="button is-info is-small ml-2">
+                   {{ __('Submit your photos') }}
+               </a>
+            </p>
+        </div>
+    </article>
+    {% endif %}
+
+    {# Pending review notification for photocee/board #}
+    {% if book is not instanceof('App\\DataIter\\DataIterRootPhotobook') and book.agenda_id is not empty and policy.userCanReviewSubmissions(book) and pending_submission_count is defined and pending_submission_count > 0 %}
+    <article class="section">
+        <div class="notification is-warning">
+            <a href="{{ path('photo_submissions.review', {book_id: book.id}) }}">
+                {{ __N('%d photo awaiting approval', '%d photos awaiting approval', pending_submission_count) }}
+            </a>
+        </div>
+    </article>
+    {% endif %}
+
 </div>
 </section>
 
