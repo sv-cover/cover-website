@@ -58,7 +58,7 @@ class BoardsController extends AbstractController
             $iter['page_id'] = $this->pageModel->insert($page, true);
 
             $id = $this->model->insert($iter);
-            return $this->redirectToRoute('boards.single', ['id' => $iter->get_id()]);
+            return $this->redirectToRoute('boards.list', ['id' => $iter->get_id()]);
         }
 
         return $this->render('boards/form.html.twig', [
