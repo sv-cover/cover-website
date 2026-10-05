@@ -1,0 +1,71 @@
+{% extends '@layout/layout.html.twig' %}
+
+{% block title __('Committee interest') ~ ' – ' ~ parent() %}
+
+{% block page %}
+<section class="section">
+    <div class="container photo-book">
+        <header class="hero is-light">
+
+            <div class="hero-body">
+                <h1 class="title has-text-centered is-centered">Committee Interest Form</h1>
+                <p class="subtitle has-text-centered is-centered">After filling in the form below, the intern will get into contact with you!</p>
+            
+                <br>
+
+                <div class="container is-centered is-fullwidth has-text-centered has-background-light">
+
+                    <a class="button {{ activeMode == 'join' ? 'has-background-primary' : ''}}" href="{{ path('committees.join', {mode: 'join'}) }}">I want to join a committee</a>
+                    <a class="button {{ activeMode == 'interest' ? 'has-background-primary' : ''}}" href="{{ path('committees.join', {mode: 'interest'}) }}">I want more information about committees</a>
+
+                </div>
+            </div>
+        </header>
+
+        <section class="section">
+                {{ form_start(form) }}
+
+                {# Global errors #}
+                {{ form_errors(form) }}
+
+                {# Form fields #}
+
+                {{ form_row(form.name) }}
+                {{ form_row(form.email) }}
+                {{ form_row(form.phone) }}
+
+                {% if activeMode == 'join' %}
+
+                    <br>
+                    {{ form_row(form.committee) }}
+
+                    <br>
+                    <br>
+                    <hr>
+                    
+                    {{ form_label(form.calendar) }}
+                    <p>In the form below, please fill in on what times you would be available for an interview during any normal week. </p>
+                    <br>
+                    {{ form_widget(form.calendar) }}
+
+                {% elseif activeMode == 'interest' %}
+
+                    <br>
+                    {# {{ form_row(form.hobbies) }} #}
+                    {{ form_row(form.committee) }}
+                    <br>
+                    {{ form_row(form.questions) }}
+
+                {% endif %}
+
+                <br>
+
+                {{ form_row(form.submit) }}
+                {{ form_end(form) }}
+
+        </section>
+
+    </div>
+</section>
+
+{% endblock %}
