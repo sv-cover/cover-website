@@ -94,7 +94,7 @@ class PageController extends AbstractController
 
         $board = $this->boardModel->get_from_page($iter['id']);
         if (isset($board))
-            return $this->redirectToRoute('boards', ['_fragment' => $board->get('login')], Response::HTTP_MOVED_PERMANENTLY);
+            return $this->redirectToRoute('boards.list', ['_fragment' => $board->get('login')], Response::HTTP_MOVED_PERMANENTLY);
 
         if (!$this->policy->userCanRead($iter))
             throw new UnauthorizedException('You are not allowed to read this page.');
