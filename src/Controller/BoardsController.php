@@ -84,7 +84,7 @@ class BoardsController extends AbstractController
             $this->pageModel->update($page);
 
             $this->model->update($iter);
-            return $this->redirectToRoute('boards.single', ['id' => $iter->get_id()]);
+            return $this->redirectToRoute('boards.list', ['id' => $iter->get_id()]);
         }
 
         return $this->render('boards/form.html.twig', [
