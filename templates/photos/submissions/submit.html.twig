@@ -1,0 +1,28 @@
+{% extends '@layout/layout.html.twig' %}
+
+{% block title __('Submit photos') ~ ' – ' ~ book.titel ~ ' – ' ~ parent() %}
+
+{% block content %}
+<h1 class="title">{{ __('Submit photos for %s')|format(book.titel) }}</h1>
+
+<div class="notification is-info is-light">
+    <p>{{ __('You can submit photos you took at this event. After review by the PhotoCee, approved photos will appear in the album.') }}</p>
+</div>
+
+{{ form_start(form, {attr: {enctype: 'multipart/form-data'}}) }}
+    {{ form_errors(form) }}
+    {{ form_row(form.photo) }}
+    {{ form_row(form.beschrijving) }}
+    <div class="field">
+        <div class="notification is-warning is-light">
+            {{ form_row(form.consent) }}
+        </div>
+    </div>
+    <div class="field">
+        <div class="control buttons">
+            {{ form_widget(form.submit) }}
+            <a href="{{ path('photo_books.single', {book_id: book.id}) }}" class="button">{{ __('Cancel') }}</a>
+        </div>
+    </div>
+{{ form_end(form) }}
+{% endblock %}

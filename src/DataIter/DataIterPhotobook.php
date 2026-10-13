@@ -21,6 +21,7 @@ class DataIterPhotobook extends DataIter implements SearchResultInterface
             'beschrijving',
             'visibility',
             'sort_index',
+            'agenda_id',
         ];
     }
 

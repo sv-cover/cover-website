@@ -667,6 +667,61 @@ class DataModelPhotobook extends DataModel implements SearchProviderInterface
         return $this->likeModel->count_for_photos($photos);
     }
 
+    public function get_book_for_event(int $agendaId): ?DataIterPhotobook
+    {
+        $row = $this->db->query_first(sprintf(
+            "SELECT f_b.*, 0 as num_photos, 0 as num_books FROM foto_boeken f_b WHERE f_b.agenda_id = %d",
+            $agendaId
+        ));
+        return $row ? $this->_row_to_iter($row, DataIterPhotobook::class) : null;
+    }
+
+    private function get_or_create_year_book(\DateTimeInterface $date): DataIterPhotobook
+    {
+        $startYear = (int) $date->format('Y');
+        if ((int) $date->format('n') < 9)
+            $startYear--;
+
+        $titel = sprintf('Photos from %d/%d', $startYear, $startYear + 1);
+
+        $row = $this->db->query_first(sprintf(
+            "SELECT f_b.*, 0 as num_photos, 0 as num_books FROM foto_boeken f_b WHERE f_b.parent_id = 0 AND f_b.titel = '%s'",
+            $this->db->escape_string($titel)
+        ));
+
+        if ($row)
+            return $this->_row_to_iter($row, DataIterPhotobook::class);
+
+        $yearBook = $this->new_photobook([
+            'parent_id'   => 0,
+            'titel'       => $titel,
+            'fotograaf'   => '',
+            'date'        => sprintf('%d-09-01', $startYear),
+            'visibility'  => self::VISIBILITY_MEMBERS,
+            'last_update' => new \DateTime(),
+        ]);
+        $id = $this->insert_book($yearBook);
+        return $this->get_book($id);
+    }
+
+    public function create_for_event(array $eventData): DataIterPhotobook
+    {
+        $eventDate = new \DateTime($eventData['van']);
+        $yearBook = $this->get_or_create_year_book($eventDate);
+
+        $book = $this->new_photobook([
+            'parent_id'   => $yearBook->get_id(),
+            'titel'       => $eventData['kop'],
+            'fotograaf'   => '',
+            'date'        => $eventDate->format('Y-m-d'),
+            'visibility'  => self::VISIBILITY_MEMBERS,
+            'agenda_id'   => $eventData['id'],
+            'last_update' => new \DateTime(),
+        ]);
+        $id = $this->insert_book($book);
+        return $this->get_book($id);
+    }
+
     public function get_extra_books()
     {
         if (!$this->auth->loggedIn)

@@ -147,6 +147,20 @@ class PolicyPhotobook implements PolicyInterface
             && $book['num_books'] > 0;
     }
 
+    public function userCanSubmitPhotos(DataIter $book): bool
+    {
+        return $this->auth->loggedIn
+            && ctype_digit((string) $book->get_id())
+            && $book->get_id() > 0
+            && $this->userCanRead($book);
+    }
+
+    public function userCanReviewSubmissions(DataIter $book): bool
+    {
+        return $this->identity->member_in_committee(DataModelCommissie::PHOTOCEE)
+            || $this->identity->member_in_committee(DataModelCommissie::BOARD);
+    }
+
     public function getAccessLevel()
     {
         if ($this->identity->member_in_committee(DataModelCommissie::PHOTOCEE))
