@@ -111,7 +111,15 @@ $profile-widget-spacing: 1.5rem
                 width: 100%
                 margin-left: 0
 
-.consumptions-table,
+.consumptions-table
+    .purchase-reverted
+        color: $grey
+        text-decoration: line-through
+    .amount-field,
+    .date-field
+        width: 12ch
+        white-space: nowrap
+        text-align: right !important
 .direct-debit-table
     .amount-field,
     .date-field
